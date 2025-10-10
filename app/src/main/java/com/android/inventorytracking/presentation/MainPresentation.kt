@@ -7,8 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.inventorytracking.presentation.components.ContentArea
+import com.android.inventorytracking.presentation.components.TopBar
 import com.android.inventorytracking.presentation.components.NavBar
-import com.android.inventorytracking.presentation.components.SideBar
 
 
 val LightBrown = Color(0xFFE5D7BD)
@@ -16,12 +16,18 @@ val Bistre = Color(0xFF3e2723)
 
 @Composable
 fun MainLayout() {
-    Column(modifier = Modifier.fillMaxSize()) {
-        NavBar(bgColor = Color.White)
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            TopBar(bgColor = Color.White)
 
-        Row(modifier = Modifier.fillMaxSize()) {
-            SideBar(Bistre)
-            ContentArea(LightBrown)
+            Row(modifier = Modifier.fillMaxSize()) {
+                NavBar(Bistre)
+                ContentArea(LightBrown)
+            }
         }
     }
 }

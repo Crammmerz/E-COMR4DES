@@ -1,4 +1,4 @@
-package com.android.inventorytracking.presentation.components
+package com.android.inventorytracking.presentation.layouts
 
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,13 +9,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ContentArea(bgColor: Color, modifier: Modifier = Modifier) {
+fun Home(bgColor: Color, modifier: Modifier = Modifier) {
     Surface(
         color = bgColor,
-        tonalElevation = 10.dp,
         modifier = modifier
             .fillMaxHeight()
-            .fillMaxWidth()// fixed width for sidebar
+            .fillMaxWidth()
     ) {
 
     }

@@ -1,4 +1,4 @@
-package com.android.inventorytracking.presentation.screens
+package com.android.inventorytracking.presentation.layouts
 
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,7 +9,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Home(bgColor: Color, modifier: Modifier = Modifier) {
+fun Inventory(bgColor: Color, modifier: Modifier = Modifier) {
     Surface(
         color = bgColor,
         tonalElevation = 10.dp,

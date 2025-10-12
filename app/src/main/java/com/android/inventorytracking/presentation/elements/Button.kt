@@ -1,4 +1,4 @@
-package com.android.inventorytracking.presentation.components
+package com.android.inventorytracking.presentation.elements
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun LeftButton(
+    modifier: Modifier,
     label: String,
     bgColor: Color,
     contentColor: Color,
@@ -30,10 +31,10 @@ fun LeftButton(
         colors = ButtonDefaults
             .buttonColors(contentColor = contentColor,
                 containerColor = bgColor),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth(0.99f)
             .padding(0.dp)
-            .height(30.dp)
+            .height(30.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -47,6 +48,7 @@ fun LeftButton(
 
 @Composable
 fun RightButton(
+    modifier: Modifier,
     label: String,
     bgColor: Color,
     contentColor: Color,
@@ -59,10 +61,10 @@ fun RightButton(
         colors = ButtonDefaults
             .buttonColors(contentColor = contentColor,
                 containerColor = bgColor),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth(0.99f)
             .padding(0.dp)
-            .height(30.dp)
+            .height(30.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),

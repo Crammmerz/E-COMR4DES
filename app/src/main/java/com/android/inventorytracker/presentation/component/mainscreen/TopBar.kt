@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -13,11 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.android.inventorytracking.presentation.elements.CenterButton
 import com.android.inventorytracking.presentation.elements.RightRow
 
 @Composable
-fun TopBar(bgColor: Color, modifier: Modifier = Modifier) {
+fun TopBar(modifier: Modifier = Modifier, bgColor: Color = Color.White ) {
     Surface(
         color = bgColor,
         modifier = modifier
@@ -33,29 +31,10 @@ fun TopBar(bgColor: Color, modifier: Modifier = Modifier) {
 @Composable
 fun TopBarElements(){
     Text(
-        text = "Inventory Management 📦",
+        text = "Inventory Tracking 📦",
         color = Color.Black,
         fontWeight = FontWeight.SemiBold
     )
     Spacer(modifier = Modifier.width(10.dp))
-
-    CenterButton(
-        label = "🔔",
-        bgColor = Color.Transparent,
-        contentColor = Color.White,
-        modifier = Modifier
-            .size(40.dp),
-        onClick = {}
-    )
-
-    CenterButton(
-        label = "⚙️",
-        bgColor = Color.Transparent,
-        contentColor = Color.White,
-        modifier = Modifier
-            .size(40.dp),
-        onClick = {}
-    )
-    Spacer(modifier = Modifier.width(30.dp))
 }
 

@@ -37,6 +37,9 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.3" // or match your BOM version
+    }
     buildFeatures {
         compose = true
     }
@@ -63,4 +66,5 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation("androidx.room:room-runtime:${room_version}")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 }

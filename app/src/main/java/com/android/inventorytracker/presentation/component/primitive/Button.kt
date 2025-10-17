@@ -32,7 +32,7 @@ fun LeftButton(
             .buttonColors(contentColor = contentColor,
                 containerColor = bgColor),
         modifier = modifier
-            .fillMaxWidth(0.99f)
+            .fillMaxWidth(1f)
             .padding(0.dp)
             .height(30.dp),
     ) {

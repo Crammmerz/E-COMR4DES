@@ -1,4 +1,4 @@
-package com.android.inventorytracking.presentation.layouts
+package com.android.inventorytracker.presentation.inventory
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize

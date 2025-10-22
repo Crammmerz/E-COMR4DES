@@ -1,4 +1,4 @@
-package com.android.inventorytracker.presentation.viewmodel
+package com.android.inventorytracker.presentation.main.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue

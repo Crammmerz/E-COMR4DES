@@ -11,8 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import com.android.inventorytracker.presentation.popup.itemdetail.ItemDetail
 import com.android.inventorytracker.ui.theme.InventoryTrackerTheme
-import com.android.inventorytracking.presentation.screens.MainScreen
+import com.android.inventorytracker.presentation.main.MainScreen
 
 val Sand = Color(0xFFE1D9C5)
 val Stone = Color(0xFFAE9372)
@@ -28,6 +29,7 @@ class MainActivity : ComponentActivity() {
             InventoryTrackerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     MainScreen(innerPadding)
+                    ItemDetail()
                 }
             }
         }
@@ -37,7 +39,7 @@ class MainActivity : ComponentActivity() {
 @Preview(
     showBackground = true,
     name = "The Preview",
-    device = "spec:width=900dp,height=550dp,dpi=420,isRound=false,orientation=landscape"
+    device = "spec:width=960dp,height=600dp,dpi=240,isRound=false,orientation=landscape"
 )
 @Composable
 fun MainPanelPreview() {

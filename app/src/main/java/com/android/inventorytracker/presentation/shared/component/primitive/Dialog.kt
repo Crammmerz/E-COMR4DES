@@ -1,4 +1,4 @@
-package com.android.inventorytracker.presentation.component.primitive
+package com.android.inventorytracker.presentation.shared.component.primitive
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -26,8 +26,8 @@ fun DialogHost(
         ) {
             Box(
                 modifier = modifier
-                    .fillMaxSize(0.75f)
-                    .background(Color.White, shape = RoundedCornerShape(12.dp))
+                    .fillMaxSize(0.9f)
+                    .background(Color.White, shape = RoundedCornerShape(5.dp))
                     .padding(24.dp)
             ) {
                 content()

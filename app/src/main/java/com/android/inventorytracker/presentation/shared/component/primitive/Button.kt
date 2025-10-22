@@ -1,4 +1,4 @@
-package com.android.inventorytracking.presentation.elements
+package com.android.inventorytracker.presentation.shared.component.primitive
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -33,7 +33,6 @@ fun LeftButton(
                 containerColor = bgColor),
         modifier = modifier
             .fillMaxWidth(1f)
-            .padding(0.dp)
             .height(30.dp),
     ) {
         Row(
@@ -41,7 +40,8 @@ fun LeftButton(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            Text(text = label)
+            Text(modifier = Modifier.padding(horizontal = 20.dp),text = label)
+
         }
     }
 }
@@ -71,7 +71,7 @@ fun RightButton(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End
         ) {
-            Text(text = label)
+            Text(modifier = Modifier.padding(horizontal = 10.dp), text = label)
         }
     }
 }
@@ -86,7 +86,7 @@ fun CenterButton(
 ) {
     Button(
         onClick = onClick,
-        shape = RoundedCornerShape(10),
+        shape = RoundedCornerShape(5.dp),
         contentPadding = PaddingValues(0.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = bgColor,

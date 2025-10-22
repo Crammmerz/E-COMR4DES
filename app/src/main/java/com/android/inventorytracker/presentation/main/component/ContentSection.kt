@@ -1,4 +1,4 @@
-package com.android.inventorytracking.presentation.layout
+package com.android.inventorytracker.presentation.main.component
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -11,14 +11,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.inventorytracker.Sand
-import com.android.inventorytracker.presentation.viewmodel.Content
-import com.android.inventorytracker.presentation.viewmodel.ContentViewModel
-import com.android.inventorytracking.presentation.layouts.Home
-import com.android.inventorytracking.presentation.layouts.Inventory
+import com.android.inventorytracker.presentation.home.Home
+import com.android.inventorytracker.presentation.inventory.Inventory
+import com.android.inventorytracker.presentation.main.viewmodel.Content
+import com.android.inventorytracker.presentation.main.viewmodel.ContentViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ContentArea(
+fun ContentSection(
     modifier: Modifier = Modifier,
     bgColor: Color = Sand,
     contentViewModel: ContentViewModel = viewModel()

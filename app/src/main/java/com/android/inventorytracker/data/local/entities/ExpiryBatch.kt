@@ -1,14 +1,15 @@
-package com.android.inventorytracking.data.local.entities
+package com.android.inventorytracker.data.local.entities
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.time.LocalDate
 
 @Entity(
     tableName = "expiry_batches",
     foreignKeys = [ForeignKey(
-        entity = Item::class,
+        entity = ItemEntity::class,
         parentColumns = ["id"],
         childColumns = ["itemId"],
         onDelete = ForeignKey.CASCADE
@@ -18,6 +19,7 @@ import androidx.room.PrimaryKey
 data class ExpiryBatch(
     @PrimaryKey(autoGenerate = true) val batchId: Int = 0,
     val itemId: Int,
-    val quantity: Double,
-    val expiryDate: String
+    val unit: Double,
+    val subUnit: Int,
+    val expiryDate: LocalDate
 )

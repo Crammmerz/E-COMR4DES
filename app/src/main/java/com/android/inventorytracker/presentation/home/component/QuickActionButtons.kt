@@ -9,8 +9,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.android.inventorytracker.Ochre
 import com.android.inventorytracker.presentation.shared.component.primitive.CenterButton
+import com.android.inventorytracker.ui.theme.Ochre
 
 @Composable
 fun QuickActions() {

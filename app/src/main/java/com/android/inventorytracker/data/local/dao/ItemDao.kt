@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ItemDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertItem(item: ItemEntity)
+    suspend fun insert(item: ItemEntity)
 
     @Delete
     fun deleteItem(item: ItemEntity)
@@ -24,5 +24,5 @@ interface ItemDao {
     suspend fun getItemById(id: String): ItemEntity?
 
     @Query("SELECT * FROM items ORDER BY name ASC")
-    suspend fun getItemListByName(): Flow<List<ItemEntity>>
+    fun getItemListByName(): Flow<List<ItemEntity>>
 }

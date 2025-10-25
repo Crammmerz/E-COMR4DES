@@ -9,6 +9,6 @@ enum class Content {
     Home, Inventory //etc
 }
 
-class ContentViewModel : ViewModel() {
-    var currentContent by mutableStateOf(Content.Home)
+class ContentViewModel: ViewModel() {
+    var currentContent by mutableStateOf(Content.Inventory)
 }

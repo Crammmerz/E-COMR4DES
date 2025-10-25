@@ -1,5 +1,6 @@
 package com.android.inventorytracker.presentation.main.component
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,17 +13,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.android.inventorytracker.Ochre
 import com.android.inventorytracker.presentation.main.viewmodel.Content
 import com.android.inventorytracker.presentation.main.viewmodel.ContentViewModel
 import com.android.inventorytracker.presentation.shared.component.primitive.LeftButton
-import com.android.inventorytracker.presentation.shared.component.primitive.LeftColumn
+import com.android.inventorytracker.ui.theme.Ochre
 
 @Composable
 fun NavBar(
     modifier: Modifier = Modifier,
     bgColor: Color = Ochre,
-    contentViewModel: ContentViewModel = viewModel()
+    viewModel: ContentViewModel = viewModel()
 ) {
     val highlight = Color.Black.copy(alpha = 0.25f)
     val default = Color.Transparent
@@ -34,7 +34,7 @@ fun NavBar(
             .fillMaxHeight()
             .fillMaxWidth(0.225f)
     ) {
-        LeftColumn(modifier = Modifier.padding(10.dp)) {
+        Column(modifier = Modifier.padding(10.dp)) {
             Text(
                 text = "📦 Lumi Cafe",
                 fontSize = 18.sp,
@@ -45,16 +45,16 @@ fun NavBar(
 
             NavButton(
                 label = "🏠 Home",
-                bgColor = if (contentViewModel.currentContent == Content.Home) highlight else default
+                bgColor = if (viewModel.currentContent == Content.Home) highlight else default
             ) {
-                contentViewModel.currentContent = Content.Home
+                viewModel.currentContent = Content.Home
             }
 
             NavButton(
                 label = "📦 Inventory",
-                bgColor = if (contentViewModel.currentContent == Content.Inventory) highlight else default
+                bgColor = if (viewModel.currentContent == Content.Inventory) highlight else default
             ) {
-                contentViewModel.currentContent = Content.Inventory
+                viewModel.currentContent = Content.Inventory
             }
         }
     }

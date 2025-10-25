@@ -10,11 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.android.inventorytracker.Sand
 import com.android.inventorytracker.presentation.home.Home
 import com.android.inventorytracker.presentation.inventory.Inventory
+import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import com.android.inventorytracker.presentation.main.viewmodel.Content
 import com.android.inventorytracker.presentation.main.viewmodel.ContentViewModel
+import com.android.inventorytracker.ui.theme.Sand
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -23,6 +24,7 @@ fun ContentSection(
     bgColor: Color = Sand,
     contentViewModel: ContentViewModel = viewModel()
 ) {
+    val itemViewModel: ItemViewModel = viewModel()
     Surface(
         color = bgColor,
         tonalElevation = 10.dp,
@@ -32,7 +34,7 @@ fun ContentSection(
     ) {
         when(contentViewModel.currentContent){
             Content.Home -> Home()
-            Content.Inventory -> Inventory()
+            Content.Inventory -> Inventory(itemViewModel)
         }
     }
 }

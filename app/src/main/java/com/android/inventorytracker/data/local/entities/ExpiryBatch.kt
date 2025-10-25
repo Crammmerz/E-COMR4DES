@@ -16,8 +16,8 @@ import java.time.LocalDate
     )],
     indices = [Index("itemId")]
 )
-data class ExpiryBatch(
-    @PrimaryKey(autoGenerate = true) val batchId: Int = 0,
+data class ExpiryBatchEntity(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val itemId: Int,
     val unit: Double,
     val subUnit: Int,

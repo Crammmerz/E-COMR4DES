@@ -1,4 +1,4 @@
-package com.android.inventorytracker.presentation.popup.itemdetail.component
+package com.android.inventorytracker.presentation.popup.item_detail.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,7 +30,7 @@ fun HeaderSection(){
         CenterColumn (modifier = Modifier
             .border(1.dp, Color.Black, shape = RoundedCornerShape(10.dp))
             .background(Color.DarkGray, shape = RoundedCornerShape(10.dp))
-            .padding(horizontal = 10.dp)
+            .padding(horizontal = 10.dp, vertical = 5.dp)
         ) {
             Text(
                 text = "Current Stocks",

@@ -1,4 +1,4 @@
-package com.android.inventorytracker.presentation.popup.itemdetail.component
+package com.android.inventorytracker.presentation.popup.item_detail.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.aspectRatio

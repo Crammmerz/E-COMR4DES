@@ -1,16 +1,17 @@
-package com.android.inventorytracker.presentation.popup.itemdetail.component
+package com.android.inventorytracker.presentation.popup.item_detail.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import com.android.inventorytracker.presentation.shared.component.primitive.CenterButton
+import com.android.inventorytracker.ui.theme.Ochre
 
 @Composable
-fun AddStockButton(){
+fun AddUnitButton(){
     CenterButton(
         modifier = Modifier.fillMaxWidth(),
         label = "+ Add Stock",
-        bgColor = Color.Black,
-        onClick = {})
+        bgColor = Ochre,
+        onClick = {}
+    )
 }

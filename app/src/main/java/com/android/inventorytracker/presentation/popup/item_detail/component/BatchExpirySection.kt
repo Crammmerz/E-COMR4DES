@@ -1,5 +1,6 @@
-package com.android.inventorytracker.presentation.popup.itemdetail.component
+package com.android.inventorytracker.presentation.popup.item_detail.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,12 +24,14 @@ import androidx.compose.ui.unit.sp
 fun BatchExpirySection(modifier: Modifier){
     Text(
         text = "Batch Expiry Information",
-        color = Color.Gray,
+        color = Color.DarkGray,
         fontWeight = FontWeight.SemiBold,
         fontSize = 15.sp,
+        modifier = Modifier.padding(top = 5.dp, bottom = 3.dp)
     )
     Column (modifier
         .fillMaxWidth()
+        .background(Color.White)
         .clip(RoundedCornerShape(10.dp))
         .border(1.dp, Color.Black, RoundedCornerShape(10.dp))){
         Row (Modifier.padding(horizontal = 10.dp, vertical = 5.dp)) {

@@ -9,7 +9,7 @@ import com.android.inventorytracker.presentation.main.component.TopBar
 
 
 @Composable
-fun MainScreen(paddingValues: PaddingValues) {
+fun Main(paddingValues: PaddingValues) {
     Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
         TopBar()
         Row(modifier = Modifier.weight(1f)) {

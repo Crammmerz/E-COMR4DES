@@ -50,7 +50,7 @@ fun NameField(
                 onValueChange = {
                     if (it.length <= maxLength) onNameChange(it.take(maxLength))
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().align(Alignment.CenterStart),
                 textStyle = TextStyle(fontSize = 15.sp),
                 cursorBrush = SolidColor(Color.Black),
                 maxLines = 1,

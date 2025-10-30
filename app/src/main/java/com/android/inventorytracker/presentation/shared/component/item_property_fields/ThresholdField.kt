@@ -11,6 +11,11 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,11 +27,18 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun ThresholdField(
-    threshold: Int,
+    unitThreshold: Int,
     onThresholdChange: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column (modifier) {
+    var textValue by rememberSaveable { mutableStateOf(unitThreshold.toString()) }
+
+    LaunchedEffect(unitThreshold) {
+        if (unitThreshold.toString() != textValue) {
+            textValue = unitThreshold.toString()
+        }
+    }
+    Column(modifier) {
         Text(
             text = "Threshold",
             color = Color.DarkGray,
@@ -34,10 +46,14 @@ fun ThresholdField(
             fontSize = 15.sp,
             modifier = Modifier.padding(top = 5.dp, bottom = 3.dp)
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             BasicTextField(
-                value = threshold.toString(),
+                value = textValue,
                 onValueChange = {
+                    textValue = it
                     val parsed = it.toIntOrNull()
                     if (parsed != null && parsed > 0) {
                         onThresholdChange(parsed)
@@ -56,7 +72,6 @@ fun ThresholdField(
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
-
             Text(
                 text = "unit",
                 color = Color.Black,
@@ -66,3 +81,4 @@ fun ThresholdField(
         }
     }
 }
+

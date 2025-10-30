@@ -1,22 +1,30 @@
 package com.android.inventorytracker.presentation.shared.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.inventorytracker.data.local.database.InventoryDatabase
+import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.data.local.entities.ItemEntity
+import com.android.inventorytracker.data.repository.ItemRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
-class ItemViewModel(application: Application) : AndroidViewModel(application) {
-    private val dao = InventoryDatabase.Companion.getDatabase(application).itemDao()
+class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
 
-    fun isValidItem(name: String, unitThreshold: Int, subUnitThreshold: Int): Boolean {
-        return name.isNotBlank() && unitThreshold > 0 && subUnitThreshold > 0
+
+    // Reactive item list from Room
+    val itemList: Flow<List<ItemEntity>> = itemRepository.getItemList()
+    val itemBatchList: Flow<List<ItemBatchEntity>> = itemRepository.getBatchList()
+
+    // Insert item safely in background
+    fun insertItem(item: ItemEntity){
+        viewModelScope.launch {
+            itemRepository.addNewItem(item)
+        }
     }
 
-    fun insertItem(newItem: ItemEntity) {
+    fun updateItem(item: ItemEntity){
         viewModelScope.launch {
-            dao.insert(newItem)
+            itemRepository.updateItem(item)
         }
     }
 }

@@ -15,14 +15,20 @@ interface ItemDao {
     suspend fun insert(item: ItemEntity)
 
     @Delete
-    fun deleteItem(item: ItemEntity)
+    suspend fun deleteItem(item: ItemEntity)
 
     @Update
     suspend fun updateItem(item: ItemEntity)
 
     @Query("SELECT * FROM items WHERE id = :id")
-    suspend fun getItemById(id: String): ItemEntity?
+    suspend fun getItemById(id: Int): ItemEntity?
 
-    @Query("SELECT * FROM items ORDER BY name ASC")
-    fun getItemListByName(): Flow<List<ItemEntity>>
+    @Query(
+        """
+        SELECT items.*
+        FROM items
+        ORDER BY items.name ASC
+    """
+    )
+    fun getItemOrderByName(): Flow<List<ItemEntity>>
 }

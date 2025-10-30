@@ -16,6 +16,7 @@ import com.android.inventorytracker.ui.theme.LightSand
 @Composable
 fun DialogMockup( // used for testing buggy dialog preview
     modifier: Modifier = Modifier,
+    onDismissRequest: () -> Unit = {},
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(

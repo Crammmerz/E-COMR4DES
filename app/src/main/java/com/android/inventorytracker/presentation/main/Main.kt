@@ -9,8 +9,8 @@ import com.android.inventorytracker.presentation.main.component.TopBar
 
 
 @Composable
-fun Main(paddingValues: PaddingValues) {
-    Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+fun Main() {
+    Column(modifier = Modifier.fillMaxSize()) {
         TopBar()
         Row(modifier = Modifier.weight(1f)) {
             NavBar()

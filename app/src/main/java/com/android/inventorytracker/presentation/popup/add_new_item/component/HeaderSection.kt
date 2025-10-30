@@ -7,7 +7,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun Header(){
+fun HeaderSection(){
     Text(
         text = "Add New Item",
         color = Color.Black,

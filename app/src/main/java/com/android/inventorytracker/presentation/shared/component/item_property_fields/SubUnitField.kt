@@ -18,6 +18,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 
 @Composable
@@ -26,7 +31,16 @@ fun SubUnitField(
     onSubUnitThresholdChange: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column (modifier) {
+    var textValue by rememberSaveable { mutableStateOf(subUnitThreshold.toString()) }
+
+    // Sync external changes to internal text
+    LaunchedEffect(subUnitThreshold) {
+        if (subUnitThreshold.toString() != textValue) {
+            textValue = subUnitThreshold.toString()
+        }
+    }
+
+    Column(modifier) {
         Text(
             text = "Sub Unit",
             color = Color.DarkGray,
@@ -34,10 +48,14 @@ fun SubUnitField(
             fontSize = 15.sp,
             modifier = Modifier.padding(top = 5.dp, bottom = 3.dp)
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             BasicTextField(
-                value = subUnitThreshold.toString(),
+                value = textValue,
                 onValueChange = {
+                    textValue = it
                     val parsed = it.toIntOrNull()
                     if (parsed != null && parsed > 0) {
                         onSubUnitThresholdChange(parsed)

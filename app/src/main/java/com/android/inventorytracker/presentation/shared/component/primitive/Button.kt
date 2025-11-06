@@ -16,6 +16,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
+//TODO: Button Design
+@Composable
+fun AddItemButton(onClick: () -> Unit){
+    Button(onClick = onClick) {
+        Text("Add Item")
+    }
+}
+@Composable
+fun DeleteItemButton(onClick: () -> Unit){
+    Button(onClick = onClick) {
+        Text("Delete Item")
+    }
+}
+@Composable
+fun CancelButton(onClick: () -> Unit){
+    Button(onClick = onClick) {
+        Text("Cancel Item")
+    }
+}
 @Composable
 fun LeftButton(
     label: String,

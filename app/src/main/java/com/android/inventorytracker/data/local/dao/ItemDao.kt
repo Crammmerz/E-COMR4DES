@@ -23,12 +23,6 @@ interface ItemDao {
     @Query("SELECT * FROM items WHERE id = :id")
     suspend fun getItemById(id: Int): ItemEntity?
 
-    @Query(
-        """
-        SELECT items.*
-        FROM items
-        ORDER BY items.name ASC
-    """
-    )
+    @Query("SELECT items.* FROM items ORDER BY items.name ASC")
     fun getItemOrderByName(): Flow<List<ItemEntity>>
 }

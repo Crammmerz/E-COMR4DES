@@ -2,48 +2,39 @@ package com.android.inventorytracker.presentation.inventory
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.android.inventorytracker.data.local.entities.ItemBatchEntity
-import com.android.inventorytracker.data.local.entities.ItemEntity
-import com.android.inventorytracker.presentation.inventory.component.AddNewItemButton
-import com.android.inventorytracker.presentation.inventory.component.HeaderSection
-import com.android.inventorytracker.presentation.inventory.component.ItemOverviewSection
-import com.android.inventorytracker.presentation.popup.add_new_item.AddNewItemPopup
-import kotlinx.coroutines.flow.Flow
-
+import com.android.inventorytracker.data.model.ItemModel
+import com.android.inventorytracker.presentation.inventory.component.*
+import com.android.inventorytracker.presentation.popup.add_new_item.InsertItemPopup
+import com.android.inventorytracker.presentation.popup.delete_item.DeleteItemPopup
+import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
+import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Inventory(
-    itemList: Flow<List<ItemEntity>>,
-    itemBatch: Flow<List<ItemBatchEntity>>,
-    showAddNewItemPopup: Boolean,
-    onShowPopupChange: (Boolean) -> Unit,
-    onAddItem: (ItemEntity) -> Unit,
+    itemModels: List<ItemModel>,
+    itemViewModel: ItemViewModel,
+    batchViewModel: BatchViewModel,
     modifier: Modifier = Modifier
 ) {
-    val itemListState by itemList.collectAsState(initial = emptyList())
-    val itemBatchState by itemBatch.collectAsState(initial = emptyList())
+    var showAddItem by rememberSaveable { mutableStateOf(false) }
+    var showDeleteItem by rememberSaveable { mutableStateOf(false) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(10.dp)
     ) {
-        Row {
-            AddNewItemButton(onClick = { onShowPopupChange(true) })
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            AddNewItemButton(onClick = { showAddItem = true })
+            DeleteItemButton(onClick = { showDeleteItem = true})
             Spacer(Modifier.weight(1f))
         }
 
@@ -53,16 +44,27 @@ fun Inventory(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(bottom = 12.dp)
         ) {
-            items(items = itemListState, key = { it.id }) { item ->
-                val matchingBatch = itemBatchState.find { it.itemId == item.id }
-                ItemOverviewSection(item, matchingBatch)
+            items(items = itemModels, key = { it.item.id }) { itemModel ->
+                ItemDataRow(
+                    itemModel = itemModel,
+                    itemViewModel = itemViewModel,
+                    batchViewModel = batchViewModel,
+                )
             }
         }
     }
 
-    AddNewItemPopup(
-        isVisible = showAddNewItemPopup,
-        onDismiss = { onShowPopupChange(false) },
-        onAdd = { newItem -> onAddItem(newItem) }
-    )
+    if(showAddItem){
+        InsertItemPopup(
+            onDismiss = { showAddItem = false },
+            onInsert = itemViewModel::insertItem
+        )
+    }
+    if(showDeleteItem){
+        DeleteItemPopup(
+            model = itemModels,
+            onDismiss = { showDeleteItem = false },
+            onDelete = itemViewModel::deleteItem
+        )
+    }
 }

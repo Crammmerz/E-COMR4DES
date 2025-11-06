@@ -12,17 +12,17 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ItemBatchDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(expiry: ItemBatchEntity)
+    suspend fun insertBatch(batch: ItemBatchEntity)
 
     @Delete
-    fun delete(expiry: ItemBatchEntity)
+    fun deleteBatch(batch: ItemBatchEntity)
 
     @Update
-    suspend fun update(expiry: ItemBatchEntity)
+    suspend fun updateBatch(batch: ItemBatchEntity)
 
-    @Query("SELECT * FROM itemBatch WHERE id = :id")
-    suspend fun getExpiryBatchById(id: String): ItemBatchEntity
+    @Query("SELECT * FROM itemBatch WHERE itemId = :itemId AND expiryDate = :expiryDate")
+    suspend fun getBatch(itemId: Int, expiryDate: String): ItemBatchEntity?
 
-    @Query("SELECT * FROM itemBatch ORDER BY subUnit ASC")
+    @Query("SELECT * FROM itemBatch ORDER BY expiryDate ASC")
     fun getBatchesOrderByUnit(): Flow<List<ItemBatchEntity>>
 }

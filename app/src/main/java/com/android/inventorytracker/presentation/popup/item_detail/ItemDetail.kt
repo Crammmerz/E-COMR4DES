@@ -1,5 +1,6 @@
 package com.android.inventorytracker.presentation.popup.item_detail
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
@@ -10,10 +11,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.data.local.entities.ItemEntity
+import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.presentation.popup.item_detail.component.AddUnitButton
 import com.android.inventorytracker.presentation.popup.item_detail.component.BatchExpirySection
 import com.android.inventorytracker.presentation.popup.item_detail.component.HeaderSection
@@ -22,28 +25,44 @@ import com.android.inventorytracker.presentation.popup.item_detail.component.Rem
 import com.android.inventorytracker.presentation.shared.component.item_property_fields.DescriptionField
 import com.android.inventorytracker.presentation.shared.component.item_property_fields.NameField
 import com.android.inventorytracker.presentation.shared.component.item_property_fields.SubUnitField
-import com.android.inventorytracker.presentation.shared.component.item_property_fields.ThresholdField
+import com.android.inventorytracker.presentation.shared.component.item_property_fields.UnitField
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
-import com.android.inventorytracker.presentation.shared.component.primitive.DialogMockup
 
 @Composable
 fun ItemDetail(
-    item: ItemEntity,
-    batchExpiry: ItemBatchEntity?,
+    itemModels: ItemModel,
     onDismiss: () -> Unit,
-    onSave: (ItemEntity) -> Unit
+    onUpdate: (ItemEntity) -> Unit
 ) {
-    var name by rememberSaveable(item.id) { mutableStateOf(item.name) }
-    var unitThreshold by rememberSaveable(item.id) { mutableIntStateOf(item.unitThreshold) }
-    var subUnitThreshold by rememberSaveable(item.id) { mutableIntStateOf(item.subUnitThreshold) }
-    var description by rememberSaveable(item.id) { mutableStateOf(item.description) }
+    var name by rememberSaveable(itemModels.item.id) { mutableStateOf(itemModels.item.name) }
+    var unitThreshold by rememberSaveable(itemModels.item.id) { mutableIntStateOf(itemModels.item.unitThreshold) }
+    var subUnitThreshold by rememberSaveable(itemModels.item.id) { mutableIntStateOf(itemModels.item.subUnitThreshold) }
+    var description by rememberSaveable(itemModels.item.id) { mutableStateOf(itemModels.item.description) }
+    val context = LocalContext.current
 
     DialogHost (// TODO: DialogHost for App testing while DialogMockup for UI Preview Testing
         modifier = Modifier.fillMaxSize(0.9f),
-        onDismissRequest = onDismiss
+        onDismissRequest = {
+            val updatedItem = itemModels.item.copy(
+                name = name,
+                unitThreshold = unitThreshold,
+                subUnitThreshold = subUnitThreshold,
+                description = description
+            )
+
+            if (itemModels.item != updatedItem) {
+                onUpdate(updatedItem)
+                Toast.makeText(context, "Item updated successfully", Toast.LENGTH_SHORT).show()
+            }
+
+            onDismiss()
+        },
+        true
     ) {
         Box(Modifier.fillMaxSize()) {
-            Column(modifier = Modifier.fillMaxSize().padding(5.dp)) {
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .padding(5.dp)) {
                 HeaderSection()
                 HorizontalDivider(Modifier.padding(vertical = 5.dp), color = Color.DarkGray, thickness = 2.dp)
 
@@ -51,7 +70,6 @@ fun ItemDetail(
                     Column(Modifier.weight(0.45f)) {
                         PhotoSelection()
 
-                        // wire NameField to local state
                         NameField(
                             name = name,
                             onNameChange = { name = it },
@@ -60,17 +78,17 @@ fun ItemDetail(
 
                         Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(top = 5.dp)) {
                             Column(Modifier.weight(1f)) {
-                                ThresholdField(
-                                    unitThreshold = unitThreshold,
-                                    onThresholdChange = { unitThreshold = it }
+                                UnitField(
+                                    unit = unitThreshold,
+                                    onUnitChange = { unitThreshold = it }
                                 )
                                 Spacer(Modifier.weight(1f))
                                 RemoveStockButton()
                             }
                             Column(Modifier.weight(1f)) {
                                 SubUnitField(
-                                    subUnitThreshold = subUnitThreshold,
-                                    onSubUnitThresholdChange = { subUnitThreshold = it }
+                                    subUnit = subUnitThreshold,
+                                    onSubUnitChange = { subUnitThreshold = it }
                                 )
                                 Spacer(Modifier.weight(1f))
                                 AddUnitButton()
@@ -87,16 +105,10 @@ fun ItemDetail(
 
                         Spacer(Modifier.height(8.dp))
 
-                        if (batchExpiry != null) {
-                            BatchExpirySection(
-                                modifier = Modifier.weight(1f)
-                            )
-                        } else {
-                            Box(modifier = Modifier
-                                .weight(1f)
-                                .fillMaxWidth()) {
-                            }
-                        }
+                        BatchExpirySection(
+                            model = itemModels,
+                            modifier = Modifier.weight(1f)
+                        )
                     }
                 }
             }
@@ -135,10 +147,4 @@ val noopOnSave: (ItemEntity) -> Unit = { /* capture or assert in tests */ }
 )
 @Composable
 fun Preview() {
-    ItemDetail(
-        item = sampleItemEntity,
-        batchExpiry = sampleExpiryBatch,
-        onDismiss = noopOnDismiss,
-        onSave = noopOnSave
-    )
 }

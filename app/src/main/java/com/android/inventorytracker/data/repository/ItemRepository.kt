@@ -7,16 +7,29 @@ import com.android.inventorytracker.data.local.entities.ItemEntity
 import kotlinx.coroutines.flow.Flow
 
 
-class ItemRepository(private val itemDao: ItemDao, private val itemBatchDao: ItemBatchDao) {
+class ItemRepository(private val itemDao: ItemDao, private val batchDao: ItemBatchDao) {
     // Returns items sorted alphabetically by name
     fun getItemList(): Flow<List<ItemEntity>> = itemDao.getItemOrderByName()
-    fun getBatchList(): Flow<List<ItemBatchEntity>> = itemBatchDao.getBatchesOrderByUnit()
+    fun getBatchList(): Flow<List<ItemBatchEntity>> = batchDao.getBatchesOrderByUnit()
+    suspend fun findBatch(batch: ItemBatchEntity) = batchDao.getBatch(batch.itemId, batch.expiryDate)
 
-    suspend fun addNewItem(item: ItemEntity) {
+    suspend fun insertItem(item: ItemEntity) {
         itemDao.insert(item)
     }
-
     suspend fun updateItem(item: ItemEntity){
         itemDao.updateItem(item)
+    }
+    suspend fun deleteItem(item: ItemEntity){
+        itemDao.deleteItem(item)
+    }
+
+    suspend fun insertBatch(batch: ItemBatchEntity){
+        batchDao.insertBatch(batch)
+    }
+    suspend fun updateBatch(batch: ItemBatchEntity){
+        batchDao.updateBatch(batch)
+    }
+    suspend fun deleteBatch(batch: ItemBatchEntity){
+        batchDao.deleteBatch(batch)
     }
 }

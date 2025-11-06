@@ -6,11 +6,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -23,8 +20,8 @@ import com.android.inventorytracker.presentation.inventory.Inventory
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import com.android.inventorytracker.presentation.main.viewmodel.Content
 import com.android.inventorytracker.presentation.main.viewmodel.ContentViewModel
+import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.ui.theme.Sand
-import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -35,14 +32,11 @@ fun ContentSection(
 ) {
     val context = LocalContext.current
     val db = InventoryDatabase.getDatabase(context)
-    val itemViewModel = ItemViewModel(
-        ItemRepository(db.itemDao(), db.itemBatchDao())
-    )
-    val coroutineScope = rememberCoroutineScope()
+    val itemRepository = ItemRepository(db.itemDao(), db.itemBatchDao())
+    val itemViewModel = ItemViewModel(itemRepository)
+    val batchViewModel = BatchViewModel(itemRepository)
 
-    val itemList = itemViewModel.itemList
-    val itemBatchList = itemViewModel.itemBatchList
-    var showPopup by remember { mutableStateOf(false) }
+    val itemModels by itemViewModel.itemModelList.collectAsState()
 
     Surface(
         color = bgColor,
@@ -54,16 +48,11 @@ fun ContentSection(
         when (contentViewModel.currentContent) {
             Content.Home -> Home()
             Content.Inventory -> Inventory(
-                itemList,
-                itemBatchList,
-                showPopup,
-                {showPopup = it},
-                onAddItem = { item ->
-                    coroutineScope.launch {
-                        itemViewModel.insertItem(item)
-                    }
-                }
+                itemModels = itemModels,
+                itemViewModel = itemViewModel,
+                batchViewModel = batchViewModel,
             )
         }
     }
 }
+

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
@@ -19,9 +20,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.inventorytracker.data.model.ItemModel
 
 @Composable
-fun BatchExpirySection(modifier: Modifier){
+fun BatchExpirySection(
+    model: ItemModel,
+    modifier: Modifier
+){
     Text(
         text = "Batch Expiry Information",
         color = Color.DarkGray,
@@ -71,8 +76,12 @@ fun BatchExpirySection(modifier: Modifier){
             )
         }
         HorizontalDivider(color = Color.Black, thickness = 1.dp)
-        LazyColumn {
-
+        if(model.batch.isNotEmpty()){
+            LazyColumn(Modifier.padding(horizontal = 5.dp)) {
+                items(items = model.batch, key = {it.id}){ batch ->
+                    BatchDataRow(model.item.subUnitThreshold,batch)
+                }
+            }
         }
     }
 }

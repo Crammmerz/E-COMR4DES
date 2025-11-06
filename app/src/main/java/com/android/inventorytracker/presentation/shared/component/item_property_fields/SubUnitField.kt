@@ -27,16 +27,16 @@ import androidx.compose.ui.Alignment
 
 @Composable
 fun SubUnitField(
-    subUnitThreshold: Int,
-    onSubUnitThresholdChange: (Int) -> Unit,
+    subUnit: Int,
+    onSubUnitChange: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var textValue by rememberSaveable { mutableStateOf(subUnitThreshold.toString()) }
+    var textValue by rememberSaveable { mutableStateOf(subUnit.toString()) }
 
     // Sync external changes to internal text
-    LaunchedEffect(subUnitThreshold) {
-        if (subUnitThreshold.toString() != textValue) {
-            textValue = subUnitThreshold.toString()
+    LaunchedEffect(subUnit) {
+        if (subUnit.toString() != textValue) {
+            textValue = subUnit.toString()
         }
     }
 
@@ -58,7 +58,7 @@ fun SubUnitField(
                     textValue = it
                     val parsed = it.toIntOrNull()
                     if (parsed != null && parsed > 0) {
-                        onSubUnitThresholdChange(parsed)
+                        onSubUnitChange(parsed)
                     }
                 },
                 modifier = Modifier

@@ -47,6 +47,19 @@ fun ItemDataRow(
     var showItemDetail by rememberSaveable {mutableStateOf(false)}
     var showInsertBatch by rememberSaveable {mutableStateOf(false)}
 
+    val totalUnit = itemModel.totalUnit
+    val threshold = itemModel.item.unitThreshold
+    val DarkRed = Color(0xFF8B0000)
+    val DarkOrange = Color(0xFFFF8C00)
+
+    val stockColor = when {//TODO: Adjust Colors
+        totalUnit.toInt() == 0 -> Color.DarkGray
+        totalUnit <= threshold * 0.2f -> DarkRed
+        totalUnit <= threshold * 0.5f -> DarkOrange
+        totalUnit <= threshold -> LightSand
+        else -> Color.Blue
+    }
+
     Row(
         modifier = modifier
             .height(75.dp)
@@ -68,7 +81,7 @@ fun ItemDataRow(
         Spacer(Modifier.weight(0.1f))
         ItemText(itemModel.item.name, Modifier.weight(1f))
         ItemText(itemModel.nearestExpiryFormatted, Modifier.weight(0.75f))
-        ItemText(df.format(itemModel.totalUnit), Modifier.weight(0.5f), TextAlign.Center)
+        ItemText(df.format(itemModel.totalUnit), Modifier.weight(0.5f).background(stockColor, shape = RoundedCornerShape(5.dp)), TextAlign.Center)
         ItemButton("-", Modifier.weight(0.25f)) { /* Decrement logic */ }
         ItemButton("+", Modifier.weight(0.25f)) {
             showInsertBatch = true
@@ -106,7 +119,11 @@ fun ItemDataRow(
 }
 
 @Composable
-fun ItemText(text: String, modifier: Modifier, textAlign: TextAlign = TextAlign.Start) {
+fun ItemText(
+    text: String,
+    modifier: Modifier,
+    textAlign: TextAlign = TextAlign.Start
+) {
     Text(
         text = text,
         color = Color.Black,
@@ -115,7 +132,7 @@ fun ItemText(text: String, modifier: Modifier, textAlign: TextAlign = TextAlign.
         textAlign = textAlign,
         modifier = modifier
             .clip(RoundedCornerShape(5.dp))
-            .background(LightSand)
+            .background(LightSand, shape = RoundedCornerShape(5.dp))
             .border(1.dp, Color.LightGray, RoundedCornerShape(5.dp))
             .padding(horizontal = 7.dp, vertical = 7.dp)
     )

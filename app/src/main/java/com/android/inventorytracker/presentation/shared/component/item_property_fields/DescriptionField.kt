@@ -54,6 +54,7 @@ fun DescriptionField(
             modifier = Modifier.fillMaxWidth(),
             textStyle = TextStyle(fontSize = 15.sp),
             cursorBrush = SolidColor(Color.Black),
+            maxLines = 12,
         )
 
         Text(

@@ -30,27 +30,27 @@ import com.android.inventorytracker.presentation.shared.component.primitive.Dial
 
 @Composable
 fun ItemDetailPopup(
-    itemModels: ItemModel,
+    itemModel: ItemModel,
     onDismiss: () -> Unit,
     onUpdate: (ItemEntity) -> Unit
 ) {
-    var name by rememberSaveable(itemModels.item.id) { mutableStateOf(itemModels.item.name) }
-    var unitThreshold by rememberSaveable(itemModels.item.id) { mutableIntStateOf(itemModels.item.unitThreshold) }
-    var subUnitThreshold by rememberSaveable(itemModels.item.id) { mutableIntStateOf(itemModels.item.subUnitThreshold) }
-    var description by rememberSaveable(itemModels.item.id) { mutableStateOf(itemModels.item.description) }
+    var name by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.name) }
+    var unitThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.unitThreshold) }
+    var subUnitThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.subUnitThreshold) }
+    var description by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.description) }
     val context = LocalContext.current
 
     DialogHost (// TODO: DialogHost for App testing while DialogMockup for UI Preview Testing
         modifier = Modifier.fillMaxSize(0.9f),
         onDismissRequest = {
-            val updatedItem = itemModels.item.copy(
+            val updatedItem = itemModel.item.copy(
                 name = name,
                 unitThreshold = unitThreshold,
                 subUnitThreshold = subUnitThreshold,
                 description = description
             )
 
-            if (itemModels.item != updatedItem) {
+            if (itemModel.item != updatedItem) {
                 onUpdate(updatedItem)
                 Toast.makeText(context, "Item updated successfully", Toast.LENGTH_SHORT).show()
             }
@@ -63,7 +63,7 @@ fun ItemDetailPopup(
             Column(modifier = Modifier
                 .fillMaxSize()
                 .padding(5.dp)) {
-                HeaderSection()
+                HeaderSection(itemModel)
                 HorizontalDivider(Modifier.padding(vertical = 5.dp), color = Color.DarkGray, thickness = 2.dp)
 
                 Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
@@ -106,7 +106,7 @@ fun ItemDetailPopup(
                         Spacer(Modifier.height(8.dp))
 
                         BatchExpirySection(
-                            model = itemModels,
+                            model = itemModel,
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -133,7 +133,7 @@ val sampleExpiryBatch = ItemBatchEntity(
     id = 100,
     itemId = sampleItemEntity.id,
     expiryDate = "2025-12-31",
-    subUnit = 20
+    unit = 20f
 )
 
 // noop callbacks for preview/test

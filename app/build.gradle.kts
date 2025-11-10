@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     implementation(libs.androidx.sqlite.ktx)
+    implementation(libs.androidx.compose.foundation)
     ksp(libs.room.compiler)
 
     implementation(libs.kotlinx.serialization.json)

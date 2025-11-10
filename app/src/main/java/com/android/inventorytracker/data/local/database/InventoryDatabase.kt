@@ -18,7 +18,7 @@ import java.security.MessageDigest
 import kotlin.concurrent.Volatile
 @Database(
     entities = [ItemEntity::class, ItemBatchEntity::class, UserEntity::class],
-    version = 4
+    version = 5
 )
 abstract class InventoryDatabase : RoomDatabase() {
     abstract fun itemDao(): ItemDao
@@ -48,6 +48,7 @@ abstract class InventoryDatabase : RoomDatabase() {
                             }
                         }
                     })
+                    .fallbackToDestructiveMigration()
                     .build().also { INSTANCE = it }
             }
         }

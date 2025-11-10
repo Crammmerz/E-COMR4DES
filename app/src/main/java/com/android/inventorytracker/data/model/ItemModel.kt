@@ -11,9 +11,9 @@ data class ItemModel(
     val item: ItemEntity,
     val batch: List<ItemBatchEntity>
 ) {
-    val totalUnitValue: Double
+    val totalUnit: Double
         get() = batch.sumOf {
-            it.subUnit.toDouble() / item.subUnitThreshold
+            it.unit.toDouble()
         }
 
     val nearestExpiryFormatted: String

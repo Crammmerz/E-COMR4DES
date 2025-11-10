@@ -18,6 +18,6 @@ import androidx.room.PrimaryKey
 data class ItemBatchEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val itemId: Int,
-    var subUnit: Int,
+    var unit: Float,
     val expiryDate: String
 )

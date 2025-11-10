@@ -11,7 +11,7 @@ import com.android.inventorytracker.data.repository.UserRepository
 import kotlinx.coroutines.launch
 
 class LoginViewModel(private val userRepository: UserRepository): ViewModel() {
-    var loginState by mutableStateOf(LoginState.LOGGED_OUT)
+    var loginState by mutableStateOf(LoginState.LOGGED_IN)
         private set
 
     var userRole by mutableStateOf(UserRole.STAFF)

@@ -32,6 +32,7 @@ import com.android.inventorytracker.presentation.popup.item_detail.ItemDetailPop
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import com.android.inventorytracker.ui.theme.LightSand
+import java.text.DecimalFormat
 
 @SuppressLint("DefaultLocale")
 @RequiresApi(Build.VERSION_CODES.O)
@@ -42,10 +43,9 @@ fun ItemDataRow(
     batchViewModel: BatchViewModel,
     modifier: Modifier = Modifier
 ) {
+    val df = DecimalFormat("#.####")
     var showItemDetail by rememberSaveable {mutableStateOf(false)}
     var showInsertBatch by rememberSaveable {mutableStateOf(false)}
-
-
 
     Row(
         modifier = modifier
@@ -68,7 +68,7 @@ fun ItemDataRow(
         Spacer(Modifier.weight(0.1f))
         ItemText(itemModel.item.name, Modifier.weight(1f))
         ItemText(itemModel.nearestExpiryFormatted, Modifier.weight(0.75f))
-        ItemText(String.format("%.2f", itemModel.totalUnitValue), Modifier.weight(0.5f), TextAlign.Center)
+        ItemText(df.format(itemModel.totalUnit), Modifier.weight(0.5f), TextAlign.Center)
         ItemButton("-", Modifier.weight(0.25f)) { /* Decrement logic */ }
         ItemButton("+", Modifier.weight(0.25f)) {
             showInsertBatch = true
@@ -80,7 +80,7 @@ fun ItemDataRow(
 
     if (showItemDetail) {
         ItemDetailPopup(
-            itemModels = itemModel,
+            itemModel = itemModel,
             onDismiss = { showItemDetail = false },
             onUpdate = itemViewModel::updateItem
         )
@@ -135,8 +135,8 @@ fun ItemOverviewSectionPreview() {
             description = ""
         ),
         batch = listOf(
-            com.android.inventorytracker.data.local.entities.ItemBatchEntity(itemId = 1, expiryDate = "2025-11-01", subUnit = 20),
-            com.android.inventorytracker.data.local.entities.ItemBatchEntity(itemId = 1, expiryDate = "2025-10-31", subUnit = 15)
+            com.android.inventorytracker.data.local.entities.ItemBatchEntity(itemId = 1, expiryDate = "2025-11-01", unit = 20f),
+            com.android.inventorytracker.data.local.entities.ItemBatchEntity(itemId = 1, expiryDate = "2025-10-31", unit = 15f)
         )
     )
 //

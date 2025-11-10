@@ -73,13 +73,13 @@ fun InsertBatchPopup(
 
                     val isTodayOrFuture = selectedDate != null && !selectedDate.isBefore(LocalDate.now())
                     if(!isTodayOrFuture)Toast.makeText(context, "Date is wrong", Toast.LENGTH_SHORT).show()
-                    if(subUnit<=0)Toast.makeText(context, "SubUnit is wrong", Toast.LENGTH_SHORT).show()
-                    if (isTodayOrFuture && subUnit > 0) {
+                    if(unit<=0)Toast.makeText(context, "Unit is wrong", Toast.LENGTH_SHORT).show()
+                    if (isTodayOrFuture && unit > 0) {
                         val formattedDate = selectedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 
                         val batch = ItemBatchEntity(
                             itemId = itemModel.item.id,
-                            subUnit = subUnit,
+                            unit = unit,
                             expiryDate = formattedDate
                         )
                         onStore(batch)

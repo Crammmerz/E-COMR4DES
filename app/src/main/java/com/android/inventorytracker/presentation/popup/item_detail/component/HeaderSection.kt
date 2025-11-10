@@ -12,12 +12,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.presentation.shared.component.primitive.CenterColumn
 import com.android.inventorytracker.presentation.shared.component.primitive.CenterRow
 
 
 @Composable
-fun HeaderSection(){
+fun HeaderSection(itemModel: ItemModel){
     CenterRow {
         // TODO: Image or Icon Display
         Text(
@@ -39,7 +40,7 @@ fun HeaderSection(){
                 fontSize = 12.sp
             )
             Text(
-                text = "240 units",
+                text = "${itemModel.totalUnit} units",
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = 12.sp

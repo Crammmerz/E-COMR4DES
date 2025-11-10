@@ -18,12 +18,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 
 @Composable
 fun SubUnitField(
@@ -32,10 +37,12 @@ fun SubUnitField(
     modifier: Modifier = Modifier
 ) {
     var textValue by rememberSaveable { mutableStateOf(subUnit.toString()) }
+    var isFocused by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
 
-    // Sync external changes to internal text
-    LaunchedEffect(subUnit) {
-        if (subUnit.toString() != textValue) {
+
+    LaunchedEffect(subUnit, isFocused) {
+        if (!isFocused) {
             textValue = subUnit.toString()
         }
     }
@@ -54,25 +61,38 @@ fun SubUnitField(
         ) {
             BasicTextField(
                 value = textValue,
-                onValueChange = {
-                    textValue = it
-                    val parsed = it.toIntOrNull()
-                    if (parsed != null && parsed > 0) {
-                        onSubUnitChange(parsed)
-                    }
-                },
+                onValueChange = { textValue = it }, // only update local state
                 modifier = Modifier
                     .weight(1f)
                     .background(Color.White)
-                    .border(
-                        width = 1.dp,
-                        color = Color.DarkGray,
-                        shape = RoundedCornerShape(5.dp)
-                    )
-                    .padding(horizontal = 10.dp, vertical = 5.dp),
+                    .border(1.dp, Color.DarkGray, RoundedCornerShape(5.dp))
+                    .padding(horizontal = 10.dp, vertical = 5.dp)
+                    .onFocusChanged { focusState ->
+                        isFocused = focusState.isFocused
+                        if (isFocused) {
+                            textValue = "" // clear when focused
+                        } else {
+                            val parsed = textValue.toIntOrNull()
+                            if (parsed != null && parsed > 0) {
+                                onSubUnitChange(parsed) // commit only on blur
+                            }
+                        }
+                    },
                 textStyle = TextStyle(fontSize = 15.sp),
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        val parsed = textValue.toIntOrNull()
+                        if (parsed != null && parsed > 0) {
+                            onSubUnitChange(parsed)
+                        }
+                        focusManager.clearFocus() // close keyboard
+                    }
+                )
             )
 
             Text(

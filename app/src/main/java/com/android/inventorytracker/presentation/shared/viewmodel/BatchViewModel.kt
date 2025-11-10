@@ -18,7 +18,7 @@ class BatchViewModel(private val itemRepository: ItemRepository): ViewModel() {
             if (existing==null) {
                 itemRepository.insertBatch(batch)
             } else {
-                existing.subUnit += batch.subUnit
+                existing.unit += batch.unit
                 itemRepository.updateBatch(existing)
             }
         }

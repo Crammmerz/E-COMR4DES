@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.android.inventorytracker.R
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.presentation.popup.add_new_batch.InsertBatchPopup
-import com.android.inventorytracker.presentation.popup.item_detail.ItemDetail
+import com.android.inventorytracker.presentation.popup.item_detail.ItemDetailPopup
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import com.android.inventorytracker.ui.theme.LightSand
@@ -79,7 +79,7 @@ fun ItemDataRow(
     }
 
     if (showItemDetail) {
-        ItemDetail(
+        ItemDetailPopup(
             itemModels = itemModel,
             onDismiss = { showItemDetail = false },
             onUpdate = itemViewModel::updateItem

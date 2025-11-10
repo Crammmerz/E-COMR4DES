@@ -29,7 +29,7 @@ import com.android.inventorytracker.presentation.shared.component.item_property_
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
 
 @Composable
-fun ItemDetail(
+fun ItemDetailPopup(
     itemModels: ItemModel,
     onDismiss: () -> Unit,
     onUpdate: (ItemEntity) -> Unit

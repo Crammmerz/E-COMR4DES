@@ -40,7 +40,7 @@ fun UnitField(
     }
     Column(modifier) {
         Text(
-            text = "Unit",
+            text = "Threshold",
             color = Color.DarkGray,
             fontWeight = FontWeight.SemiBold,
             fontSize = 15.sp,
@@ -98,7 +98,7 @@ fun UnitFieldFloat(
     }
     Column(modifier) {
         Text(
-            text = "Threshold",
+            text = "Unit",
             color = Color.DarkGray,
             fontWeight = FontWeight.SemiBold,
             fontSize = 15.sp,

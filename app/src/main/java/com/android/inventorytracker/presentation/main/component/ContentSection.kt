@@ -10,7 +10,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.inventorytracker.data.local.database.InventoryDatabase
@@ -28,10 +27,9 @@ import com.android.inventorytracker.ui.theme.Sand
 fun ContentSection(
     modifier: Modifier = Modifier,
     bgColor: Color = Sand,
-    contentViewModel: ContentViewModel = viewModel()
+    contentViewModel: ContentViewModel = viewModel(),
+    db: InventoryDatabase
 ) {
-    val context = LocalContext.current
-    val db = InventoryDatabase.getDatabase(context)
     val itemRepository = ItemRepository(db.itemDao(), db.itemBatchDao())
     val itemViewModel = ItemViewModel(itemRepository)
     val batchViewModel = BatchViewModel(itemRepository)

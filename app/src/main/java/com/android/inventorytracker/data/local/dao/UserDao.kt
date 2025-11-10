@@ -15,14 +15,20 @@ interface UserDao {
     suspend fun insert(user: UserEntity)
 
     @Delete
-    fun delete(user: UserEntity)
+    suspend fun delete(user: UserEntity)
 
     @Update
     suspend fun update(user: UserEntity)
 
+    @Query("SELECT * FROM users WHERE role = :role")
+    fun getUsersByRole(role: String): List<UserEntity>
+
+    @Query("SELECT * FROM users WHERE username = :username AND passwordHash = :passwordHash AND role= :role")
+    suspend fun getUserCredential(username: String, passwordHash: String, role: String): UserEntity?
+
     @Query("SELECT * FROM users WHERE id = :id")
-    suspend fun getUserById(id: String): UserEntity
+    fun getUserById(id: Int): UserEntity?
 
     @Query("SELECT * FROM users ORDER BY username ASC")
-    suspend fun getUsersOrderedByUsername(): Flow<List<UserEntity>>
+    fun getUsersOrderedByUsername(): Flow<List<UserEntity>>
 }

@@ -24,5 +24,5 @@ interface ItemDao {
     suspend fun getItemById(id: Int): ItemEntity?
 
     @Query("SELECT items.* FROM items ORDER BY items.name ASC")
-    fun getItemOrderByName(): Flow<List<ItemEntity>>
+    fun getItemOrderByNameAsc(): Flow<List<ItemEntity>>
 }

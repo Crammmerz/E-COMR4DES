@@ -36,6 +36,7 @@ fun Inventory(
             AddNewItemButton(onClick = { showAddItem = true })
             DeleteItemButton(onClick = { showDeleteItem = true})
             Spacer(Modifier.weight(1f))
+            SortDropdownMenu(itemViewModel)
         }
 
         HeaderSection()

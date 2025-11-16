@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.Flow
 
 class ItemRepository(private val itemDao: ItemDao, private val batchDao: ItemBatchDao) {
     // Returns items sorted alphabetically by name
-    fun getItemList(): Flow<List<ItemEntity>> = itemDao.getItemOrderByName()
-    fun getBatchList(): Flow<List<ItemBatchEntity>> = batchDao.getBatchesOrderByUnit()
+    fun getItemList(): Flow<List<ItemEntity>> = itemDao.getItemOrderByNameAsc()
+    fun getBatchList(): Flow<List<ItemBatchEntity>> = batchDao.getBatchesOrderByUnitAsc()
     suspend fun findBatch(batch: ItemBatchEntity) = batchDao.getBatch(batch.itemId, batch.expiryDate)
 
     suspend fun insertItem(item: ItemEntity) {

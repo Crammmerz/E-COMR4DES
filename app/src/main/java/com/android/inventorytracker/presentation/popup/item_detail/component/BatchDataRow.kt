@@ -28,7 +28,8 @@ fun BatchDataRow(threshold: Int, batch: ItemBatchEntity){
         //TODO: Expiry Level
         Text(unit, modifier = Modifier.weight(0.2f),
             textAlign = TextAlign.Center,)
-        Text(subUnit, modifier = Modifier.weight(0.1f),
-                textAlign = TextAlign.Center,)
+        Text(subUnit,
+            modifier = Modifier.weight(0.1f),
+            textAlign = TextAlign.Center,)
     }
 }

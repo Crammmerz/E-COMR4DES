@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.data.model.ItemModel
@@ -30,12 +31,16 @@ fun Inventory(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(10.dp)
+            .padding(10.dp),
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             AddNewItemButton(onClick = { showAddItem = true })
             DeleteItemButton(onClick = { showDeleteItem = true})
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.weight(0.5f))
+            SearchBar(itemViewModel, Modifier.weight(0.5f).height(45.dp))
             SortDropdownMenu(itemViewModel)
         }
 

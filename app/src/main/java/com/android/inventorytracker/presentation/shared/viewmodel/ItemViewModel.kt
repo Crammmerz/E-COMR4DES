@@ -19,27 +19,43 @@ import kotlinx.coroutines.launch
 
 class ItemViewModel(private val itemRepository: ItemRepository) : ViewModel() {
     private val sortBy = MutableStateFlow(SortBy.NAME_ASC)
+    private val searchQuery = MutableStateFlow("")
+
     // Reactive item list from Room
     val item: Flow<List<ItemEntity>> = itemRepository.getItemList()
     val batch: Flow<List<ItemBatchEntity>> = itemRepository.getBatchList()
 
     @RequiresApi(Build.VERSION_CODES.O)
-    val itemModelList: StateFlow<List<ItemModel>> = combine(item, batch, sortBy) { items, batches, sort ->
+    val itemModelList: StateFlow<List<ItemModel>> = combine(item, batch, sortBy, searchQuery) { items, batches, sort, query ->
+        // Build models
         val models = items.map { item ->
             val relatedBatches = batches.filter { it.itemId == item.id }
             ItemModel(item, relatedBatches)
         }
+        // Apply search filter
+        val filtered = if (query.isBlank()) {
+            models
+        } else {
+            models.filter { model ->
+                model.item.name.contains(query, ignoreCase = true)
+                        || model.item.description?.contains(query, ignoreCase = true) == true
+            }
+        }
+        // Apply sort
         when (sort) {
-            SortBy.NAME_ASC -> models.sortedBy { it.item.name }
-            SortBy.NAME_DESC -> models.sortedByDescending { it.item.name }
-            SortBy.EXPIRY_SOONEST -> models.sortedBy { it.nearestExpiry }
-            SortBy.STOCK_LOW_HIGH -> models.sortedBy { it.totalUnit }
-            SortBy.STOCK_HIGH_LOW -> models.sortedByDescending { it.totalUnit }
+            SortBy.NAME_ASC -> filtered.sortedBy { it.item.name }
+            SortBy.NAME_DESC -> filtered.sortedByDescending { it.item.name }
+            SortBy.EXPIRY_SOONEST -> filtered.sortedBy { it.nearestExpiry }
+            SortBy.STOCK_LOW_HIGH -> filtered.sortedBy { it.totalUnit }
+            SortBy.STOCK_HIGH_LOW -> filtered.sortedByDescending { it.totalUnit }
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun setSort(option: SortBy) {
         sortBy.value = option
+    }
+    fun setSearchQuery(query: String) {
+        searchQuery.value = query
     }
 
     // Insert item safely in background

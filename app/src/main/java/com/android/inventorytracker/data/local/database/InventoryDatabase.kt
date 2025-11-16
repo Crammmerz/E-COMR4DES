@@ -41,18 +41,23 @@ abstract class InventoryDatabase : RoomDatabase() {
                                 INSTANCE?.userDao()?.insert(
                                     UserEntity(
                                         username = "admin",
-                                        passwordHash = hashPassword("admin123"),
+                                        passwordHash = hashPassword("admin"),
                                         role = "ADMIN"
+                                    )
+                                )
+                                INSTANCE?.userDao()?.insert(
+                                    UserEntity(
+                                        username = "staff",
+                                        passwordHash = hashPassword("staff"),
+                                        role = "STAFF"
                                     )
                                 )
                             }
                         }
                     })
-                    .fallbackToDestructiveMigration()
                     .build().also { INSTANCE = it }
             }
         }
-
         private fun hashPassword(password: String): String {
             val bytes = MessageDigest.getInstance("SHA-256").digest(password.toByteArray())
             return bytes.joinToString("") { "%02x".format(it) }

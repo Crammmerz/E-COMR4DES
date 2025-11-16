@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -37,18 +38,22 @@ fun SortDropdownMenu(itemViewModel: ItemViewModel) {
                 text = { Text("Name (A-Z)") },
                 onClick = { itemViewModel.setSort(SortBy.NAME_ASC) }
             )
+            HorizontalDivider()
             DropdownMenuItem(
                 text = { Text("Name (Z-A)") },
                 onClick = { itemViewModel.setSort(SortBy.NAME_DESC) }
             )
+            HorizontalDivider()
             DropdownMenuItem(
                 text = { Text("Expiry (Soon)") },
                 onClick = { itemViewModel.setSort(SortBy.EXPIRY_SOONEST) }
             )
+            HorizontalDivider()
             DropdownMenuItem(
                 text = { Text("Stock (Low-High)") },
                 onClick = { itemViewModel.setSort(SortBy.STOCK_LOW_HIGH) }
             )
+            HorizontalDivider()
             DropdownMenuItem(
                 text = { Text("Stock (High-Low)") },
                 onClick = { itemViewModel.setSort(SortBy.STOCK_HIGH_LOW) }

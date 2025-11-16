@@ -50,6 +50,7 @@ android {
 dependencies {
     // Compose BOM for main config
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui.text)
 
     // ALSO add BOM to androidTest and debug to align versions there too
     androidTestImplementation(platform(libs.androidx.compose.bom))

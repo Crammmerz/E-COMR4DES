@@ -14,8 +14,8 @@ import java.text.DecimalFormat
 fun BatchDataRow(threshold: Int, batch: ItemBatchEntity){
     val df = DecimalFormat("#.####")
     val batchId = (batch.itemId*1000+batch.id).toString()
-    val unit = df.format(batch.unit)
-    val subUnit = ((batch.unit*threshold).toInt()).toString()
+    val unit = df.format(batch.subUnit/threshold.toDouble())
+    val subUnit = batch.subUnit.toString()
     Row(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         modifier = Modifier.fillMaxWidth()

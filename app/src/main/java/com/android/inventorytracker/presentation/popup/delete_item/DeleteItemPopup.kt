@@ -24,7 +24,7 @@ import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.presentation.popup.delete_item.component.HeaderSection
 import com.android.inventorytracker.presentation.popup.delete_item.component.InventoryItem
 import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
-import com.android.inventorytracker.presentation.shared.component.primitive.DeleteItemButton
+import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
 
 @Composable
@@ -66,7 +66,7 @@ fun DeleteItemPopup(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     CancelButton(onClick = onDismiss)
-                    DeleteItemButton(onClick = { showDialog = true })
+                    ConfirmButton("Delete Item",onClick = { showDialog = true })
                 }
             }
         }

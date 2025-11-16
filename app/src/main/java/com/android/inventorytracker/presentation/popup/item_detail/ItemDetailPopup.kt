@@ -42,6 +42,7 @@ fun ItemDetailPopup(
 
     DialogHost (// TODO: DialogHost for App testing while DialogMockup for UI Preview Testing
         modifier = Modifier.fillMaxSize(0.9f),
+        useImePadding = true,
         onDismissRequest = {
             val updatedItem = itemModel.item.copy(
                 name = name,
@@ -57,7 +58,6 @@ fun ItemDetailPopup(
 
             onDismiss()
         },
-        true
     ) {
         Box(Modifier.fillMaxSize()) {
             Column(modifier = Modifier
@@ -133,7 +133,7 @@ val sampleExpiryBatch = ItemBatchEntity(
     id = 100,
     itemId = sampleItemEntity.id,
     expiryDate = "2025-12-31",
-    unit = 20f
+    subUnit = 20
 )
 
 // noop callbacks for preview/test

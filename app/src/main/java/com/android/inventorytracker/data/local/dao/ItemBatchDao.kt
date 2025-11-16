@@ -15,7 +15,7 @@ interface ItemBatchDao {
     suspend fun insertBatch(batch: ItemBatchEntity)
 
     @Delete
-    fun deleteBatch(batch: ItemBatchEntity)
+    suspend fun deleteBatch(batch: ItemBatchEntity)
 
     @Update
     suspend fun updateBatch(batch: ItemBatchEntity)

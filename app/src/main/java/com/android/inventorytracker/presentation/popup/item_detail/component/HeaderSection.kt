@@ -24,15 +24,12 @@ fun HeaderSection(itemModel: ItemModel){
     val df = DecimalFormat("#.####")
     val totalUnit = itemModel.totalUnit
     val threshold = itemModel.item.unitThreshold
-    val DarkRed = Color(0xFF8B0000)
-    val DarkOrange = Color(0xFFFF8C00)
+    val darkRed = Color(0xFF8B0000)
 
     val stockColor = when {//TODO: Adjust Colors
         totalUnit.toInt() == 0 -> Color.DarkGray
-        totalUnit <= threshold * 0.2f -> DarkRed
-        totalUnit <= threshold * 0.5f -> DarkOrange
-        totalUnit <= threshold -> LightSand
-        else -> Color.Blue
+        totalUnit <= threshold * 0.2f -> darkRed
+        else -> LightSand
     }
 
     CenterRow {
@@ -51,13 +48,13 @@ fun HeaderSection(itemModel: ItemModel){
         ) {
             Text(
                 text = "Current Stocks",
-                color = Color.White,
+                color = Color.Black,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 12.sp
             )
             Text(
-                text = "${df.format(totalUnit)} units",
-                color = Color.White,
+                text = "${itemModel.totalUnitFormatted} units",
+                color = Color.Black,
                 fontWeight = FontWeight.Bold,
                 fontSize = 12.sp
             )

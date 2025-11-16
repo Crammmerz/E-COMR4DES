@@ -28,11 +28,11 @@ import androidx.compose.ui.unit.sp
 import com.android.inventorytracker.R
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.presentation.popup.add_new_batch.InsertBatchPopup
+import com.android.inventorytracker.presentation.popup.delete_batch.DeleteBatchPopup
 import com.android.inventorytracker.presentation.popup.item_detail.ItemDetailPopup
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import com.android.inventorytracker.ui.theme.LightSand
-import java.text.DecimalFormat
 
 @SuppressLint("DefaultLocale")
 @RequiresApi(Build.VERSION_CODES.O)
@@ -43,21 +43,21 @@ fun ItemDataRow(
     batchViewModel: BatchViewModel,
     modifier: Modifier = Modifier
 ) {
-    val df = DecimalFormat("#.####")
-    var showItemDetail by rememberSaveable {mutableStateOf(false)}
-    var showInsertBatch by rememberSaveable {mutableStateOf(false)}
+    var showItemDetail by rememberSaveable { mutableStateOf(false) }
+    var showInsertBatch by rememberSaveable { mutableStateOf(false) }
+    var showDeleteBatch by rememberSaveable { mutableStateOf(false) }
+
+    val unit = batchViewModel.unit
+    val subUnit = batchViewModel.subUnit
 
     val totalUnit = itemModel.totalUnit
     val threshold = itemModel.item.unitThreshold
-    val DarkRed = Color(0xFF8B0000)
-    val DarkOrange = Color(0xFFFF8C00)
+    val darkRed = Color(0xFF8B0000)
 
     val stockColor = when {//TODO: Adjust Colors
         totalUnit.toInt() == 0 -> Color.DarkGray
-        totalUnit <= threshold * 0.2f -> DarkRed
-        totalUnit <= threshold * 0.5f -> DarkOrange
-        totalUnit <= threshold -> LightSand
-        else -> Color.Blue
+        totalUnit <= threshold * 0.2f -> darkRed
+        else -> LightSand
     }
 
     Row(
@@ -81,14 +81,10 @@ fun ItemDataRow(
         Spacer(Modifier.weight(0.1f))
         ItemText(itemModel.item.name, Modifier.weight(1f))
         ItemText(itemModel.nearestExpiryFormatted, Modifier.weight(0.75f))
-        ItemText(df.format(itemModel.totalUnit), Modifier.weight(0.5f).background(stockColor, shape = RoundedCornerShape(5.dp)), TextAlign.Center)
-        ItemButton("-", Modifier.weight(0.25f)) { /* Decrement logic */ }
-        ItemButton("+", Modifier.weight(0.25f)) {
-            showInsertBatch = true
-        }
-        ItemButton("View More", Modifier.weight(0.5f)) {
-            showItemDetail = true
-        }
+        ItemText(itemModel.totalUnitFormatted, Modifier.weight(0.5f).background(stockColor, shape = RoundedCornerShape(5.dp)), TextAlign.Center)
+        ItemButton("-", Modifier.weight(0.25f)) { showDeleteBatch = true }
+        ItemButton("+", Modifier.weight(0.25f)) { showInsertBatch = true }
+        ItemButton("View More", Modifier.weight(0.5f)) { showItemDetail = true }
     }
 
     if (showItemDetail) {
@@ -103,9 +99,6 @@ fun ItemDataRow(
         LaunchedEffect(true) {
             batchViewModel.unitReset()
         }
-
-        val unit = batchViewModel.unit
-        val subUnit = batchViewModel.subUnit
         InsertBatchPopup(
             itemModel = itemModel,
             unit = unit,
@@ -116,12 +109,28 @@ fun ItemDataRow(
             onStore = batchViewModel::storeBatch
         )
     }
+
+    if(showDeleteBatch){
+        LaunchedEffect(true) {
+            batchViewModel.unitReset()
+        }
+        DeleteBatchPopup(
+            totalSubUnit = itemModel.totalSubUnit,
+            batch = itemModel.batch,
+            unit = unit,
+            subUnit = subUnit,
+            onUnitChange = { batchViewModel.onUnitChange(it, itemModel.item.subUnitThreshold) },
+            onSubUnitChange = { batchViewModel.onSubUnitChange(it, itemModel.item.subUnitThreshold) },
+            onDismiss = { showDeleteBatch = false },
+            onDelete = batchViewModel::deleteBatch
+        )
+    }
 }
 
 @Composable
 fun ItemText(
     text: String,
-    modifier: Modifier,
+    modifier: Modifier = Modifier.background(LightSand, shape = RoundedCornerShape(5.dp)),
     textAlign: TextAlign = TextAlign.Start
 ) {
     Text(
@@ -132,7 +141,6 @@ fun ItemText(
         textAlign = textAlign,
         modifier = modifier
             .clip(RoundedCornerShape(5.dp))
-            .background(LightSand, shape = RoundedCornerShape(5.dp))
             .border(1.dp, Color.LightGray, RoundedCornerShape(5.dp))
             .padding(horizontal = 7.dp, vertical = 7.dp)
     )
@@ -152,8 +160,8 @@ fun ItemOverviewSectionPreview() {
             description = ""
         ),
         batch = listOf(
-            com.android.inventorytracker.data.local.entities.ItemBatchEntity(itemId = 1, expiryDate = "2025-11-01", unit = 20f),
-            com.android.inventorytracker.data.local.entities.ItemBatchEntity(itemId = 1, expiryDate = "2025-10-31", unit = 15f)
+            com.android.inventorytracker.data.local.entities.ItemBatchEntity(itemId = 1, expiryDate = "2025-11-01", subUnit = 20),
+            com.android.inventorytracker.data.local.entities.ItemBatchEntity(itemId = 1, expiryDate = "2025-10-31", subUnit = 15)
         )
     )
 //

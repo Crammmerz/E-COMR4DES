@@ -20,13 +20,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.data.local.entities.ItemEntity
-import com.android.inventorytracker.presentation.inventory.component.AddNewItemButton
 import com.android.inventorytracker.presentation.popup.add_new_item.component.HeaderSection
 import com.android.inventorytracker.presentation.shared.component.item_property_fields.DescriptionField
 import com.android.inventorytracker.presentation.shared.component.item_property_fields.NameField
 import com.android.inventorytracker.presentation.shared.component.item_property_fields.SubUnitField
 import com.android.inventorytracker.presentation.shared.component.item_property_fields.UnitField
 import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
+import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
 
 @Composable
@@ -92,25 +92,26 @@ fun InsertItemPopup(
         ) {
             CancelButton(onClick = onDismiss)
 
-            AddNewItemButton(onClick = {
-                val trimmedName = name.trim()
-                val trimmedDescription = description.trim()
+            ConfirmButton("Add Item",onClick = {
+                    val trimmedName = name.trim()
+                    val trimmedDescription = description.trim()
 
-                if (trimmedName.isNotEmpty() && unitThreshold > 0 && subUnitThreshold > 0) {
-                    val item = ItemEntity(
-                        imageUri = null,
-                        name = trimmedName,
-                        unitThreshold = unitThreshold,
-                        subUnitThreshold = subUnitThreshold,
-                        description = trimmedDescription
-                    )
-                    onInsert(item)
-                    onDismiss()
-                    Toast.makeText(context, "Item added!", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(context, "Please fill required fields", Toast.LENGTH_SHORT).show()
+                    if (trimmedName.isNotEmpty() && unitThreshold > 0 && subUnitThreshold > 0) {
+                        val item = ItemEntity(
+                            imageUri = null,
+                            name = trimmedName,
+                            unitThreshold = unitThreshold,
+                            subUnitThreshold = subUnitThreshold,
+                            description = trimmedDescription
+                        )
+                        onInsert(item)
+                        onDismiss()
+                        Toast.makeText(context, "Item added!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "Please fill required fields", Toast.LENGTH_SHORT).show()
+                    }
                 }
-            })
+            )
         }
     }
 }

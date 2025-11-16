@@ -17,10 +17,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.data.model.ItemModel
-import com.android.inventorytracker.presentation.popup.add_new_batch.component.AddBatchButton
-import com.android.inventorytracker.presentation.popup.add_new_batch.component.CancelButton
 import com.android.inventorytracker.presentation.shared.component.item_property_fields.SubUnitField
 import com.android.inventorytracker.presentation.shared.component.item_property_fields.UnitFieldFloat
+import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
+import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
 import java.time.Instant
 import java.time.LocalDate
@@ -65,7 +65,8 @@ fun InsertBatchPopup(
             }
             DatePicker(state = datePickerState)
             Row {
-                AddBatchButton {
+                CancelButton { onDismiss() }
+                ConfirmButton("Add Stock") {
                     val selectedDateMillis = datePickerState.selectedDateMillis
                     val selectedDate = selectedDateMillis?.let {
                         Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
@@ -79,7 +80,7 @@ fun InsertBatchPopup(
 
                         val batch = ItemBatchEntity(
                             itemId = itemModel.item.id,
-                            unit = unit,
+                            subUnit = subUnit,
                             expiryDate = formattedDate
                         )
                         onStore(batch)
@@ -87,7 +88,6 @@ fun InsertBatchPopup(
                         onDismiss()
                     }
                 }
-                CancelButton { onDismiss() }
             }
         }
     }

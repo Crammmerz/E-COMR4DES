@@ -12,26 +12,6 @@ import kotlinx.coroutines.launch
 
 class BatchViewModel(private val itemRepository: ItemRepository): ViewModel() {
 
-    fun storeBatch(batch: ItemBatchEntity) {
-        viewModelScope.launch {
-            val existing = itemRepository.findBatch(batch)
-            if (existing==null) {
-                itemRepository.insertBatch(batch)
-            } else {
-                existing.unit += batch.unit
-                itemRepository.updateBatch(existing)
-            }
-        }
-    }
-
-    fun deleteBatch(batch: ItemBatchEntity){
-        viewModelScope.launch {
-            itemRepository.deleteBatch(batch)
-        }
-    }
-
-
-
     var unit by mutableFloatStateOf(0f)
         private set
     var subUnit by mutableIntStateOf(0)
@@ -49,5 +29,36 @@ class BatchViewModel(private val itemRepository: ItemRepository): ViewModel() {
     fun onSubUnitChange(newSubUnit: Int, threshold: Int) {
         subUnit = newSubUnit
         unit = newSubUnit.toFloat() / threshold
+    }
+    fun storeBatch(batch: ItemBatchEntity) {
+        viewModelScope.launch {
+            val existing = itemRepository.findBatch(batch)
+            if (existing==null) {
+                itemRepository.insertBatch(batch)
+            } else {
+                existing.subUnit += batch.subUnit
+                itemRepository.updateBatch(existing)
+            }
+        }
+    }
+
+    fun deleteBatch(batches: List<ItemBatchEntity>, toRemove: Int) {
+        viewModelScope.launch {
+            var remaining = toRemove
+
+            batches.forEach { batch ->
+                if (remaining <= 0) return@forEach
+
+                val removeAmount = minOf(batch.subUnit, remaining)
+                batch.subUnit -= removeAmount
+                remaining -= removeAmount
+
+                if (batch.subUnit == 0) {
+                    itemRepository.deleteBatch(batch)
+                } else {
+                    itemRepository.updateBatch(batch)
+                }
+            }
+        }
     }
 }

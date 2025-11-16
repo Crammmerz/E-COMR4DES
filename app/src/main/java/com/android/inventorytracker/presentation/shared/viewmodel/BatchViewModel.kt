@@ -42,6 +42,16 @@ class BatchViewModel(private val itemRepository: ItemRepository): ViewModel() {
         }
     }
 
+    fun convertBatch(batches: List<ItemBatchEntity>, subUnitThreshold: Int, newSubUnitThreshold: Int){
+        viewModelScope.launch {
+            batches.forEach { batch ->
+                val unit = batch.subUnit.toDouble()/subUnitThreshold
+                batch.subUnit = (unit*newSubUnitThreshold).toInt()
+                itemRepository.updateBatch(batch)
+            }
+        }
+    }
+
     fun deleteBatch(batches: List<ItemBatchEntity>, toRemove: Int) {
         viewModelScope.launch {
             var remaining = toRemove

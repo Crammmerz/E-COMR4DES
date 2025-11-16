@@ -61,8 +61,8 @@ fun BatchExpirySection(
                 color = Color.Black,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
-                textAlign = TextAlign.End,
-                modifier = Modifier.weight(0.15f)
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(0.2f)
             )
             Text(
                 text = "Sub Unit",
@@ -71,8 +71,8 @@ fun BatchExpirySection(
                 fontSize = 14.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.End,
-                modifier = Modifier.weight(0.2f)
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(0.1f)
             )
         }
         HorizontalDivider(color = Color.Black, thickness = 1.dp)

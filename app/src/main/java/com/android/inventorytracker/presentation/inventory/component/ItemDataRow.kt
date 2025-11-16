@@ -55,9 +55,9 @@ fun ItemDataRow(
     val darkRed = Color(0xFF8B0000)
 
     val stockColor = when {//TODO: Adjust Colors
-        totalUnit.toInt() == 0 -> Color.DarkGray
-        totalUnit <= threshold * 0.2f -> darkRed
-        else -> LightSand
+        totalUnit == 0.0 -> Color.DarkGray
+        totalUnit <= threshold * 0.2 -> darkRed
+        else -> Color.White
     }
 
     Row(
@@ -91,7 +91,8 @@ fun ItemDataRow(
         ItemDetailPopup(
             itemModel = itemModel,
             onDismiss = { showItemDetail = false },
-            onUpdate = itemViewModel::updateItem
+            onUpdateItem = itemViewModel::updateItem,
+            onUpdateBatch = batchViewModel::convertBatch
         )
     }
 

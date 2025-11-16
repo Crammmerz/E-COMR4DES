@@ -32,7 +32,8 @@ import com.android.inventorytracker.presentation.shared.component.primitive.Dial
 fun ItemDetailPopup(
     itemModel: ItemModel,
     onDismiss: () -> Unit,
-    onUpdate: (ItemEntity) -> Unit
+    onUpdateItem: (ItemEntity) -> Unit,
+    onUpdateBatch: (List<ItemBatchEntity>, Int, Int) -> Unit,
 ) {
     var name by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.name) }
     var unitThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.unitThreshold) }
@@ -52,7 +53,10 @@ fun ItemDetailPopup(
             )
 
             if (itemModel.item != updatedItem) {
-                onUpdate(updatedItem)
+                if(itemModel.item.subUnitThreshold != updatedItem.subUnitThreshold){
+                    onUpdateBatch(itemModel.batch, itemModel.item.subUnitThreshold, updatedItem.subUnitThreshold)
+                }
+                onUpdateItem(updatedItem)
                 Toast.makeText(context, "Item updated successfully", Toast.LENGTH_SHORT).show()
             }
 

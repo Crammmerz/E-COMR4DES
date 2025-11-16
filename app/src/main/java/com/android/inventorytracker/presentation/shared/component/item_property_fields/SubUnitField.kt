@@ -90,7 +90,7 @@ fun SubUnitField(
                         if (parsed != null && parsed > 0) {
                             onSubUnitChange(parsed)
                         }
-                        focusManager.clearFocus() // close keyboard
+                        focusManager.clearFocus()
                     }
                 )
             )
@@ -102,5 +102,6 @@ fun SubUnitField(
                 fontSize = 15.sp
             )
         }
+
     }
 }

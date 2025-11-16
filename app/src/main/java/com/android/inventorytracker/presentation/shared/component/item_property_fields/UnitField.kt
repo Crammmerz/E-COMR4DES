@@ -167,7 +167,7 @@ fun UnitFieldFloat(
                         if (parsed != null && parsed > 0f) {
                             onUnitChange(parsed)
                         }
-                        focusManager.clearFocus() // close keyboard
+                        focusManager.clearFocus()
                     }
                 )
             )

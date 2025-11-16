@@ -21,15 +21,14 @@ import java.text.DecimalFormat
 
 @Composable
 fun HeaderSection(itemModel: ItemModel){
-    val df = DecimalFormat("#.####")
     val totalUnit = itemModel.totalUnit
     val threshold = itemModel.item.unitThreshold
     val darkRed = Color(0xFF8B0000)
 
     val stockColor = when {//TODO: Adjust Colors
-        totalUnit.toInt() == 0 -> Color.DarkGray
-        totalUnit <= threshold * 0.2f -> darkRed
-        else -> LightSand
+        totalUnit == 0.0 -> Color.DarkGray
+        totalUnit <= threshold * 0.2 -> darkRed
+        else -> Color.White
     }
 
     CenterRow {

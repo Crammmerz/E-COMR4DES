@@ -1,4 +1,4 @@
-package com.android.inventorytracker.presentation.popup.add_new_item
+package com.android.inventorytracker.presentation.popup.item_insertion
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.data.local.entities.ItemEntity
-import com.android.inventorytracker.presentation.popup.add_new_item.component.HeaderSection
+import com.android.inventorytracker.presentation.popup.item_insertion.component.HeaderSection
 import com.android.inventorytracker.presentation.shared.component.item_property_fields.DescriptionField
 import com.android.inventorytracker.presentation.shared.component.item_property_fields.NameField
 import com.android.inventorytracker.presentation.shared.component.item_property_fields.SubUnitField

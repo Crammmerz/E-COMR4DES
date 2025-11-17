@@ -1,4 +1,4 @@
-package com.android.inventorytracker.presentation.popup.add_new_item.component
+package com.android.inventorytracker.presentation.popup.item_insertion.component
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable

@@ -12,8 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.presentation.inventory.component.*
-import com.android.inventorytracker.presentation.popup.add_new_item.InsertItemPopup
-import com.android.inventorytracker.presentation.popup.delete_item.DeleteItemPopup
+import com.android.inventorytracker.presentation.popup.item_insertion.InsertItemPopup
+import com.android.inventorytracker.presentation.popup.item_removal.DeleteItemPopup
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 

@@ -1,4 +1,4 @@
-package com.android.inventorytracker.presentation.popup.delete_item.component
+package com.android.inventorytracker.presentation.popup.item_removal.component
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Checkbox

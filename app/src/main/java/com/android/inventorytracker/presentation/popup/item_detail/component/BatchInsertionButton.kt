@@ -7,11 +7,11 @@ import com.android.inventorytracker.presentation.shared.component.primitive.Cent
 import com.android.inventorytracker.ui.theme.Ochre
 
 @Composable
-fun AddUnitButton(){
+fun BatchInsertionButton(onClick: () -> Unit){
     CenterButton(
         modifier = Modifier.fillMaxWidth(),
         label = "+ Add Stock",
         bgColor = Ochre,
-        onClick = {}
+        onClick = onClick
     )
 }

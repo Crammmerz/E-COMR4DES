@@ -1,4 +1,4 @@
-package com.android.inventorytracker.presentation.popup.delete_item.component
+package com.android.inventorytracker.presentation.popup.item_removal.component
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable

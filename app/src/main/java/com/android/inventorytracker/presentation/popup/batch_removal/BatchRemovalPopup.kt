@@ -1,4 +1,4 @@
-package com.android.inventorytracker.presentation.popup.delete_batch
+package com.android.inventorytracker.presentation.popup.batch_removal
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column

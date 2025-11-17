@@ -1,4 +1,4 @@
-package com.android.inventorytracker.presentation.popup.add_new_batch
+package com.android.inventorytracker.presentation.popup.batch_insertion
 
 import android.os.Build
 import android.widget.Toast

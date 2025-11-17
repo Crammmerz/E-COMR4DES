@@ -1,4 +1,4 @@
-package com.android.inventorytracker.presentation.popup.delete_item
+package com.android.inventorytracker.presentation.popup.item_removal
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,8 +21,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.data.local.entities.ItemEntity
 import com.android.inventorytracker.data.model.ItemModel
-import com.android.inventorytracker.presentation.popup.delete_item.component.HeaderSection
-import com.android.inventorytracker.presentation.popup.delete_item.component.InventoryItem
+import com.android.inventorytracker.presentation.popup.item_removal.component.HeaderSection
+import com.android.inventorytracker.presentation.popup.item_removal.component.InventoryItem
 import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
 import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost

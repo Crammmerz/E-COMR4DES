@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.kotlin.kapt)
 }
 
 android {
@@ -91,4 +93,7 @@ dependencies {
     // Serialization + SQLite
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.sqlite.ktx)
+
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
 }

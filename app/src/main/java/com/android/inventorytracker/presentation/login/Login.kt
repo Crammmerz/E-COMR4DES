@@ -20,7 +20,7 @@ import com.android.inventorytracker.presentation.popup.login.LoginPopup
 fun Login(
     userRole: UserRole,
     onSetUserRole: (UserRole) -> Unit,
-    onLogin: (username: String, password: String) -> Unit
+    onLogin: (username: String, password: String, userRole: String) -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
     Column(

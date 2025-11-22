@@ -11,9 +11,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.android.inventorytracker.data.local.database.InventoryDatabase
-import com.android.inventorytracker.data.repository.ItemRepository
 import com.android.inventorytracker.presentation.home.Home
 import com.android.inventorytracker.presentation.inventory.Inventory
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
@@ -24,15 +23,13 @@ import com.android.inventorytracker.ui.theme.Sand
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ContentSection(
+fun ContentSection (
     modifier: Modifier = Modifier,
     bgColor: Color = Sand,
+    itemViewModel: ItemViewModel = hiltViewModel(),
+    batchViewModel: BatchViewModel = hiltViewModel(),
     contentViewModel: ContentViewModel = viewModel(),
-    db: InventoryDatabase
 ) {
-    val itemRepository = ItemRepository(db.itemDao(), db.itemBatchDao())
-    val itemViewModel = ItemViewModel(itemRepository)
-    val batchViewModel = BatchViewModel(itemRepository)
 
     val itemModels by itemViewModel.itemModelList.collectAsState()
 
@@ -44,12 +41,16 @@ fun ContentSection(
             .fillMaxWidth()
     ) {
         when (contentViewModel.currentContent) {
-            Content.Home -> Home()
-            Content.Inventory -> Inventory(
-                itemModels = itemModels,
-                itemViewModel = itemViewModel,
-                batchViewModel = batchViewModel,
-            )
+            Content.Home -> {
+                Home()
+            }
+            Content.Inventory -> {
+                Inventory(
+                    itemModels = itemModels,
+                    itemViewModel = itemViewModel,
+                    batchViewModel = batchViewModel,
+                )
+            }
         }
     }
 }

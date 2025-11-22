@@ -8,28 +8,26 @@ import androidx.lifecycle.viewModelScope
 import com.android.inventorytracker.data.model.LoginState
 import com.android.inventorytracker.data.model.UserRole
 import com.android.inventorytracker.data.repository.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.launch
 
-class LoginViewModel(private val userRepository: UserRepository): ViewModel() {
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val userRepository: UserRepository
+) : ViewModel() {
     var loginState by mutableStateOf(LoginState.LOGGED_OUT)
         private set
 
     var userRole by mutableStateOf(UserRole.STAFF)
         private set
-    fun onLogin(username: String, password: String){
+    fun onLogin(username: String, password: String, userRole: String) {
         viewModelScope.launch {
-            if(userRepository.login(
-                    username = username,
-                    rawPassword = password,
-                    role = when(userRole){
-                        UserRole.ADMIN -> "ADMIN"
-                        UserRole.STAFF -> "STAFF"
-                    }
-                )) {
-                loginState = LoginState.LOGGED_IN
-            }
+            val success = userRepository.login(username, password, userRole)
+            loginState = if (success) LoginState.LOGGED_IN else LoginState.LOGGED_OUT
         }
     }
+
     fun updateLoginState(newState: LoginState) {
         this.loginState = newState
     }

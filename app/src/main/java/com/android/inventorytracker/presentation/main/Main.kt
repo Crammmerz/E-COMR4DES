@@ -10,12 +10,12 @@ import com.android.inventorytracker.presentation.main.component.TopBar
 
 
 @Composable
-fun Main(db: InventoryDatabase) {
+fun Main() {
     Column(modifier = Modifier.fillMaxSize()) {
         TopBar()
         Row(modifier = Modifier.weight(1f)) {
             NavBar()
-            ContentSection(db = db)
+            ContentSection()
         }
     }
 }

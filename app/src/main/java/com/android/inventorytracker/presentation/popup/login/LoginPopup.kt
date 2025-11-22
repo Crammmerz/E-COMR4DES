@@ -23,7 +23,7 @@ import com.android.inventorytracker.data.model.UserRole
 fun LoginPopup(
     userRole: UserRole,
     onDismiss: () -> Unit,
-    onLogin: (username: String, password: String) -> Unit,
+    onLogin: (username: String, password: String, userRole: String) -> Unit,
 ) {
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -50,7 +50,7 @@ fun LoginPopup(
         },
         confirmButton = {
             Button(onClick = {
-                onLogin(username, password)
+                onLogin(username, password, userRole.name)
             }) {
                 Text("Login")
             }

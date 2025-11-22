@@ -8,9 +8,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.data.repository.ItemRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class BatchViewModel(private val itemRepository: ItemRepository): ViewModel() {
+@HiltViewModel
+class BatchViewModel @Inject constructor(
+    private val itemRepository: ItemRepository
+): ViewModel() {
 
     var unit by mutableFloatStateOf(0f)
         private set

@@ -1,9 +1,10 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.room)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.kotlin.kapt)
 }
@@ -36,16 +37,24 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
     buildFeatures {
         compose = true
     }
-
-    room {
-        schemaDirectory("$projectDir/schemas")
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+            freeCompilerArgs.addAll(
+                listOf(
+                    "-opt-in=kotlin.RequiresOptIn",
+                    "-Xannotation-default-target=param-property"
+                )
+            )
+        }
+    }
+    kapt {
+        arguments {
+            arg("kapt.kotlin.generated", layout.buildDirectory.dir("generated/source/kaptKotlin").get().asFile.path)
+        }
     }
 }
 
@@ -95,5 +104,6 @@ dependencies {
     implementation(libs.androidx.sqlite.ktx)
 
     implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
     kapt(libs.hilt.compiler)
 }

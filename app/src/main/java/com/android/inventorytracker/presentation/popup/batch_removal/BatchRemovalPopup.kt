@@ -51,7 +51,7 @@ fun DeleteBatchPopup(
                     )
                 }
             }
-            CancelButton { onDismiss() }
+            CancelButton(onClick = { onDismiss() },)
             ConfirmButton("Deduct Stock") {
                 if(subUnit<=0){
                     Toast.makeText(context, "Please enter a valid amount", Toast.LENGTH_SHORT).show()

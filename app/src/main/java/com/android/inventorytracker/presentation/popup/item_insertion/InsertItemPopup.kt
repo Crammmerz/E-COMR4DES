@@ -90,7 +90,7 @@ fun InsertItemPopup(
             modifier = Modifier.align(Alignment.BottomEnd),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            CancelButton(onClick = onDismiss)
+            CancelButton(onClick = onDismiss,)
 
             ConfirmButton("Add Item",onClick = {
                     val trimmedName = name.trim()

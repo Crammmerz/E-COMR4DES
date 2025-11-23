@@ -1,7 +1,5 @@
 package com.android.inventorytracker.presentation.inventory
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,7 +15,6 @@ import com.android.inventorytracker.presentation.popup.item_removal.DeleteItemPo
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Inventory(
     itemModels: List<ItemModel>,

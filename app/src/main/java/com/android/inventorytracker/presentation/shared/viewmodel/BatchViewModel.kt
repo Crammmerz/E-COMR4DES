@@ -37,7 +37,7 @@ class BatchViewModel @Inject constructor(
     }
     fun storeBatch(batch: ItemBatchEntity) {
         viewModelScope.launch {
-            val existing = itemRepository.findBatch(batch)
+            val existing = itemRepository.findBatch(batch.itemId, batch.expiryDate)
             if (existing==null) {
                 itemRepository.insertBatch(batch)
             } else {

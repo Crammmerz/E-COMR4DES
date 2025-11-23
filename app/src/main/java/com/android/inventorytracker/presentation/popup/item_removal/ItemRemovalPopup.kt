@@ -65,7 +65,7 @@ fun DeleteItemPopup(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    CancelButton(onClick = onDismiss)
+                    CancelButton(onClick = onDismiss,)
                     ConfirmButton("Delete Item",onClick = { showDialog = true })
                 }
             }

@@ -27,7 +27,6 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun InsertBatchPopup(
     itemModel: ItemModel,
@@ -65,7 +64,7 @@ fun InsertBatchPopup(
             }
             DatePicker(state = datePickerState)
             Row {
-                CancelButton { onDismiss() }
+                CancelButton(onClick = { onDismiss() },)
                 ConfirmButton("Add Stock") {
                     val selectedDateMillis = datePickerState.selectedDateMillis
                     val selectedDate = selectedDateMillis?.let {

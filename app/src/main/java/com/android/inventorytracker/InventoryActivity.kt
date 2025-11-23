@@ -5,42 +5,38 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.inventorytracker.data.model.LoginState
 import com.android.inventorytracker.presentation.login.Login
 import com.android.inventorytracker.presentation.login.viewmodel.LoginViewModel
 import com.android.inventorytracker.ui.theme.InventoryTrackerTheme
 import com.android.inventorytracker.presentation.main.Main
-import com.android.inventorytracker.presentation.popup.notification_permission_request.NotificationPermissionRequest
+import com.android.inventorytracker.presentation.notification_permission_request.NotificationPermissionRequest
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.android.inventorytracker.services.notification.NotificationHelper.canPostNotifications
 
 
 @AndroidEntryPoint
 class InventoryActivity : ComponentActivity() {
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @SuppressLint("ViewModelConstructorInComposable")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
 
             val loginViewModel: LoginViewModel = hiltViewModel()
+            val context = LocalContext.current
+            val showNotificationRequest = rememberSaveable { mutableStateOf(true) }
 
-            var showNotificationRequest by rememberSaveable { mutableStateOf(true) }
             InventoryTrackerTheme {
-                if (showNotificationRequest) {
-                    NotificationPermissionRequest(
-                        onDismiss = { showNotificationRequest = false }
-                    )
-                }
-                when(loginViewModel.loginState){
+                when (loginViewModel.loginState) {
                     LoginState.LOGGED_OUT -> {
                         Login(
                             userRole = loginViewModel.userRole,
@@ -51,6 +47,15 @@ class InventoryActivity : ComponentActivity() {
                     LoginState.LOGGED_IN -> {
                         Main()
                     }
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                    showNotificationRequest.value &&
+                    !canPostNotifications(context)
+                ) {
+                    NotificationPermissionRequest(
+                        modifier = Modifier.fillMaxSize(),
+                        onDismiss = { showNotificationRequest.value = false }
+                    )
                 }
             }
         }

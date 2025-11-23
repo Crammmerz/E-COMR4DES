@@ -1,8 +1,5 @@
 package com.android.inventorytracker.data.model
 
-import android.icu.text.DecimalFormat
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.data.local.entities.ItemEntity
 import java.time.LocalDate
@@ -13,29 +10,22 @@ enum class SortBy {
 }
 data class ItemModel(
     val item: ItemEntity,
-    val batch: List<ItemBatchEntity>
+    val batch: List<ItemBatchEntity>,
+    val expiryParser: (String) -> LocalDate? = { s -> runCatching { LocalDate.parse(s) }.getOrNull() },
+    val unitFormatter: (Double) -> String = { d -> java.text.DecimalFormat("#.####").format(d) }
 ) {
-    companion object {
-        private val df = DecimalFormat("#.####")
-        @RequiresApi(Build.VERSION_CODES.O)
-        private val expiryFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
-    }
-
     val totalUnit: Double
-        get() = batch.sumOf { it.subUnit / item.subUnitThreshold.toDouble() }
+        get() {
+            val threshold = item.subUnitThreshold.takeIf { it != 0 } ?: 1
+            return batch.sumOf { it.subUnit / threshold.toDouble() }
+        }
 
-    val totalSubUnit: Int
-        get() = batch.sumOf { it.subUnit }
+    val totalSubUnit: Int get() = batch.sumOf { it.subUnit }
 
-    val totalUnitFormatted: String
-        get() = df.format(totalUnit)
+    val totalUnitFormatted: String get() = unitFormatter(totalUnit)
 
-    val nearestExpiry: LocalDate?
-        @RequiresApi(Build.VERSION_CODES.O)
-        get() = batch.mapNotNull { runCatching { LocalDate.parse(it.expiryDate) }.getOrNull() }
-            .minOrNull()
+    val nearestExpiry: LocalDate? get() = batch.mapNotNull { expiryParser(it.expiryDate) }.minOrNull()
 
-    val nearestExpiryFormatted: String
-        @RequiresApi(Build.VERSION_CODES.O)
-        get() = nearestExpiry?.format(expiryFormatter) ?: "N/A"
+    fun nearestExpiryFormatted(dateFormatter: DateTimeFormatter? = DateTimeFormatter.ofPattern("MMM dd, yyyy")): String =
+        nearestExpiry?.let { dateFormatter?.format(it) } ?: "N/A"
 }

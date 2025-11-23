@@ -1,8 +1,6 @@
 package com.android.inventorytracker.presentation.inventory.component
 
 import android.annotation.SuppressLint
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,7 +33,6 @@ import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import com.android.inventorytracker.ui.theme.LightSand
 
 @SuppressLint("DefaultLocale")
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ItemDataRow(
     itemModel: ItemModel,
@@ -80,7 +77,7 @@ fun ItemDataRow(
         )
         Spacer(Modifier.weight(0.1f))
         ItemText(itemModel.item.name, Modifier.weight(1f))
-        ItemText(itemModel.nearestExpiryFormatted, Modifier.weight(0.75f))
+        ItemText(itemModel.nearestExpiryFormatted(), Modifier.weight(0.75f))
         ItemText(itemModel.totalUnitFormatted, Modifier.weight(0.5f).background(stockColor, shape = RoundedCornerShape(5.dp)), TextAlign.Center)
         ItemButton("-", Modifier.weight(0.25f)) { showDeleteBatch = true }
         ItemButton("+", Modifier.weight(0.25f)) { showInsertBatch = true }
@@ -148,30 +145,3 @@ fun ItemText(
     )
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true, device = "spec:width=960dp,height=600dp,dpi=240,isRound=false,orientation=landscape")
-@Composable
-fun ItemOverviewSectionPreview() {
-    val sampleModel = ItemModel(
-        item = com.android.inventorytracker.data.local.entities.ItemEntity(
-            id = 1,
-            imageUri = null,
-            name = "Coffee Beans",
-            unitThreshold = 10,
-            subUnitThreshold = 20,
-            description = ""
-        ),
-        batch = listOf(
-            com.android.inventorytracker.data.local.entities.ItemBatchEntity(itemId = 1, expiryDate = "2025-11-01", subUnit = 20),
-            com.android.inventorytracker.data.local.entities.ItemBatchEntity(itemId = 1, expiryDate = "2025-10-31", subUnit = 15)
-        )
-    )
-//
-//    ItemDataRow(
-//        itemModel = sampleModel,
-//        showItemDetail = false,
-//        onShowItemDetailChange = {},
-//        itemViewModel = ,
-//        batchViewModel = ,
-//    )
-}

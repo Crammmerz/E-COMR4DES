@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId = "com.android.inventorytracker"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -62,6 +62,7 @@ dependencies {
     // Compose BOM for main config
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui.text)
+    implementation(libs.androidx.work.runtime.ktx)
 
     // ALSO add BOM to androidTest and debug to align versions there too
     androidTestImplementation(platform(libs.androidx.compose.bom))

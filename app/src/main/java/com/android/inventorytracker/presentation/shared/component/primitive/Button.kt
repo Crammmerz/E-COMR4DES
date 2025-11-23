@@ -18,15 +18,15 @@ import androidx.compose.ui.unit.dp
 
 //TODO: Button Design
 @Composable
-fun ConfirmButton(text: String, onClick: () -> Unit){
+fun ConfirmButton(text: String = "Confirm", onClick: () -> Unit){
     Button(onClick = onClick) {
         Text(text)
     }
 }
 @Composable
-fun CancelButton(onClick: () -> Unit){
+fun CancelButton(text: String = "Cancel",onClick: () -> Unit){
     Button(onClick = onClick) {
-        Text("Cancel")
+        Text(text)
     }
 }
 @Composable

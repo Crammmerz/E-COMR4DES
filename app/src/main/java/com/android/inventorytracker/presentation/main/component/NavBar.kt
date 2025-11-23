@@ -2,77 +2,37 @@ package com.android.inventorytracker.presentation.main.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.inventorytracker.presentation.main.viewmodel.Content
 import com.android.inventorytracker.presentation.main.viewmodel.ContentViewModel
-import com.android.inventorytracker.presentation.shared.component.primitive.LeftButton
 import com.android.inventorytracker.ui.theme.Ochre
 
 @Composable
 fun NavBar(
     modifier: Modifier = Modifier,
     bgColor: Color = Ochre,
-    viewModel: ContentViewModel = viewModel()
+    viewModel: ContentViewModel
 ) {
+    val current by viewModel.currentContent.collectAsState()
     val highlight = Color.Black.copy(alpha = 0.25f)
     val default = Color.Transparent
 
-    Surface(
-        color = bgColor,
-        tonalElevation = 10.dp,
-        modifier = modifier
-            .fillMaxHeight()
-            .fillMaxWidth(0.225f)
-    ) {
+    Surface(color = bgColor, modifier = modifier.fillMaxHeight()) {
         Column(modifier = Modifier.padding(10.dp)) {
-            Text(
-                text = "📦 Lumi Cafe",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.White,
-                modifier = Modifier.padding(10.dp)
-            )
-
-            NavButton(
-                label = "🏠 Home",
-                bgColor = if (viewModel.currentContent == Content.Home) highlight else default
-            ) {
-                viewModel.currentContent = Content.Home
-            }
-
-            NavButton(
-                label = "📦 Inventory",
-                bgColor = if (viewModel.currentContent == Content.Inventory) highlight else default
-            ) {
-                viewModel.currentContent = Content.Inventory
-            }
+            Text("📦 Lumi Cafe")
+            NavButton("🏠 Home", bgColor = if (current == Content.Home) highlight else default) { viewModel.setContent(Content.Home) }
+            NavButton("📦 Inventory", bgColor = if (current == Content.Inventory) highlight else default) { viewModel.setContent(Content.Inventory) }
         }
     }
 }
 
-@Composable
-fun NavButton(
-    label: String,
-    bgColor: Color = Color.Transparent,
-    onClick: () -> Unit
-) {
-    LeftButton(
-        label = label,
-        bgColor = bgColor,
-        contentColor = Color.White,
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxHeight(0.075f)
-    )
-}
+
 

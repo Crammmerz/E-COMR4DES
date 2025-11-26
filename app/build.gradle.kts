@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
-    alias(libs.plugins.kotlin.kapt)
 }
 
 android {
@@ -51,11 +50,6 @@ android {
             )
         }
     }
-    kapt {
-        arguments {
-            arg("kapt.kotlin.generated", layout.buildDirectory.dir("generated/source/kaptKotlin").get().asFile.path)
-        }
-    }
 }
 
 dependencies {
@@ -63,6 +57,9 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui.text)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.hilt.common)
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
 
     // ALSO add BOM to androidTest and debug to align versions there too
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -106,5 +103,5 @@ dependencies {
 
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
 }

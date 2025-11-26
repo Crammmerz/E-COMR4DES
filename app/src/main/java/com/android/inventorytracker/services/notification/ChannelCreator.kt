@@ -34,12 +34,19 @@ object ChannelCreator {
                 channel.enableVibration(true)
                 channel.vibrationPattern = longArrayOf(0L, 300L, 150L, 300L)
                 channel.importance = NotificationManager.IMPORTANCE_HIGH
+                channel.setShowBadge(true)
             }
             AppChannel.WARNING -> {
                 channel.importance = NotificationManager.IMPORTANCE_DEFAULT
+                channel.setShowBadge(true)
             }
-            AppChannel.INFO, AppChannel.SILENT -> {
+            AppChannel.INFO -> {
                 channel.importance = NotificationManager.IMPORTANCE_LOW
+                channel.setShowBadge(true)
+            }
+            AppChannel.SILENT -> {
+                channel.importance = NotificationManager.IMPORTANCE_MIN
+                channel.setShowBadge(false)
             }
         }
     }

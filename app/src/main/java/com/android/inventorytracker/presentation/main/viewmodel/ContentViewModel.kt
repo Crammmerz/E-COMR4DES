@@ -1,7 +1,7 @@
 package com.android.inventorytracker.presentation.main.viewmodel
 
 import androidx.lifecycle.ViewModel
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 

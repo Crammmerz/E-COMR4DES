@@ -6,13 +6,17 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
 import com.android.inventorytracker.data.local.entities.UserEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(user: UserEntity)
+
+    @Upsert
+    suspend fun upsert(user: UserEntity)
 
     @Delete
     suspend fun delete(user: UserEntity)
@@ -31,4 +35,7 @@ interface UserDao {
 
     @Query("SELECT * FROM users ORDER BY username ASC")
     fun getUsersOrderedByUsername(): Flow<List<UserEntity>>
+
+    @Query("SELECT COUNT(*) FROM users")
+    suspend fun getCount(): Int
 }

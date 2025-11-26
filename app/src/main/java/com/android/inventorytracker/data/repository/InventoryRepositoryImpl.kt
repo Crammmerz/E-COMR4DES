@@ -6,6 +6,7 @@ import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.data.local.entities.ItemEntity
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.data.model.ItemWithBatches
+import com.android.inventorytracker.di.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -16,7 +17,7 @@ import javax.inject.Inject
 class ItemRepositoryImpl @Inject constructor(
     private val itemDao: ItemDao,
     private val batchDao: ItemBatchDao,
-    @com.android.inventorytracker.di.IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ItemRepository {
 
     override fun observeItems(): Flow<List<ItemEntity>> =

@@ -2,10 +2,10 @@ package com.android.inventorytracker.di
 
 import com.android.inventorytracker.data.repository.ItemRepository
 import com.android.inventorytracker.data.repository.ItemRepositoryImpl
+import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import dagger.Binds
 import javax.inject.Singleton
 
 @Module

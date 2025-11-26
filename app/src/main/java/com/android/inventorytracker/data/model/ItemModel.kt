@@ -19,10 +19,9 @@ data class ItemModel(
             val threshold = item.subUnitThreshold.takeIf { it != 0 } ?: 1
             return batch.sumOf { it.subUnit / threshold.toDouble() }
         }
+    val totalUnitFormatted: String get() = unitFormatter(totalUnit)
 
     val totalSubUnit: Int get() = batch.sumOf { it.subUnit }
-
-    val totalUnitFormatted: String get() = unitFormatter(totalUnit)
 
     val nearestExpiry: LocalDate? get() = batch.mapNotNull { expiryParser(it.expiryDate) }.minOrNull()
 

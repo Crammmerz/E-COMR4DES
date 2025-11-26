@@ -9,7 +9,7 @@ import com.android.inventorytracker.data.model.LoginState
 import com.android.inventorytracker.data.model.UserRole
 import com.android.inventorytracker.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 @HiltViewModel

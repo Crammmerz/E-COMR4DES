@@ -18,18 +18,18 @@ object SyncScheduler {
             .setRequiresBatteryNotLow(true)
             .build()
 
-        val oneTimeReq = OneTimeWorkRequestBuilder<InventoryUpdateWorker>()
-            .setInitialDelay(1, TimeUnit.MINUTES)
+        val periodicReq = PeriodicWorkRequestBuilder<InventoryUpdateWorker>(
+            15, TimeUnit.MINUTES
+        )
             .setConstraints(constraints)
-            .addTag("inventory_sync_one_time")
+            .addTag("inventory_sync_periodic")
             .build()
 
         WorkManager.getInstance(appCtx)
-            .enqueueUniqueWork(
+            .enqueueUniquePeriodicWork(
                 InventoryUpdateWorker.UNIQUE_NAME,
-                ExistingWorkPolicy.REPLACE,
-                oneTimeReq
+                ExistingPeriodicWorkPolicy.REPLACE,
+                periodicReq
             )
-
     }
 }

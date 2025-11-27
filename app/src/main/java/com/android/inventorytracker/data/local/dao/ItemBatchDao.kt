@@ -21,7 +21,7 @@ interface ItemBatchDao {
     suspend fun updateBatch(batch: ItemBatchEntity)
 
     @Query("SELECT * FROM itemBatch WHERE itemId = :itemId AND expiryDate = :expiryDate")
-    suspend fun getBatch(itemId: Int, expiryDate: String): ItemBatchEntity?
+    suspend fun getBatch(itemId: Int, expiryDate: Long): ItemBatchEntity?
 
     @Query("SELECT * FROM itemBatch ORDER BY expiryDate ASC")
     fun getBatchesOrderByUnitAsc(): Flow<List<ItemBatchEntity>>

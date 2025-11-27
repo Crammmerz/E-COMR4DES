@@ -24,10 +24,11 @@ fun DeleteItemButton(onClick: () -> Unit){
 }
 
 @Composable
-fun ItemButton(text: String, modifier: Modifier,onClick: () -> Unit){
+fun ItemButton(text: String, enabled: Boolean = true, modifier: Modifier,onClick: () -> Unit){
     Button(
         modifier = modifier,
-        onClick = onClick //TODO: Design The Button
+        enabled = enabled,
+        onClick = onClick, //TODO: Design The Button
     ) {
         Text(text)
     }

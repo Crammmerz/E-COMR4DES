@@ -8,9 +8,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.presentation.shared.component.primitive.CenterButton
+import com.android.inventorytracker.ui.theme.Ochre
 
 @Composable
-fun RemoveStockButton(onClick: () -> Unit){
+fun BatchInsertionButton(onClick: () -> Unit){
+    CenterButton(
+        modifier = Modifier.fillMaxWidth(),
+        label = "+ Add Stock",
+        bgColor = Ochre,
+        onClick = onClick
+    )
+}
+
+@Composable
+fun RemoveStockButton(enabled: Boolean = true, onClick: () -> Unit){
     CenterButton(
         modifier = Modifier
             .fillMaxWidth()
@@ -22,6 +33,7 @@ fun RemoveStockButton(onClick: () -> Unit){
         label = "- Remove Stock",
         bgColor = Color.White,
         contentColor = Color.Black,
-        onClick = onClick
+        onClick = onClick,
+        enabled = enabled
     )
 }

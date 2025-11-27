@@ -10,12 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
+import com.android.inventorytracker.util.toFormattedDateString
 import java.text.DecimalFormat
 
 @Composable
 fun BatchDataRow(threshold: Int, batch: ItemBatchEntity){
     val df = DecimalFormat("#.####")
     val batchId = (batch.itemId*1000+batch.id).toString()
+    val expiryDate = batch.expiryDate.toFormattedDateString()
     val unit = df.format(batch.subUnit/threshold.toDouble())
     val subUnit = batch.subUnit.toString()
     Row(
@@ -23,13 +25,24 @@ fun BatchDataRow(threshold: Int, batch: ItemBatchEntity){
             .fillMaxWidth()
             .padding(horizontal = 10.dp, vertical = 5.dp)
     ){
-        Text(batchId, modifier = Modifier.weight(0.2f))
-        Text(batch.expiryDate, modifier = Modifier.weight(0.5f))
+        Text(
+            text = batchId,
+            modifier = Modifier.weight(0.2f),
+            )
+        Text(
+            text = expiryDate,
+            modifier = Modifier.weight(0.5f),
+            )
         //TODO: Expiry Level
-        Text(unit, modifier = Modifier.weight(0.2f),
-            textAlign = TextAlign.Center,)
-        Text(subUnit,
+        Text(
+            text = unit,
+            modifier = Modifier.weight(0.2f),
+            textAlign = TextAlign.Center,
+            )
+        Text(
+            text = subUnit,
             modifier = Modifier.weight(0.1f),
-            textAlign = TextAlign.Center,)
+            textAlign = TextAlign.Center,
+            )
     }
 }

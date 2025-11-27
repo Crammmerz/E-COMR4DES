@@ -17,16 +17,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.inventorytracker.R
 import com.android.inventorytracker.data.model.ItemModel
-import com.android.inventorytracker.presentation.popup.batch_insertion.InsertBatchPopup
-import com.android.inventorytracker.presentation.popup.batch_removal.DeleteBatchPopup
+import com.android.inventorytracker.presentation.popup.batch_insertion.BatchInsertionPopup
+import com.android.inventorytracker.presentation.popup.batch_removal.BatchDeductPopup
 import com.android.inventorytracker.presentation.popup.item_detail.ItemDetailPopup
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
@@ -40,6 +40,7 @@ fun ItemDataRow(
     batchViewModel: BatchViewModel,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     var showItemDetail by rememberSaveable { mutableStateOf(false) }
     var showInsertBatch by rememberSaveable { mutableStateOf(false) }
     var showDeleteBatch by rememberSaveable { mutableStateOf(false) }
@@ -69,7 +70,7 @@ fun ItemDataRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
-            painter = painterResource(id = R.drawable.haahahaahha),
+            painter = painterResource(id = R.drawable.outline_add_photo_alternate_24),
             contentDescription = "Placeholder image",
             modifier = Modifier
                 .clip(RoundedCornerShape(5.dp))
@@ -79,9 +80,9 @@ fun ItemDataRow(
         ItemText(itemModel.item.name, Modifier.weight(1f))
         ItemText(itemModel.nearestExpiryFormatted(), Modifier.weight(0.75f))
         ItemText(itemModel.totalUnitFormatted, Modifier.weight(0.5f).background(stockColor, shape = RoundedCornerShape(5.dp)), TextAlign.Center)
-        ItemButton("-", Modifier.weight(0.25f)) { showDeleteBatch = true }
-        ItemButton("+", Modifier.weight(0.25f)) { showInsertBatch = true }
-        ItemButton("View More", Modifier.weight(0.5f)) { showItemDetail = true }
+        ItemButton(text = "-",  enabled = itemModel.totalSubUnit > 0, modifier =  Modifier.weight(0.25f)) { showDeleteBatch = true }
+        ItemButton("+", modifier = Modifier.weight(0.25f)) { showInsertBatch = true }
+        ItemButton("View More", modifier = Modifier.weight(0.5f)) { showItemDetail = true }
     }
 
     if (showItemDetail) {
@@ -90,38 +91,37 @@ fun ItemDataRow(
             batchViewModel = batchViewModel,
             onDismiss = { showItemDetail = false },
             onUpdateItem = itemViewModel::updateItem,
-            onUpdateBatch = batchViewModel::convertBatch
+            onUpdateBatch = batchViewModel::onConvertBatch
         )
     }
 
     if(showInsertBatch){
         LaunchedEffect(true) {
-            batchViewModel.unitReset()
+            batchViewModel.onUnitReset()
         }
-        InsertBatchPopup(
+        BatchInsertionPopup(
             itemModel = itemModel,
             unit = unit,
             subUnit = subUnit,
             onUnitChange = { batchViewModel.onUnitChange(it, itemModel.item.subUnitThreshold) },
             onSubUnitChange = { batchViewModel.onSubUnitChange(it, itemModel.item.subUnitThreshold) },
             onDismiss = { showInsertBatch = false },
-            onStore = batchViewModel::storeBatch
+            onStore = batchViewModel::onStoreBatch
         )
     }
 
     if(showDeleteBatch){
         LaunchedEffect(true) {
-            batchViewModel.unitReset()
+            batchViewModel.onUnitReset()
         }
-        DeleteBatchPopup(
-            totalSubUnit = itemModel.totalSubUnit,
+        BatchDeductPopup(
             batch = itemModel.batch,
             unit = unit,
             subUnit = subUnit,
             onUnitChange = { batchViewModel.onUnitChange(it, itemModel.item.subUnitThreshold) },
             onSubUnitChange = { batchViewModel.onSubUnitChange(it, itemModel.item.subUnitThreshold) },
             onDismiss = { showDeleteBatch = false },
-            onDelete = batchViewModel::deleteBatch
+            onDeductStock = batchViewModel::onDeductStock
         )
     }
 }

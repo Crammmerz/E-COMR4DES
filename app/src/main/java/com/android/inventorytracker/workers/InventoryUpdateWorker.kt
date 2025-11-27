@@ -11,11 +11,14 @@ import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.data.repository.ItemRepository
 import com.android.inventorytracker.services.notification.AppChannel
 import com.android.inventorytracker.services.notification.NotificationHelper
+import com.android.inventorytracker.util.toLocalDate
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
 import java.io.IOException
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 
 @HiltWorker
 class InventoryUpdateWorker @AssistedInject constructor(
@@ -26,8 +29,6 @@ class InventoryUpdateWorker @AssistedInject constructor(
 
     companion object {
         const val UNIQUE_NAME = "inventory_update_worker"
-        const val INPUT_TITLE = "title"
-        const val INPUT_TEXT = "text"
         const val NOTIF_ID = 2001
         private const val FG_NOTIF_ID = 2000
     }
@@ -64,12 +65,16 @@ class InventoryUpdateWorker @AssistedInject constructor(
             val today = LocalDate.now()
 
             val isZero = itemModels.filter { it.totalSubUnit == 0 }
-            val isExpired = itemModels.filter { it.nearestExpiry?.isBefore(today) == true }
-            val isLow = itemModels.filter {
-                it.totalSubUnit > 0 && it.totalSubUnit <= it.item.unitThreshold * 0.20
+            val isExpired = itemModels.filter { model ->
+                model.nearestExpiry?.toLocalDate()?.isBefore(today) == true
             }
-            val isExpiring = itemModels.filter {
-                it.nearestExpiry?.let { date ->
+
+            val isLow = itemModels.filter { model ->
+                model.totalSubUnit > 0 &&
+                        model.totalSubUnit <= model.item.unitThreshold * 0.20
+            }
+            val isExpiring = itemModels.filter { model ->
+                model.nearestExpiry?.toLocalDate()?.let { date ->
                     !date.isBefore(today) && date.isBefore(today.plusMonths(1))
                 } == true
             }
@@ -128,3 +133,4 @@ class InventoryUpdateWorker @AssistedInject constructor(
         }
     }
 }
+

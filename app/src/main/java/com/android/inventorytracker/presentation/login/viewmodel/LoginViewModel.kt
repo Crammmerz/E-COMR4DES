@@ -28,9 +28,6 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun updateLoginState(newState: LoginState) {
-        this.loginState = newState
-    }
     fun updateUserRole(role: UserRole){
         this.userRole = role
     }

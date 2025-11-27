@@ -1,18 +1,18 @@
 package com.android.inventorytracker.presentation.popup.batch_insertion
 
-import android.os.Build
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
@@ -22,13 +22,11 @@ import com.android.inventorytracker.presentation.shared.component.item_property_
 import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
 import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
-import java.time.Instant
+import com.android.inventorytracker.util.toLocalDate
 import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 @Composable
-fun InsertBatchPopup(
+fun BatchInsertionPopup(
     itemModel: ItemModel,
     unit: Float,
     subUnit: Int,
@@ -48,7 +46,7 @@ fun InsertBatchPopup(
         useImePadding = true
     ) {
         Column{
-            Row (){
+            Row {
                 Column(Modifier.weight(1f)) {
                     UnitFieldFloat(
                         unit = unit, onUnitChange = onUnitChange, // Pass value handler
@@ -62,29 +60,34 @@ fun InsertBatchPopup(
                     )
                 }
             }
-            DatePicker(state = datePickerState)
+            DatePicker(
+                state = datePickerState,
+                colors = DatePickerDefaults.colors(
+                    containerColor = Color.Transparent,
+                    selectedDayContainerColor = Color(0xFF4CAF50),
+                    todayContentColor = Color.Black
+                )
+            ) // TODO (Date Picker Design)
             Row {
                 CancelButton(onClick = { onDismiss() },)
                 ConfirmButton("Add Stock") {
                     val selectedDateMillis = datePickerState.selectedDateMillis
-                    val selectedDate = selectedDateMillis?.let {
-                        Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
-                    }
+                    val selectedDate = selectedDateMillis?.toLocalDate()
 
-                    val isTodayOrFuture = selectedDate != null && !selectedDate.isBefore(LocalDate.now())
-                    if(!isTodayOrFuture)Toast.makeText(context, "Date is wrong", Toast.LENGTH_SHORT).show()
-                    if(unit<=0)Toast.makeText(context, "Unit is wrong", Toast.LENGTH_SHORT).show()
-                    if (isTodayOrFuture && unit > 0) {
-                        val formattedDate = selectedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-
-                        val batch = ItemBatchEntity(
-                            itemId = itemModel.item.id,
-                            subUnit = subUnit,
-                            expiryDate = formattedDate
-                        )
-                        onStore(batch)
-                        Toast.makeText(context, "Item stored successfully", Toast.LENGTH_SHORT).show()
-                        onDismiss()
+                    when {
+                        selectedDate == null || selectedDate.isBefore(LocalDate.now()) ->
+                            Toast.makeText(context, "Please enter a valid date", Toast.LENGTH_SHORT).show()
+                        subUnit <= 0 ->
+                            Toast.makeText(context, "Please enter a valid unit", Toast.LENGTH_SHORT).show()
+                        else -> {
+                            val batch = ItemBatchEntity(
+                                itemId = itemModel.item.id,
+                                subUnit = subUnit,
+                                expiryDate = selectedDateMillis
+                            )
+                            onStore(batch)
+                            onDismiss()
+                        }
                     }
                 }
             }

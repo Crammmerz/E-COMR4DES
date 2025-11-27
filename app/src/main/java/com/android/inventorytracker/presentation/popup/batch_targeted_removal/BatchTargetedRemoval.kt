@@ -1,4 +1,4 @@
-package com.android.inventorytracker.presentation.popup.batch_removal
+package com.android.inventorytracker.presentation.popup.batch_targeted_removal
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
@@ -6,8 +6,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
@@ -18,17 +23,18 @@ import com.android.inventorytracker.presentation.shared.component.primitive.Conf
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
 
 @Composable
-fun BatchDeductPopup(
+fun BatchTargetedRemoval(
     batch: List<ItemBatchEntity>,
     unit: Float,
     subUnit: Int,
     onUnitChange: (Float) -> Unit,
     onSubUnitChange: (Int) -> Unit,
     onDismiss: () -> Unit,
-    onDeductStock: (List<ItemBatchEntity>, toRemove: Int) -> Unit
-    ,
+    onTargetedDeduct: (batch: ItemBatchEntity, toRemove: Int) -> Unit,
 ){
+    val datePickerState = rememberDatePickerState(initialDisplayMode = DisplayMode.Input)
     val context = LocalContext.current
+
     DialogHost(
         Modifier
             .fillMaxHeight(0.8f)
@@ -51,14 +57,30 @@ fun BatchDeductPopup(
                     )
                 }
             }
+            DatePicker(
+                state = datePickerState,
+                colors = DatePickerDefaults.colors(
+                    containerColor = Color.Transparent,
+                    selectedDayContainerColor = Color(0xFF4CAF50),
+                    todayContentColor = Color.Black
+                )
+            ) //TODO (Design of Date Picker)
             Row {
                 CancelButton(onClick = { onDismiss() },)
                 ConfirmButton("Deduct Stock") {
-                    when  {
-                        subUnit > batch.sumOf { it.subUnit } || subUnit <= 0 ->
-                            Toast.makeText(context, "Please enter a valid amount", Toast.LENGTH_SHORT).show()
-                        else ->
-                            onDeductStock(batch, subUnit)
+                    val date = datePickerState.selectedDateMillis
+                    val exist = batch.firstOrNull { it.expiryDate == date }
+                    when {
+                        date == null || exist == null ->
+                            Toast.makeText(context, "Please enter a valid Date", Toast.LENGTH_SHORT).show()
+                        subUnit <= 0 ->
+                            Toast.makeText(context, "Amount must be greater than 0", Toast.LENGTH_SHORT).show()
+                        exist.subUnit < subUnit ->
+                            Toast.makeText(context, "Amount exceeds available stock", Toast.LENGTH_SHORT).show()
+                        else -> {
+                            onTargetedDeduct(exist, subUnit)
+                            onDismiss()
+                        }
                     }
                 }
             }

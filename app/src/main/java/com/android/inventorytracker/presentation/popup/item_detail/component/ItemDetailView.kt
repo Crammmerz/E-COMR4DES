@@ -37,7 +37,7 @@ fun ItemDetailView(
     onDismiss: () -> Unit,
     onUpdateItem: (ItemEntity) -> Unit,
     onUpdateBatch: (List<ItemBatchEntity>, Int, Int) -> Unit,
-    setMode: (ScreenMode) -> Unit
+    onSetMode: (ScreenMode) -> Unit
 ){
     var name by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.name) }
     var unitThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.unitThreshold) }
@@ -105,7 +105,7 @@ fun ItemDetailView(
                                     onUnitChange = { unitThreshold = it }
                                 )
                                 Spacer(Modifier.weight(1f))
-                                RemoveStockButton(onClick = { setMode(ScreenMode.DELETE_BATCH) })
+                                RemoveStockButton(enabled = itemModel.totalUnit > 0, onClick = { onSetMode(ScreenMode.DELETE_BATCH) })
                             }
                             Column(Modifier.weight(1f)) {
                                 SubUnitField(
@@ -113,7 +113,7 @@ fun ItemDetailView(
                                     onSubUnitChange = { subUnitThreshold = it }
                                 )
                                 Spacer(Modifier.weight(1f))
-                                BatchInsertionButton(onClick = { setMode(ScreenMode.ADD_BATCH) })
+                                BatchInsertionButton(onClick = { onSetMode(ScreenMode.ADD_BATCH) })
                             }
                         }
                     }

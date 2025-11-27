@@ -2,7 +2,9 @@ package com.android.inventorytracker.data.model
 
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.data.local.entities.ItemEntity
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 enum class SortBy {
@@ -23,8 +25,15 @@ data class ItemModel(
 
     val totalSubUnit: Int get() = batch.sumOf { it.subUnit }
 
-    val nearestExpiry: LocalDate? get() = batch.mapNotNull { expiryParser(it.expiryDate) }.minOrNull()
+    val nearestExpiry: Long? get() = batch.minOfOrNull { it.expiryDate }
 
-    fun nearestExpiryFormatted(dateFormatter: DateTimeFormatter? = DateTimeFormatter.ofPattern("MMM dd, yyyy")): String =
-        nearestExpiry?.let { dateFormatter?.format(it) } ?: "N/A"
+    fun nearestExpiryFormatted(
+        dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
+    ): String {
+        return nearestExpiry?.let { millis ->
+            val instant = Instant.ofEpochMilli(millis)
+            val localDate = instant.atZone(ZoneId.systemDefault()).toLocalDate()
+            dateFormatter.format(localDate)
+        } ?: "N/A"
+    }
 }

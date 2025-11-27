@@ -11,7 +11,7 @@ import com.android.inventorytracker.data.local.entities.UserEntity
 
 @Database(
     entities = [ItemEntity::class, ItemBatchEntity::class, UserEntity::class],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 abstract class InventoryDatabase : RoomDatabase() {

@@ -15,7 +15,7 @@ import com.android.inventorytracker.R
 @Composable
 fun PhotoSelection(modifier: Modifier = Modifier){
     Image(
-        painter = painterResource(id = R.drawable.haahahaahha),
+        painter = painterResource(id = R.drawable.outline_add_photo_alternate_24),
         contentDescription = "Placeholder image",
         modifier = modifier
             .fillMaxWidth()

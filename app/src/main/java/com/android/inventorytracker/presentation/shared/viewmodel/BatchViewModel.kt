@@ -22,7 +22,7 @@ class BatchViewModel @Inject constructor(
     var subUnit by mutableIntStateOf(0)
         private set
 
-    fun unitReset(){
+    fun onUnitReset(){
         unit = 0f
         subUnit = 0
     }
@@ -35,7 +35,7 @@ class BatchViewModel @Inject constructor(
         subUnit = newSubUnit
         unit = newSubUnit.toFloat() / threshold
     }
-    fun storeBatch(batch: ItemBatchEntity) {
+    fun onStoreBatch(batch: ItemBatchEntity) {
         viewModelScope.launch {
             val existing = itemRepository.findBatch(batch.itemId, batch.expiryDate)
             if (existing==null) {
@@ -47,7 +47,7 @@ class BatchViewModel @Inject constructor(
         }
     }
 
-    fun convertBatch(batches: List<ItemBatchEntity>, subUnitThreshold: Int, newSubUnitThreshold: Int){
+    fun onConvertBatch(batches: List<ItemBatchEntity>, subUnitThreshold: Int, newSubUnitThreshold: Int){
         viewModelScope.launch {
             batches.forEach { batch ->
                 val unit = batch.subUnit.toDouble()/subUnitThreshold
@@ -57,7 +57,10 @@ class BatchViewModel @Inject constructor(
         }
     }
 
-    fun deleteBatch(batches: List<ItemBatchEntity>, toRemove: Int) {
+    fun onDeductStock(
+        batches: List<ItemBatchEntity>,
+        toRemove: Int
+    ) {
         viewModelScope.launch {
             var remaining = toRemove
 
@@ -73,6 +76,21 @@ class BatchViewModel @Inject constructor(
                 } else {
                     itemRepository.updateBatch(batch)
                 }
+            }
+        }
+    }
+
+    fun onTargetedDeductStock(
+        batch: ItemBatchEntity,
+        toRemove: Int
+    ) {
+        viewModelScope.launch {
+            batch.subUnit -= toRemove
+
+            if (batch.subUnit == 0) {
+                itemRepository.deleteBatch(batch)
+            } else {
+                itemRepository.updateBatch(batch)
             }
         }
     }

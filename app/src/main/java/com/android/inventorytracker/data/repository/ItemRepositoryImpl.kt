@@ -49,7 +49,7 @@ class ItemRepositoryImpl @Inject constructor(
         itemDao.deleteItem(item)
     }
 
-    override suspend fun findBatch(itemId: Int, expiryDate: String): ItemBatchEntity? =
+    override suspend fun findBatch(itemId: Int, expiryDate: Long): ItemBatchEntity? =
         withContext(ioDispatcher) {
             batchDao.getBatch(itemId, expiryDate)
         }

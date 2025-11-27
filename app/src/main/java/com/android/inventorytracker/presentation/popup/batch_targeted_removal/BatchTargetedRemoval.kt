@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -43,6 +44,15 @@ fun BatchTargetedRemoval(
         useImePadding = true
     ) {
         Column {
+            Text("Stock Deduction")
+            DatePicker(
+                state = datePickerState,
+                colors = DatePickerDefaults.colors(
+                    containerColor = Color.Transparent,
+                    selectedDayContainerColor = Color(0xFF4CAF50),
+                    todayContentColor = Color.Black
+                )
+            ) //TODO (Design of Date Picker)
             Row {
                 Column(Modifier.weight(1f)) {
                     UnitFieldFloat(
@@ -57,14 +67,6 @@ fun BatchTargetedRemoval(
                     )
                 }
             }
-            DatePicker(
-                state = datePickerState,
-                colors = DatePickerDefaults.colors(
-                    containerColor = Color.Transparent,
-                    selectedDayContainerColor = Color(0xFF4CAF50),
-                    todayContentColor = Color.Black
-                )
-            ) //TODO (Design of Date Picker)
             Row {
                 CancelButton(onClick = { onDismiss() },)
                 ConfirmButton("Deduct Stock") {

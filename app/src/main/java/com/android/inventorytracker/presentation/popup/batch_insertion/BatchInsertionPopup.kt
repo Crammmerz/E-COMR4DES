@@ -46,6 +46,14 @@ fun BatchInsertionPopup(
         useImePadding = true
     ) {
         Column{
+            DatePicker(
+                state = datePickerState,
+                colors = DatePickerDefaults.colors(
+                    containerColor = Color.Transparent,
+                    selectedDayContainerColor = Color(0xFF4CAF50),
+                    todayContentColor = Color.Black
+                )
+            ) // TODO (Date Picker Design)
             Row {
                 Column(Modifier.weight(1f)) {
                     UnitFieldFloat(
@@ -60,14 +68,6 @@ fun BatchInsertionPopup(
                     )
                 }
             }
-            DatePicker(
-                state = datePickerState,
-                colors = DatePickerDefaults.colors(
-                    containerColor = Color.Transparent,
-                    selectedDayContainerColor = Color(0xFF4CAF50),
-                    todayContentColor = Color.Black
-                )
-            ) // TODO (Date Picker Design)
             Row {
                 CancelButton(onClick = { onDismiss() },)
                 ConfirmButton("Add Stock") {

@@ -38,7 +38,7 @@ object NotificationHelper {
         }
 
         return NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.drawable.sharp_add_24)
+            .setSmallIcon(R.drawable.outline_add_photo_alternate_24)
             .setContentTitle(title)
             .setContentText(text)
             .setPriority(priority)

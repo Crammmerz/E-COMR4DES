@@ -9,31 +9,36 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.presentation.main.component.ContentSection
 import com.android.inventorytracker.presentation.main.component.NavBar
 import com.android.inventorytracker.presentation.main.component.TopBar
-import com.android.inventorytracker.presentation.main.viewmodel.ContentViewModel
+import com.android.inventorytracker.presentation.main.viewmodel.MainViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 
 
 @Composable
 fun Main(
     itemViewModel: ItemViewModel = hiltViewModel(),
     batchViewModel: BatchViewModel = hiltViewModel(),
-    contentViewModel: ContentViewModel = hiltViewModel()
+    mainViewModel: MainViewModel = hiltViewModel()
 ) {
-    Scaffold(topBar = { TopBar() }) { inner ->
+    val showNavBar by mainViewModel.showNavBar.collectAsState()
+    Scaffold(topBar = { TopBar(mainViewModel) }) { inner ->
         Row(modifier = Modifier
             .padding(inner)
             .fillMaxSize()
         ) {
-            NavBar(
-                modifier = Modifier.widthIn(min = 200.dp, max = 320.dp),
-                viewModel = contentViewModel
-            )
+            if (showNavBar){
+                NavBar(
+                    modifier = Modifier.widthIn(min = 130.dp, max = 150.dp),
+                    viewModel = mainViewModel
+                )
+            }
             ContentSection(
                 modifier = Modifier.weight(1f),
                 itemViewModel = itemViewModel,
                 batchViewModel = batchViewModel,
-                contentViewModel = contentViewModel
+                mainViewModel = mainViewModel
             )
         }
     }

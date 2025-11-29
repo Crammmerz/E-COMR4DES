@@ -12,20 +12,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.presentation.main.viewmodel.Content
-import com.android.inventorytracker.presentation.main.viewmodel.ContentViewModel
+import com.android.inventorytracker.presentation.main.viewmodel.MainViewModel
 import com.android.inventorytracker.ui.theme.Ochre
 
 @Composable
 fun NavBar(
     modifier: Modifier = Modifier,
-    bgColor: Color = Ochre,
-    viewModel: ContentViewModel
+    viewModel: MainViewModel
 ) {
     val current by viewModel.currentContent.collectAsState()
     val highlight = Color.Black.copy(alpha = 0.25f)
     val default = Color.Transparent
 
-    Surface(color = bgColor, modifier = modifier.fillMaxHeight()) {
+    Surface(color = Ochre, modifier = modifier.fillMaxHeight()) {
         Column(modifier = Modifier.padding(10.dp)) {
             Text("📦 Lumi Cafe")
             NavButton("🏠 Home", bgColor = if (current == Content.Home) highlight else default) { viewModel.setContent(Content.Home) }

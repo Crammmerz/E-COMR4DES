@@ -6,6 +6,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -40,7 +44,6 @@ fun ItemDataRow(
     batchViewModel: BatchViewModel,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
     var showItemDetail by rememberSaveable { mutableStateOf(false) }
     var showInsertBatch by rememberSaveable { mutableStateOf(false) }
     var showDeleteBatch by rememberSaveable { mutableStateOf(false) }
@@ -60,14 +63,14 @@ fun ItemDataRow(
 
     Row(
         modifier = modifier
-            .height(75.dp)
+            .height(60.dp)
             .fillMaxWidth()
             .background(Color.White)
             .clip(RoundedCornerShape(5.dp))
             .border(1.dp, Color.DarkGray, RoundedCornerShape(5.dp))
-            .padding(horizontal = 15.dp, vertical = 5.dp),
+            .padding(horizontal = 5.dp, vertical = 5.dp),
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(5.dp),
-        verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
             painter = painterResource(id = R.drawable.outline_add_photo_alternate_24),
@@ -75,13 +78,27 @@ fun ItemDataRow(
             modifier = Modifier
                 .clip(RoundedCornerShape(5.dp))
                 .size(64.dp)
+                .padding(horizontal = 10.dp),
         )
-        Spacer(Modifier.weight(0.1f))
-        ItemText(itemModel.item.name, Modifier.weight(1f))
-        ItemText(itemModel.nearestExpiryFormatted(), Modifier.weight(0.75f))
-        ItemText(itemModel.totalUnitFormatted, Modifier.weight(0.5f).background(stockColor, shape = RoundedCornerShape(5.dp)), TextAlign.Center)
-        ItemButton(text = "-",  enabled = itemModel.totalSubUnit > 0, modifier =  Modifier.weight(0.25f)) { showDeleteBatch = true }
-        ItemButton("+", modifier = Modifier.weight(0.25f)) { showInsertBatch = true }
+        ItemText(itemModel.item.name, Modifier.weight(0.75f))
+        ItemText(itemModel.nearestExpiryFormatted(), Modifier.weight(0.5f))
+        ItemText(itemModel.totalUnitFormatted,
+            modifier = Modifier
+                .weight(0.5f)
+                .background(
+                    stockColor,
+                    shape = RoundedCornerShape(5.dp)), TextAlign.Center)
+        ItemButton(
+            modifier =  Modifier.weight(0.25f),
+            enabled = itemModel.totalSubUnit > 0,
+            onClick = { showDeleteBatch = true },
+            text = "-"
+        )
+        ItemButton (
+            modifier =  Modifier.weight(0.25f),
+            onClick = { showInsertBatch = true },
+            text = "+"
+        )
         ItemButton("View More", modifier = Modifier.weight(0.5f)) { showItemDetail = true }
     }
 
@@ -129,7 +146,7 @@ fun ItemDataRow(
 @Composable
 fun ItemText(
     text: String,
-    modifier: Modifier = Modifier.background(LightSand, shape = RoundedCornerShape(5.dp)),
+    modifier: Modifier = Modifier,
     textAlign: TextAlign = TextAlign.Start
 ) {
     Text(
@@ -138,10 +155,13 @@ fun ItemText(
         fontWeight = FontWeight.SemiBold,
         fontSize = 13.sp,
         textAlign = textAlign,
+        maxLines = 1,
+        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
         modifier = modifier
+            .background(LightSand, shape = RoundedCornerShape(5.dp))
             .clip(RoundedCornerShape(5.dp))
             .border(1.dp, Color.LightGray, RoundedCornerShape(5.dp))
-            .padding(horizontal = 7.dp, vertical = 7.dp)
+            .padding(horizontal = 5.dp, vertical = 7.dp)
     )
 }
 

@@ -24,7 +24,11 @@ object NotificationHelper {
         text: String,
         priority: Int,
         intent: Intent? = null,
-        ongoing: Boolean = false
+        ongoing: Boolean = false,
+        expired: String? = null,
+        noStock: String? = null,
+        lowStock: String? = null,
+        expiring: String? = null,
     ): Notification {
         val pending = intent?.let {
             PendingIntent.getActivity(
@@ -37,7 +41,7 @@ object NotificationHelper {
             )
         }
 
-        return NotificationCompat.Builder(context, channelId)
+        val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.outline_add_photo_alternate_24)
             .setContentTitle(title)
             .setContentText(text)
@@ -45,7 +49,19 @@ object NotificationHelper {
             .setContentIntent(pending)
             .setOngoing(ongoing)
             .setAutoCancel(!ongoing)
-            .build()
+
+        // Collect all lines into one InboxStyle
+        val inboxStyle = NotificationCompat.InboxStyle()
+        if (!expired.isNullOrBlank()) inboxStyle.addLine("Expired: $expired")
+        if (!noStock.isNullOrBlank()) inboxStyle.addLine("Depleted: $noStock")
+        if (!lowStock.isNullOrBlank()) inboxStyle.addLine("Low Stock: $lowStock")
+        if (!expiring.isNullOrBlank()) inboxStyle.addLine("Expiring Soon: $expiring")
+
+        if (!expired.isNullOrBlank() || !noStock.isNullOrBlank() || !lowStock.isNullOrBlank() || !expiring.isNullOrBlank()){
+            builder.setStyle(inboxStyle)
+        }
+
+        return builder.build()
     }
 
     fun canPostNotifications(context: Context): Boolean {

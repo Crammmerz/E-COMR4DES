@@ -71,7 +71,7 @@ class InventoryUpdateWorker @AssistedInject constructor(
 
             val isLow = itemModels.filter { model ->
                 model.totalSubUnit > 0 &&
-                        model.totalSubUnit <= model.item.unitThreshold * 0.20
+                        model.totalUnit <= model.item.unitThreshold * 0.20
             }
             val isExpiring = itemModels.filter { model ->
                 model.nearestExpiry?.toLocalDate()?.let { date ->
@@ -88,33 +88,38 @@ class InventoryUpdateWorker @AssistedInject constructor(
                 when {
                     isZero.isNotEmpty() || isExpired.isNotEmpty() -> {
                         val contentText = buildString {
-                            if (isExpired.isNotEmpty()) append("Expired Items: $expired\n")
-                            if (isZero.isNotEmpty()) append("Out of Stock: $noStock\n")
-                            if (isExpiring.isNotEmpty()) append("Nearly Expired Items: $expiring\n")
-                            if (isLow.isNotEmpty()) append("Running Low Stock: $lowStock\n")
+                            append("Critical: ${isExpired.count() + isZero.count()} \t")
+                            if(lowStock.isNotEmpty()||expiring.isNotEmpty()){
+                                append("Warning: ${isExpiring.count() + isLow.count()} \n")
+                            }
                         }
 
                         val notif = NotificationHelper.buildNotification(
-                            context,
-                            AppChannel.CRITICAL.id,
-                            "Urgent Inventory Issue",
-                            contentText,
-                            NotificationHelper.channelImportanceToPriority(AppChannel.CRITICAL.importance)
+                            context = context,
+                            channelId = AppChannel.CRITICAL.id,
+                            title = "Urgent Inventory Issue",
+                            text = contentText,
+                            priority = NotificationHelper.channelImportanceToPriority(AppChannel.CRITICAL.importance),
+                            expired = expired,
+                            noStock = noStock,
+                            lowStock = lowStock,
+                            expiring = expiring
                         )
                         @SuppressLint("MissingPermission")
                         NotificationHelper.safeNotify(context, "inventory_updates".hashCode(), notif)
                     }
                     isLow.isNotEmpty() || isExpiring.isNotEmpty() -> {
                         val contentText = buildString {
-                            if(isExpiring.isNotEmpty()) append("Nearly Expired Items: $expiring\n")
-                            if(isLow.isNotEmpty()) append("Running Low Stock: $lowStock\n")
+                            append("Stock Alert : ${isExpiring.count() + isLow.count()}")
                         }
                         val notif = NotificationHelper.buildNotification(
                             context,
                             AppChannel.WARNING.id,
-                            "Inventory Status Notice",
-                            contentText,
-                            NotificationHelper.channelImportanceToPriority(AppChannel.WARNING.importance)
+                            title = "Inventory Status Notice",
+                            text = contentText,
+                            priority = NotificationHelper.channelImportanceToPriority(AppChannel.WARNING.importance),
+                            lowStock = lowStock,
+                            expiring = expiring
                         )
                         @SuppressLint("MissingPermission")
                         NotificationHelper.safeNotify(context, "inventory_updates".hashCode(), notif)

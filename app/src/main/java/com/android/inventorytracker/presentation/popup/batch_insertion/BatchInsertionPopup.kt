@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePicker
@@ -48,6 +49,7 @@ fun BatchInsertionPopup(
         Column{
             DatePicker(
                 state = datePickerState,
+                modifier = Modifier.fillMaxSize(0.5f),
                 colors = DatePickerDefaults.colors(
                     containerColor = Color.Transparent,
                     selectedDayContainerColor = Color(0xFF4CAF50),
@@ -58,13 +60,13 @@ fun BatchInsertionPopup(
                 Column(Modifier.weight(1f)) {
                     UnitFieldFloat(
                         unit = unit, onUnitChange = onUnitChange, // Pass value handler
-                        Modifier.padding(top = 10.dp)
+                        modifier = Modifier.padding(top = 10.dp)
                     )
                 }
                 Column(Modifier.weight(1f)) {
                     SubUnitField(
                         subUnit = subUnit, onSubUnitChange = onSubUnitChange, // Pass value handler
-                        Modifier.padding(vertical = 10.dp)
+                        modifier = Modifier.padding(vertical = 10.dp)
                     )
                 }
             }

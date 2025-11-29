@@ -4,6 +4,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun AddNewItemButton(onClick: () -> Unit) {
@@ -15,9 +16,10 @@ fun AddNewItemButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun DeleteItemButton(onClick: () -> Unit){
+fun DeleteItemButton(onClick: () -> Unit, enabled: Boolean){
     Button(
-        onClick = onClick //TODO: Design The Button
+        onClick = onClick, //TODO: Design The Button
+        enabled = enabled
     ) {
         Text("Remove Item")
     }
@@ -30,6 +32,9 @@ fun ItemButton(text: String, enabled: Boolean = true, modifier: Modifier,onClick
         enabled = enabled,
         onClick = onClick, //TODO: Design The Button
     ) {
-        Text(text)
+        Text(
+            text,
+            fontSize = 12.sp,
+            )
     }
 }

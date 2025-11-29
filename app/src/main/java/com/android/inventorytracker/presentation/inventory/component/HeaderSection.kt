@@ -1,5 +1,6 @@
 package com.android.inventorytracker.presentation.inventory.component
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -15,23 +16,25 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun HeaderSection(){
-    Row(Modifier.padding(vertical = 20.dp, horizontal = 15.dp)) {
+    Row(Modifier.padding(horizontal = 5.dp),
+        horizontalArrangement = Arrangement.spacedBy(5.dp),) {
         Text(
             text = "Image",
             color = Color.Black,
             fontWeight = FontWeight.SemiBold,
             fontSize = 13.sp,
-            modifier = Modifier.width(64.dp)
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .width(64.dp)
         )
-        Spacer(Modifier.weight(0.1f))
         Text(
             text = "Item Name",
             color = Color.Black,
             fontWeight = FontWeight.SemiBold,
             fontSize = 13.sp,
             modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 7.dp)
+                .weight(0.75f)
+                .padding(horizontal = 5.dp)
         )
         Text(
             text = "Expiry",
@@ -39,8 +42,8 @@ fun HeaderSection(){
             fontWeight = FontWeight.SemiBold,
             fontSize = 13.sp,
             modifier = Modifier
-                .weight(0.75f)
-                .padding(horizontal = 7.dp)
+                .weight(0.5f)
+                .padding(horizontal = 5.dp)
         )
         Text(
             text = "Unit",
@@ -49,26 +52,8 @@ fun HeaderSection(){
             fontSize = 13.sp,
             modifier = Modifier
                 .weight(0.5f)
-                .padding(horizontal = 7.dp)
+                .padding(horizontal = 5.dp)
         )
-        Text(
-            text = "Action",
-            textAlign = TextAlign.Center,
-            color = Color.Black,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 13.sp,
-            modifier = Modifier
-                .weight(0.5f)
-                .padding(horizontal = 7.dp)
-        )
-        Text(
-            text = "More",
-            color = Color.Black,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 13.sp,
-            modifier = Modifier
-                .weight(0.5f)
-                .padding(horizontal = 7.dp)
-        )
+        Spacer(modifier = Modifier.weight(1f))
     }
 }

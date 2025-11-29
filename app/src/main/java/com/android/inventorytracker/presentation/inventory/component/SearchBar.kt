@@ -54,7 +54,7 @@ fun SearchBar(
         modifier = modifier
             .background(Color.White, RoundedCornerShape(8.dp))
             .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(horizontal = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Leading search icon
@@ -68,11 +68,14 @@ fun SearchBar(
         Spacer(modifier = Modifier.width(8.dp))
 
         // Text field with placeholder
-        Box(modifier = Modifier.weight(1f)) {
+        Box(
+            modifier = Modifier.weight(1f),
+            contentAlignment = Alignment.CenterStart
+        ) {
             BasicTextField(
                 value = name,
                 onValueChange = { name = it.take(maxLength) },
-                textStyle = TextStyle(fontSize = 15.sp, color = Color.Black),
+                textStyle = TextStyle(fontSize = 12.sp, color = Color.Black),
                 cursorBrush = SolidColor(Color.Black),
                 singleLine = true,
                 maxLines = 1,
@@ -85,9 +88,9 @@ fun SearchBar(
 
             if (name.isEmpty()) {
                 Text(
-                    text = "Search Items...",
+                    text = " Search Items...",
                     color = Color.Gray,
-                    fontSize = 15.sp
+                    fontSize = 12.sp
                 )
             }
         }
@@ -95,6 +98,7 @@ fun SearchBar(
         // Trailing clear button
         if (name.isNotEmpty()) {
             IconButton(
+                modifier = Modifier.size(20.dp),
                 onClick = {
                     name = ""
                     itemViewModel.setSearchQuery("")

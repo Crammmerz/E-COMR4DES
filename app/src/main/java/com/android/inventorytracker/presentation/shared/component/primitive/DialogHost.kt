@@ -27,7 +27,6 @@ fun DialogHost(
                 .fillMaxSize(0.9f)
                 .background(LightSand, shape = RoundedCornerShape(5.dp))
                 .then(if (useImePadding) Modifier.imePadding() else Modifier)
-                .padding(24.dp)
         ) {
             content()
         }

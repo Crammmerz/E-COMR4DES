@@ -11,23 +11,22 @@ import com.android.inventorytracker.presentation.home.Home
 import com.android.inventorytracker.presentation.inventory.Inventory
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import com.android.inventorytracker.presentation.main.viewmodel.Content
-import com.android.inventorytracker.presentation.main.viewmodel.ContentViewModel
+import com.android.inventorytracker.presentation.main.viewmodel.MainViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.ui.theme.Sand
 
 @Composable
 fun ContentSection(
     modifier: Modifier = Modifier,
-    bgColor: Color = Sand,
     itemViewModel: ItemViewModel,
     batchViewModel: BatchViewModel,
-    contentViewModel: ContentViewModel
+    mainViewModel: MainViewModel
 ) {
     val itemModels by itemViewModel.itemModelList.collectAsState()
-    val currentContent by contentViewModel.currentContent.collectAsState()
+    val currentContent by mainViewModel.currentContent.collectAsState()
 
     Surface(
-        color = bgColor,
+        color = Sand,
         modifier = modifier.fillMaxSize()
     ) {
         when (currentContent) {
@@ -36,4 +35,3 @@ fun ContentSection(
         }
     }
 }
-

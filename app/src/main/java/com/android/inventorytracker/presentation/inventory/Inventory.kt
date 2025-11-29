@@ -20,32 +20,31 @@ fun Inventory(
     itemModels: List<ItemModel>,
     itemViewModel: ItemViewModel,
     batchViewModel: BatchViewModel,
-    modifier: Modifier = Modifier
 ) {
     var showAddItem by rememberSaveable { mutableStateOf(false) }
     var showDeleteItem by rememberSaveable { mutableStateOf(false) }
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
-            .padding(10.dp),
+            .padding(5.dp),
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             AddNewItemButton(onClick = { showAddItem = true })
-            DeleteItemButton(onClick = { showDeleteItem = true})
-            Spacer(Modifier.weight(0.5f))
-            SearchBar(itemViewModel, Modifier.weight(0.5f).height(45.dp))
+            DeleteItemButton(onClick = { showDeleteItem = true}, enabled = itemModels.isNotEmpty())
+            Spacer(Modifier.weight(1f))
+            SearchBar(itemViewModel, Modifier.width(275.dp).height(40.dp))
             SortDropdownMenu(itemViewModel)
         }
 
         HeaderSection()
 
         LazyColumn(
+            Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(bottom = 12.dp)
         ) {
             items(items = itemModels, key = { it.item.id }) { itemModel ->
                 ItemDataRow(

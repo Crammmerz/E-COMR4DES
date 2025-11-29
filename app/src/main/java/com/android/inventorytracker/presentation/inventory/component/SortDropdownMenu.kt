@@ -25,7 +25,7 @@ fun SortDropdownMenu(itemViewModel: ItemViewModel) {
     var expanded by remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(horizontal = 20.dp)
     ) {
         IconButton(onClick = { expanded = !expanded }) {
             Icon(Icons.Default.MoreVert, contentDescription = "More options")

@@ -10,18 +10,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.TimeViewModel
-import com.android.inventorytracker.ui.theme.Ochre
-
 
 @Composable
 fun Header(){
     val timeViewModel: TimeViewModel = viewModel()
-    Text(
-        text = "Welcome to Lumi Cafe",
-        color = Ochre,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 18.sp
-    )
     Text(
         text = timeViewModel.getDayAndDate(),
         color = Color.Black,

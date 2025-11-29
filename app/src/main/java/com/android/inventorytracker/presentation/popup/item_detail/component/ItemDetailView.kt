@@ -47,7 +47,8 @@ fun ItemDetailView(
 
     // TODO: DialogHost for App testing while DialogMockup for UI Preview Testing
     DialogHost(
-        modifier = Modifier.fillMaxSize(0.9f),
+        modifier = Modifier
+            .fillMaxSize(0.85f),
         useImePadding = true,
         onDismissRequest = {
             val updatedItem = itemModel.item.copy(
@@ -72,66 +73,63 @@ fun ItemDetailView(
             onDismiss()
         },
     ) {
-        Box(Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(5.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp)
+        ) {
+            HeaderSection(itemModel)
+            Row(
+                Modifier.weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                HeaderSection(itemModel)
-                HorizontalDivider(
-                    Modifier.padding(vertical = 5.dp),
-                    color = Color.DarkGray,
-                    thickness = 2.dp
-                )
+                Column(Modifier.weight(0.40f)) {
+                    PhotoSelection()
 
-                Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                    Column(Modifier.weight(0.45f)) {
-                        PhotoSelection()
+                    NameField(
+                        name = name,
+                        onNameChange = { name = it },
+                        modifier = Modifier.padding(top = 5.dp)
+                    )
 
-                        NameField(
-                            name = name,
-                            onNameChange = { name = it },
-                            modifier = Modifier.padding(top = 10.dp)
-                        )
-
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(10.dp),
-                            modifier = Modifier.padding(top = 5.dp)
-                        ) {
-                            Column(Modifier.weight(1f)) {
-                                UnitField(
-                                    unit = unitThreshold,
-                                    onUnitChange = { unitThreshold = it }
-                                )
-                                Spacer(Modifier.weight(1f))
-                                RemoveStockButton(enabled = itemModel.totalUnit > 0, onClick = { onSetMode(ScreenMode.DELETE_BATCH) })
-                            }
-                            Column(Modifier.weight(1f)) {
-                                SubUnitField(
-                                    subUnit = subUnitThreshold,
-                                    onSubUnitChange = { subUnitThreshold = it }
-                                )
-                                Spacer(Modifier.weight(1f))
-                                BatchInsertionButton(onClick = { onSetMode(ScreenMode.ADD_BATCH) })
-                            }
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        modifier = Modifier.padding(top = 5.dp)
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            UnitField(
+                                unit = unitThreshold,
+                                onUnitChange = { unitThreshold = it }
+                            )
+                            Spacer(Modifier.weight(1f))
+                            RemoveStockButton(
+                                enabled = itemModel.totalUnit > 0,
+                                onClick = { onSetMode(ScreenMode.DELETE_BATCH) })
+                        }
+                        Column(Modifier.weight(1f)) {
+                            SubUnitField(
+                                subUnit = subUnitThreshold,
+                                onSubUnitChange = { subUnitThreshold = it }
+                            )
+                            Spacer(Modifier.weight(1f))
+                            BatchInsertionButton(onClick = { onSetMode(ScreenMode.ADD_BATCH) })
                         }
                     }
+                }
 
-                    Column(Modifier.weight(0.55f)) {
-                        DescriptionField(
-                            description = description,
-                            onDescriptionChange = { description = it },
-                            modifier = Modifier.weight(1f)
-                        )
+                Column(Modifier.weight(0.60f)) {
+                    DescriptionField(
+                        description = description,
+                        onDescriptionChange = { description = it },
+                        modifier = Modifier.weight(1f)
+                    )
 
-                        Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(10.dp))
 
-                        BatchExpirySection(
-                            model = itemModel,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
+                    BatchExpirySection(
+                        model = itemModel,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
         }

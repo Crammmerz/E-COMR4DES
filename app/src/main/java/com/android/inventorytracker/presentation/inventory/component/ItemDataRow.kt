@@ -148,7 +148,7 @@ fun ItemDataRow(
 fun ItemText(
     text: String,
     color: Color = LightSand,
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     textAlign: TextAlign = TextAlign.Start
 ) {
     Text(

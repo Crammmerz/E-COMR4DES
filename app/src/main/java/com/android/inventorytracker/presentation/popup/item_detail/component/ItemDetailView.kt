@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
@@ -76,25 +78,23 @@ fun ItemDetailView(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp)
+                .padding(10.dp)
         ) {
             HeaderSection(itemModel)
             Row(
                 Modifier.weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(20.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Column(Modifier.weight(0.40f)) {
+                Column(Modifier.weight(0.40f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     PhotoSelection()
 
                     NameField(
                         name = name,
-                        onNameChange = { name = it },
-                        modifier = Modifier.padding(top = 5.dp)
+                        onNameChange = { name = it }
                     )
 
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        modifier = Modifier.padding(top = 5.dp)
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Column(Modifier.weight(1f)) {
                             UnitField(
@@ -121,14 +121,14 @@ fun ItemDetailView(
                     DescriptionField(
                         description = description,
                         onDescriptionChange = { description = it },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(0.45f)
                     )
 
                     Spacer(Modifier.height(10.dp))
 
                     BatchExpirySection(
                         model = itemModel,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(0.55f)
                     )
                 }
             }

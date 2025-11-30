@@ -3,6 +3,7 @@ package com.android.inventorytracker.presentation.shared.component.item_property
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,46 +27,45 @@ fun DescriptionField(
     maxLength: Int = 350
 ) {
     val safeDescription = description ?: ""
-
-    Text(
-        text = "Description",
-        color = Color.DarkGray,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 15.sp,
-        modifier = Modifier.padding(top = 5.dp, bottom = 3.dp)
-    )
-
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(Color.White)
-            .border(
-                width = 1.dp,
-                color = Color.DarkGray,
-                shape = RoundedCornerShape(5.dp)
-            )
-            .padding(horizontal = 10.dp, vertical = 5.dp)
-    ) {
-        BasicTextField(
-            value = safeDescription,
-            onValueChange = {
-                if (it.length <= maxLength) onDescriptionChange(it)
-            },
-            modifier = Modifier.fillMaxWidth(),
-            textStyle = TextStyle(fontSize = 15.sp),
-            cursorBrush = SolidColor(Color.Black),
-            maxLines = 12,
-        )
-
+    Column (modifier){
         Text(
-            text = "${safeDescription.length}/$maxLength",
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
+            text = "Description",
             color = Color.DarkGray,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(end = 8.dp, top = 2.dp)
-                .background(Color.White)
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 15.sp,
         )
+
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .background(Color.White)
+                .border(
+                    width = 1.dp,
+                    color = Color.DarkGray,
+                    shape = RoundedCornerShape(5.dp)
+                )
+        ) {
+            BasicTextField(
+                value = safeDescription,
+                onValueChange = {
+                    if (it.length <= maxLength) onDescriptionChange(it)
+                },
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = TextStyle(fontSize = 15.sp),
+                cursorBrush = SolidColor(Color.Black),
+                maxLines = 12,
+            )
+
+            Text(
+                text = "${safeDescription.length}/$maxLength",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.DarkGray,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 8.dp, top = 2.dp)
+                    .background(Color.White)
+            )
+        }
     }
 }

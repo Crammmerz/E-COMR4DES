@@ -30,7 +30,7 @@ fun Main(
         ) {
             if (showNavBar){
                 NavBar(
-                    modifier = Modifier.widthIn(min = 130.dp, max = 150.dp),
+                    modifier = Modifier.widthIn(min = 150.dp, max = 175.dp),
                     viewModel = mainViewModel
                 )
             }

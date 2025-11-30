@@ -71,7 +71,6 @@ fun ItemDetailView(
                 onUpdateItem(updatedItem)
                 Toast.makeText(context, "Item updated successfully", Toast.LENGTH_SHORT).show()
             }
-
             onDismiss()
         },
     ) {
@@ -101,18 +100,12 @@ fun ItemDetailView(
                                 unit = unitThreshold,
                                 onUnitChange = { unitThreshold = it }
                             )
-                            Spacer(Modifier.weight(1f))
-                            RemoveStockButton(
-                                enabled = itemModel.totalUnit > 0,
-                                onClick = { onSetMode(ScreenMode.DELETE_BATCH) })
                         }
                         Column(Modifier.weight(1f)) {
                             SubUnitField(
                                 subUnit = subUnitThreshold,
                                 onSubUnitChange = { subUnitThreshold = it }
                             )
-                            Spacer(Modifier.weight(1f))
-                            BatchInsertionButton(onClick = { onSetMode(ScreenMode.ADD_BATCH) })
                         }
                     }
                 }

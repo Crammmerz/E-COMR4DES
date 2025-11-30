@@ -31,6 +31,7 @@ import com.android.inventorytracker.R
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.presentation.popup.batch_insertion.BatchInsertionPopup
 import com.android.inventorytracker.presentation.popup.batch_removal.BatchDeductPopup
+import com.android.inventorytracker.presentation.popup.batch_targeted_removal.BatchTargetedRemoval
 import com.android.inventorytracker.presentation.popup.item_detail.ItemDetailPopup
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
@@ -58,7 +59,7 @@ fun ItemDataRow(
     val stockColor = when {//TODO: Adjust Colors
         totalUnit == 0.0 -> Color.DarkGray
         totalUnit <= threshold * 0.2 -> darkRed
-        else -> Color.White
+        else -> LightSand
     }
 
     Row(
@@ -80,14 +81,14 @@ fun ItemDataRow(
                 .size(64.dp)
                 .padding(horizontal = 10.dp),
         )
-        ItemText(itemModel.item.name, Modifier.weight(0.75f))
-        ItemText(itemModel.nearestExpiryFormatted(), Modifier.weight(0.5f))
+        ItemText(itemModel.item.name, modifier = Modifier.weight(0.75f))
+        ItemText(itemModel.nearestExpiryFormatted(), modifier = Modifier.weight(0.5f))
         ItemText(itemModel.totalUnitFormatted,
             modifier = Modifier
-                .weight(0.5f)
-                .background(
-                    stockColor,
-                    shape = RoundedCornerShape(5.dp)), TextAlign.Center)
+                .weight(0.5f),
+            textAlign = TextAlign.Center,
+            color = stockColor,
+            )
         ItemButton(
             modifier =  Modifier.weight(0.25f),
             enabled = itemModel.totalSubUnit > 0,
@@ -131,14 +132,14 @@ fun ItemDataRow(
         LaunchedEffect(true) {
             batchViewModel.onUnitReset()
         }
-        BatchDeductPopup(
+        BatchTargetedRemoval(
             batch = itemModel.batch,
             unit = unit,
             subUnit = subUnit,
             onUnitChange = { batchViewModel.onUnitChange(it, itemModel.item.subUnitThreshold) },
             onSubUnitChange = { batchViewModel.onSubUnitChange(it, itemModel.item.subUnitThreshold) },
             onDismiss = { showDeleteBatch = false },
-            onDeductStock = batchViewModel::onDeductStock
+            onTargetedDeduct = batchViewModel::onTargetedDeductStock
         )
     }
 }
@@ -146,6 +147,7 @@ fun ItemDataRow(
 @Composable
 fun ItemText(
     text: String,
+    color: Color = LightSand,
     modifier: Modifier = Modifier,
     textAlign: TextAlign = TextAlign.Start
 ) {
@@ -158,7 +160,7 @@ fun ItemText(
         maxLines = 1,
         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
         modifier = modifier
-            .background(LightSand, shape = RoundedCornerShape(5.dp))
+            .background(color, shape = RoundedCornerShape(5.dp))
             .clip(RoundedCornerShape(5.dp))
             .border(1.dp, Color.LightGray, RoundedCornerShape(5.dp))
             .padding(horizontal = 5.dp, vertical = 7.dp)

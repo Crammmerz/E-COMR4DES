@@ -29,7 +29,7 @@ fun TopBar(
         color = Color.White,
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp)
+            .height(50.dp)
     ) {
         Row (
             modifier = Modifier

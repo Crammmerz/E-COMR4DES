@@ -21,10 +21,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.data.local.entities.ItemEntity
 import com.android.inventorytracker.presentation.popup.item_insertion.component.HeaderSection
-import com.android.inventorytracker.presentation.shared.component.item_property_fields.DescriptionField
-import com.android.inventorytracker.presentation.shared.component.item_property_fields.NameField
-import com.android.inventorytracker.presentation.shared.component.item_property_fields.SubUnitField
-import com.android.inventorytracker.presentation.shared.component.item_property_fields.UnitField
+import com.android.inventorytracker.presentation.shared.component.input_fields.DescriptionField
+import com.android.inventorytracker.presentation.shared.component.input_fields.StringField
+import com.android.inventorytracker.presentation.shared.component.input_fields.IntField
 import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
 import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
@@ -36,8 +35,9 @@ fun InsertItemPopup(
 ) {
     val context = LocalContext.current
     var name by rememberSaveable { mutableStateOf("") }
-    var unitThreshold by rememberSaveable { mutableIntStateOf(0) }
-    var subUnitThreshold by rememberSaveable { mutableIntStateOf(0) }
+    var unitThreshold by rememberSaveable { mutableIntStateOf(1) }
+    var subUnitThreshold by rememberSaveable { mutableIntStateOf(1) }
+    var expiryThreshold by rememberSaveable { mutableIntStateOf(1) }
     var description by rememberSaveable { mutableStateOf("") }
 
     DialogHost( // TODO: DialogHost for App testing while DialogMockup for Preview Testing
@@ -53,31 +53,30 @@ fun InsertItemPopup(
         ) {
             HeaderSection()
 
-            NameField(
-                name = name,
-                onNameChange = { name = it },
-                modifier = Modifier.padding(top = 10.dp)
+            StringField(
+                text = name,
+                onTextChange = { name = it },
+                header = "Item Name"
             )
 
-            Row(
-                modifier = Modifier.padding(top = 5.dp),
-                horizontalArrangement = Arrangement.spacedBy(15.dp)
-            ) {
-                Column(Modifier.weight(1f)) {
-                    UnitField(
-                        unit = unitThreshold,
-                        onUnitChange = { unitThreshold = it },
-                        modifier = Modifier.padding(top = 10.dp)
-                    )
-                }
-                Column(Modifier.weight(1f)) {
-                    SubUnitField(
-                        subUnit = subUnitThreshold,
-                        onSubUnitChange = { subUnitThreshold = it },
-                        modifier = Modifier.padding(vertical = 10.dp)
-                    )
-                }
-            }
+            IntField(
+                num = unitThreshold,
+                onNumChange = { unitThreshold = it },
+                header = "Unit"
+            )
+
+            IntField(
+                num = subUnitThreshold,
+                onNumChange = { subUnitThreshold = it },
+                header = "Sub Unit"
+            )
+
+            IntField(
+                num = expiryThreshold,
+                onNumChange = { expiryThreshold = it },
+                modifier = Modifier.padding(vertical = 10.dp),
+                header = "Expiry Threshold"
+            )
 
             DescriptionField(
                 description = description,
@@ -102,6 +101,7 @@ fun InsertItemPopup(
                             name = trimmedName,
                             unitThreshold = unitThreshold,
                             subUnitThreshold = subUnitThreshold,
+                            expiryThreshold = expiryThreshold,
                             description = trimmedDescription
                         )
                         onInsert(item)

@@ -1,0 +1,26 @@
+package com.android.inventorytracker.presentation.setting.viewmodel
+
+import androidx.lifecycle.ViewModel
+import com.android.inventorytracker.data.repository.PreferencesRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
+
+@HiltViewModel
+class SettingsViewModel @Inject constructor(
+    private val preferencesRepository: PreferencesRepository
+) : ViewModel() {
+    private val _authEnabled = MutableStateFlow(preferencesRepository.isAuthEnabled())
+    val authEnabled: StateFlow<Boolean> = _authEnabled
+    private val _roleAuthEnabled = MutableStateFlow(preferencesRepository.isRoleAuthEnabled())
+    val roleAuthEnabled: StateFlow<Boolean> = _roleAuthEnabled
+    fun toggleAuth(enabled: Boolean) {
+        preferencesRepository.setAuthEnabled(enabled)
+        _authEnabled.value = enabled
+    }
+    fun toggleRoleAuth(enabled: Boolean) {
+        preferencesRepository.setRoleAuthEnabled(enabled)
+        _roleAuthEnabled.value = enabled
+    }
+}

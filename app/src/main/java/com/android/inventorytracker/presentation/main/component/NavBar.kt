@@ -29,6 +29,7 @@ fun NavBar(
             Text("📦 Lumi Cafe")
             NavButton("🏠 Home", bgColor = if (current == Content.Home) highlight else default) { viewModel.setContent(Content.Home) }
             NavButton("📦 Inventory", bgColor = if (current == Content.Inventory) highlight else default) { viewModel.setContent(Content.Inventory) }
+            NavButton("⚙️ Setting", bgColor = if (current == Content.Setting) highlight else default) { viewModel.setContent(Content.Setting) }
         }
     }
 }

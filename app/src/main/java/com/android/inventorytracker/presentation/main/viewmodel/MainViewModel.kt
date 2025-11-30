@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 enum class Content {
-    Home, Inventory //etc
+    Home, Inventory, Setting
 }
 @HiltViewModel
 class MainViewModel @Inject constructor(): ViewModel() {

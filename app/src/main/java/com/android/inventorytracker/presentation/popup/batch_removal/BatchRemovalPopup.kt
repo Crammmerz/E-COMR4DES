@@ -12,8 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
-import com.android.inventorytracker.presentation.shared.component.item_property_fields.SubUnitField
-import com.android.inventorytracker.presentation.shared.component.item_property_fields.UnitFieldFloat
+import com.android.inventorytracker.presentation.shared.component.input_fields.IntField
+import com.android.inventorytracker.presentation.shared.component.input_fields.FloatField
 import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
 import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
@@ -39,20 +39,15 @@ fun BatchDeductPopup(
     ) {
         Column {
             Text("Stock Deduction")
-            Row {
-                Column(Modifier.weight(1f)) {
-                    UnitFieldFloat(
-                        unit = unit, onUnitChange = onUnitChange, // Pass value handler
-                        Modifier.padding(top = 10.dp)
-                    )
-                }
-                Column(Modifier.weight(1f)) {
-                    SubUnitField(
-                        subUnit = subUnit, onSubUnitChange = onSubUnitChange, // Pass value handler
-                        Modifier.padding(vertical = 10.dp)
-                    )
-                }
-            }
+            FloatField(
+                num = unit, onNumChange = onUnitChange,
+                header = "Unit"
+            )
+            IntField(
+                num = subUnit,
+                onNumChange = onSubUnitChange,
+                header = "Sub Unit",
+            )
             Row {
                 CancelButton(onClick = { onDismiss() },)
                 ConfirmButton("Deduct Stock") {

@@ -10,9 +10,8 @@ import androidx.work.WorkerParameters
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.data.repository.ItemRepository
 import com.android.inventorytracker.services.notification.AppChannel
-import com.android.inventorytracker.services.notification.InventoryNotifier
+import com.android.inventorytracker.services.notification.inventoryNotifier
 import com.android.inventorytracker.services.notification.NotificationHelper
-import com.android.inventorytracker.util.toLocalDate
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
@@ -63,7 +62,7 @@ class InventoryUpdateWorker @AssistedInject constructor(
             val itemModels: List<ItemModel> = itemRepository.observeItemModels().first()
 
             if (canNotify) {
-                InventoryNotifier(itemModels, context, LocalDate.now())
+                inventoryNotifier(itemModels, context, LocalDate.now())
             }
 
             Result.success()

@@ -61,7 +61,7 @@ dependencies {
     implementation(libs.androidx.hilt.work)
     ksp(libs.androidx.hilt.compiler)
 
-    // ALSO add BOM to androidTest and debug to align versions there too
+    // Debug BOM for debug config
     androidTestImplementation(platform(libs.androidx.compose.bom))
     debugImplementation(platform(libs.androidx.compose.bom))
 

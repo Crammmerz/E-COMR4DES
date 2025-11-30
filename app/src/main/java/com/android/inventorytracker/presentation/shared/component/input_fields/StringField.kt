@@ -1,10 +1,11 @@
-package com.android.inventorytracker.presentation.shared.component.item_property_fields
+package com.android.inventorytracker.presentation.shared.component.input_fields
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -20,23 +21,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun NameField(
-    name: String,
-    onNameChange: (String) -> Unit,
+fun StringField(
+    text: String,
+    onTextChange: (String) -> Unit,
+    header: String,
     modifier: Modifier = Modifier,
     maxLength: Int = 30
 ) {
     Column (modifier) {
         Text(
-            text = "Item Name",
+            text = header,
             color = Color.DarkGray,
             fontWeight = FontWeight.SemiBold,
             fontSize = 15.sp,
-            modifier = Modifier.padding(top = 5.dp, bottom = 3.dp)
         )
 
-        Box (modifier = Modifier
+        Box (
+            modifier = Modifier
             .fillMaxWidth()
+            .height(30.dp)
             .background(Color.White)
             .border(
                 width = 1.dp,
@@ -46,9 +49,9 @@ fun NameField(
             .padding(horizontal = 10.dp, vertical = 5.dp)
         ) {
             BasicTextField(
-                value = name,
+                value = text,
                 onValueChange = {
-                    if (it.length <= maxLength) onNameChange(it.take(maxLength))
+                    if (it.length <= maxLength) onTextChange(it.take(maxLength))
                 },
                 modifier = Modifier.fillMaxWidth().align(Alignment.CenterStart),
                 textStyle = TextStyle(fontSize = 15.sp),
@@ -57,13 +60,12 @@ fun NameField(
                 singleLine = true
             )
             Text(
-                text = "${name.length}/$maxLength",
+                text = "${text.length}/$maxLength",
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.DarkGray,
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(end = 8.dp, top = 2.dp)
+                    .align(Alignment.CenterEnd)
                     .background(Color.White)
             )
         }

@@ -11,5 +11,6 @@ data class ItemEntity(
     val name: String,
     val unitThreshold: Int,
     val subUnitThreshold: Int,
+    val expiryThreshold: Int,
     val description: String?
 )

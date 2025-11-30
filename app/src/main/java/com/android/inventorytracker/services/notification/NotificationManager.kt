@@ -6,7 +6,7 @@ import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.util.toLocalDate
 import java.time.LocalDate
 
-fun InventoryNotifier(itemModels: List<ItemModel>, context: Context, today: LocalDate) {
+fun inventoryNotifier(itemModels: List<ItemModel>, context: Context, today: LocalDate) {
     val isZero = itemModels.filter { it.totalSubUnit == 0 }
     val isExpired = itemModels.filter { it.nearestExpiry?.toLocalDate()?.isBefore(today) == true }
     val isLow = itemModels.filter { it.totalSubUnit > 0 && it.totalUnit <= it.item.unitThreshold * 0.20 }

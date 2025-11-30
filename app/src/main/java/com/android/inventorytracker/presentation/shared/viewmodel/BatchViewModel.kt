@@ -23,8 +23,8 @@ class BatchViewModel @Inject constructor(
         private set
 
     fun onUnitReset(){
-        unit = 0f
-        subUnit = 0
+        unit = 1f
+        subUnit = 1
     }
     fun onUnitChange(newUnit: Float, threshold: Int) {
         unit = newUnit

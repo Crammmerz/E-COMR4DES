@@ -2,16 +2,12 @@ package com.android.inventorytracker.presentation.popup.item_detail.component
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -19,17 +15,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.data.local.entities.ItemEntity
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.presentation.popup.item_detail.ScreenMode
-import com.android.inventorytracker.presentation.shared.component.item_property_fields.DescriptionField
-import com.android.inventorytracker.presentation.shared.component.item_property_fields.NameField
-import com.android.inventorytracker.presentation.shared.component.item_property_fields.SubUnitField
-import com.android.inventorytracker.presentation.shared.component.item_property_fields.UnitField
+import com.android.inventorytracker.presentation.shared.component.input_fields.DescriptionField
+import com.android.inventorytracker.presentation.shared.component.input_fields.StringField
+import com.android.inventorytracker.presentation.shared.component.input_fields.IntField
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
 
 
@@ -44,7 +38,9 @@ fun ItemDetailView(
     var name by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.name) }
     var unitThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.unitThreshold) }
     var subUnitThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.subUnitThreshold) }
+    var expiryThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.expiryThreshold) }
     var description by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.description) }
+
     val context = LocalContext.current
 
     // TODO: DialogHost for App testing while DialogMockup for UI Preview Testing
@@ -57,6 +53,7 @@ fun ItemDetailView(
                 name = name,
                 unitThreshold = unitThreshold,
                 subUnitThreshold = subUnitThreshold,
+                expiryThreshold = expiryThreshold,
                 description = description
             )
 
@@ -87,27 +84,35 @@ fun ItemDetailView(
                 Column(Modifier.weight(0.40f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     PhotoSelection()
 
-                    NameField(
-                        name = name,
-                        onNameChange = { name = it }
+                    StringField(
+                        text = name,
+                        onTextChange = { name = it },
+                        header = "Item Name"
                     )
 
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Column(Modifier.weight(1f)) {
-                            UnitField(
-                                unit = unitThreshold,
-                                onUnitChange = { unitThreshold = it }
+                            IntField(
+                                num = unitThreshold,
+                                onNumChange = { unitThreshold = it },
+                                header = "Unit"
                             )
                         }
                         Column(Modifier.weight(1f)) {
-                            SubUnitField(
-                                subUnit = subUnitThreshold,
-                                onSubUnitChange = { subUnitThreshold = it }
+                            IntField(
+                                num = subUnitThreshold,
+                                onNumChange = { subUnitThreshold = it },
+                                header = "Sub Unit"
                             )
                         }
                     }
+                    IntField(
+                        num = expiryThreshold,
+                        onNumChange = { expiryThreshold = it },
+                        header = "Expiry Threshold"
+                    )
                 }
 
                 Column(Modifier.weight(0.60f)) {

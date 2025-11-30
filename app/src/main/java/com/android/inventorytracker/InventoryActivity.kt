@@ -21,6 +21,7 @@ import com.android.inventorytracker.presentation.main.Main
 import com.android.inventorytracker.presentation.notification_permission_request.NotificationPermissionRequest
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.android.inventorytracker.data.preferences.AuthPreferences
 import com.android.inventorytracker.services.notification.NotificationHelper.canPostNotifications
 
 
@@ -34,17 +35,18 @@ class InventoryActivity : ComponentActivity() {
             val loginViewModel: LoginViewModel = hiltViewModel()
             val context = LocalContext.current
             val showNotificationRequest = rememberSaveable { mutableStateOf(true) }
-
             InventoryTrackerTheme {
-                when (loginViewModel.loginState) {
-                    LoginState.LOGGED_OUT -> {
+                when {
+                    loginViewModel.loginState == LoginState.LOGGED_OUT
+                            && loginViewModel.authEnabled -> {
                         Login(
                             userRole = loginViewModel.userRole,
                             onSetUserRole = loginViewModel::updateUserRole,
-                            onLogin = loginViewModel::onLogin
+                            onLogin = loginViewModel::onLogin,
+                            isRoleAuthEnabled = loginViewModel.roleAuthEnabled
                         )
                     }
-                    LoginState.LOGGED_IN -> {
+                    else -> {
                         Main()
                     }
                 }

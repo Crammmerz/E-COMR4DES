@@ -28,9 +28,14 @@ fun LoginPopup(
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
 
+    val header = when (userRole) {
+        UserRole.ADMIN -> "Admin Login"
+        UserRole.STAFF -> "User Login"
+    }
+
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("${userRole.name} Login") },
+        title = { Text(header) },
         text = {
             Column {
                 OutlinedTextField(

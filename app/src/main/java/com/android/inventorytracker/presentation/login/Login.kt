@@ -20,8 +20,10 @@ import com.android.inventorytracker.presentation.popup.login.LoginPopup
 fun Login(
     userRole: UserRole,
     onSetUserRole: (UserRole) -> Unit,
-    onLogin: (username: String, password: String, userRole: String) -> Unit
+    onLogin: (username: String, password: String, userRole: String) -> Unit,
+    isRoleAuthEnabled: Boolean
 ) {
+    val header = if(isRoleAuthEnabled) "Select Login Type" else "Login"
     var showDialog by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
@@ -30,7 +32,9 @@ fun Login(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Select Login Type", style = MaterialTheme.typography.headlineMedium)
+
+        Text(header, style = MaterialTheme.typography.headlineMedium)
+
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(onClick = {
@@ -39,12 +43,14 @@ fun Login(
         }) {
             Text("Admin Login")
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            onSetUserRole(UserRole.STAFF)
-            showDialog = true
-        }) {
-            Text("User Login")
+        if(isRoleAuthEnabled){
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = {
+                onSetUserRole(UserRole.STAFF)
+                showDialog = true
+            }) {
+                Text("User Login")
+            }
         }
 
         if (showDialog) {

@@ -1,9 +1,10 @@
-package com.android.inventorytracker.presentation.shared.component.item_property_fields
+package com.android.inventorytracker.presentation.shared.component.input_fields
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -51,10 +52,11 @@ fun DescriptionField(
                 onValueChange = {
                     if (it.length <= maxLength) onDescriptionChange(it)
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxSize(),
                 textStyle = TextStyle(fontSize = 15.sp),
                 cursorBrush = SolidColor(Color.Black),
                 maxLines = 12,
+                decorationBox = { innerTextField -> Box(Modifier.fillMaxSize()) { innerTextField() } }
             )
 
             Text(

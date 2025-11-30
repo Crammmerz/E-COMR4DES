@@ -14,13 +14,12 @@ import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.android.inventorytracker.presentation.login.viewmodel.LoginViewModel
 
 
 @Composable
 fun Main(
-    itemViewModel: ItemViewModel = hiltViewModel(),
-    batchViewModel: BatchViewModel = hiltViewModel(),
-    mainViewModel: MainViewModel = hiltViewModel()
+    mainViewModel: MainViewModel = hiltViewModel(),
 ) {
     val showNavBar by mainViewModel.showNavBar.collectAsState()
     Scaffold(topBar = { TopBar(mainViewModel) }) { inner ->
@@ -36,9 +35,7 @@ fun Main(
             }
             ContentSection(
                 modifier = Modifier.weight(1f),
-                itemViewModel = itemViewModel,
-                batchViewModel = batchViewModel,
-                mainViewModel = mainViewModel
+                mainViewModel = mainViewModel,
             )
         }
     }

@@ -65,9 +65,8 @@ fun ItemDataRow(
 
     val expiryColor = when {
         nearestExpiry == null -> Color.Gray                                      // no expiry
-        nearestExpiry.toLocalDate().isBefore(today) -> DarkRed       // expired
-        nearestExpiry.toLocalDate().isEqual(today) -> Color.Red      // expires today
-        nearestExpiry.toLocalDate().isBefore(today.plusDays(3)) -> Orange // expiring soon
+        nearestExpiry.toLocalDate().isBefore(today) -> Color.Red       // expired
+        nearestExpiry.toLocalDate().isEqual(today) -> Orange
         else -> Color.Gray                                         // safe/fresh
     }
 

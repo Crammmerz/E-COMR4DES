@@ -2,6 +2,8 @@ package com.android.inventorytracker.di
 
 import com.android.inventorytracker.data.repository.ItemRepository
 import com.android.inventorytracker.data.repository.ItemRepositoryImpl
+import com.android.inventorytracker.data.repository.PreferencesRepository
+import com.android.inventorytracker.data.repository.PreferencesRepositoryImpl
 import com.android.inventorytracker.data.repository.UserRepository
 import com.android.inventorytracker.data.repository.UserRepositoryImpl
 import dagger.Binds
@@ -25,4 +27,9 @@ abstract class RepositoryModule {
         impl: UserRepositoryImpl
     ): UserRepository
 
+    @Binds
+    @Singleton
+    abstract fun bindPreferencesRepository(
+        impl: PreferencesRepositoryImpl
+    ): PreferencesRepository
 }

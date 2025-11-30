@@ -44,6 +44,7 @@ fun DescriptionField(
                     color = Color.DarkGray,
                     shape = RoundedCornerShape(5.dp)
                 )
+                .padding(10.dp)
         ) {
             BasicTextField(
                 value = safeDescription,

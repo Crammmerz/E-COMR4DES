@@ -6,11 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,12 +25,14 @@ import androidx.compose.ui.unit.sp
 import com.android.inventorytracker.R
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.presentation.popup.batch_insertion.BatchInsertionPopup
-import com.android.inventorytracker.presentation.popup.batch_removal.BatchDeductPopup
 import com.android.inventorytracker.presentation.popup.batch_targeted_removal.BatchTargetedRemoval
 import com.android.inventorytracker.presentation.popup.item_detail.ItemDetailPopup
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import com.android.inventorytracker.ui.theme.LightSand
+import com.android.inventorytracker.util.toLocalDate
+import java.time.LocalDate
+
 
 @SuppressLint("DefaultLocale")
 @Composable
@@ -45,6 +42,7 @@ fun ItemDataRow(
     batchViewModel: BatchViewModel,
     modifier: Modifier = Modifier
 ) {
+    val today = LocalDate.now()
     var showItemDetail by rememberSaveable { mutableStateOf(false) }
     var showInsertBatch by rememberSaveable { mutableStateOf(false) }
     var showDeleteBatch by rememberSaveable { mutableStateOf(false) }
@@ -54,12 +52,23 @@ fun ItemDataRow(
 
     val totalUnit = itemModel.totalUnit
     val threshold = itemModel.item.unitThreshold
-    val darkRed = Color(0xFF8B0000)
+    val nearestExpiry = itemModel.nearestExpiry
+    val DarkRed = Color(0xFF8B0000)
+    val Orange = Color(0xFFFFA500)
+
 
     val stockColor = when {//TODO: Adjust Colors
-        totalUnit == 0.0 -> Color.DarkGray
-        totalUnit <= threshold * 0.2 -> darkRed
-        else -> LightSand
+        totalUnit == 0.0 -> DarkRed
+        totalUnit <= threshold * 0.2 -> Orange
+        else -> Color.Gray
+    }
+
+    val expiryColor = when {
+        nearestExpiry == null -> Color.Gray                                      // no expiry
+        nearestExpiry.toLocalDate().isBefore(today) -> DarkRed       // expired
+        nearestExpiry.toLocalDate().isEqual(today) -> Color.Red      // expires today
+        nearestExpiry.toLocalDate().isBefore(today.plusDays(3)) -> Orange // expiring soon
+        else -> Color.Gray                                         // safe/fresh
     }
 
     Row(
@@ -81,9 +90,14 @@ fun ItemDataRow(
                 .size(64.dp)
                 .padding(horizontal = 10.dp),
         )
-        ItemText(itemModel.item.name, modifier = Modifier.weight(0.75f))
-        ItemText(itemModel.nearestExpiryFormatted(), modifier = Modifier.weight(0.5f))
-        ItemText(itemModel.totalUnitFormatted,
+        ItemText(text = itemModel.item.name, modifier = Modifier.weight(0.75f))
+        ItemText(
+            text =itemModel.nearestExpiryFormatted(),
+            modifier = Modifier.weight(0.5f),
+            color = expiryColor
+        )
+        ItemText(
+            text = itemModel.totalUnitFormatted,
             modifier = Modifier
                 .weight(0.5f),
             textAlign = TextAlign.Center,
@@ -147,7 +161,7 @@ fun ItemDataRow(
 @Composable
 fun ItemText(
     text: String,
-    color: Color = LightSand,
+    color: Color = Color.Gray,
     modifier: Modifier,
     textAlign: TextAlign = TextAlign.Start
 ) {
@@ -160,9 +174,9 @@ fun ItemText(
         maxLines = 1,
         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
         modifier = modifier
-            .background(color, shape = RoundedCornerShape(5.dp))
+            .background(LightSand, shape = RoundedCornerShape(5.dp))
             .clip(RoundedCornerShape(5.dp))
-            .border(1.dp, Color.LightGray, RoundedCornerShape(5.dp))
+            .border(if(color == Color.Gray)1.dp else 2.dp, color = color, RoundedCornerShape(5.dp))
             .padding(horizontal = 5.dp, vertical = 7.dp)
     )
 }

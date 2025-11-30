@@ -10,15 +10,14 @@ import androidx.work.WorkerParameters
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.data.repository.ItemRepository
 import com.android.inventorytracker.services.notification.AppChannel
+import com.android.inventorytracker.services.notification.InventoryNotifier
 import com.android.inventorytracker.services.notification.NotificationHelper
 import com.android.inventorytracker.util.toLocalDate
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
 import java.io.IOException
-import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
 
 @HiltWorker
 class InventoryUpdateWorker @AssistedInject constructor(
@@ -62,71 +61,10 @@ class InventoryUpdateWorker @AssistedInject constructor(
 
             Log.d("WorkerTest", "Worker started")
             val itemModels: List<ItemModel> = itemRepository.observeItemModels().first()
-            val today = LocalDate.now()
-
-            val isZero = itemModels.filter { it.totalSubUnit == 0 }
-            val isExpired = itemModels.filter { model ->
-                model.nearestExpiry?.toLocalDate()?.isBefore(today) == true
-            }
-
-            val isLow = itemModels.filter { model ->
-                model.totalSubUnit > 0 &&
-                        model.totalUnit <= model.item.unitThreshold * 0.20
-            }
-            val isExpiring = itemModels.filter { model ->
-                model.nearestExpiry?.toLocalDate()?.let { date ->
-                    !date.isBefore(today) && date.isBefore(today.plusMonths(1))
-                } == true
-            }
-
-            val expired = isExpired.joinToString { it.item.name }
-            val noStock = isZero.joinToString { it.item.name }
-            val lowStock = isLow.joinToString { it.item.name }
-            val expiring = isExpiring.joinToString { it.item.name }
 
             if (canNotify) {
-                when {
-                    isZero.isNotEmpty() || isExpired.isNotEmpty() -> {
-                        val contentText = buildString {
-                            append("Critical: ${isExpired.count() + isZero.count()} \t")
-                            if(lowStock.isNotEmpty()||expiring.isNotEmpty()){
-                                append("Warning: ${isExpiring.count() + isLow.count()} \n")
-                            }
-                        }
-
-                        val notif = NotificationHelper.buildNotification(
-                            context = context,
-                            channelId = AppChannel.CRITICAL.id,
-                            title = "Urgent Inventory Issue",
-                            text = contentText,
-                            priority = NotificationHelper.channelImportanceToPriority(AppChannel.CRITICAL.importance),
-                            expired = expired,
-                            noStock = noStock,
-                            lowStock = lowStock,
-                            expiring = expiring
-                        )
-                        @SuppressLint("MissingPermission")
-                        NotificationHelper.safeNotify(context, "inventory_updates".hashCode(), notif)
-                    }
-                    isLow.isNotEmpty() || isExpiring.isNotEmpty() -> {
-                        val contentText = buildString {
-                            append("Stock Alert : ${isExpiring.count() + isLow.count()}")
-                        }
-                        val notif = NotificationHelper.buildNotification(
-                            context,
-                            AppChannel.WARNING.id,
-                            title = "Inventory Status Notice",
-                            text = contentText,
-                            priority = NotificationHelper.channelImportanceToPriority(AppChannel.WARNING.importance),
-                            lowStock = lowStock,
-                            expiring = expiring
-                        )
-                        @SuppressLint("MissingPermission")
-                        NotificationHelper.safeNotify(context, "inventory_updates".hashCode(), notif)
-                    }
-                }
+                InventoryNotifier(itemModels, context, LocalDate.now())
             }
-
 
             Result.success()
         } catch (e: IOException) {

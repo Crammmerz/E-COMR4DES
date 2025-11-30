@@ -53,22 +53,16 @@ fun BatchTargetedRemoval(
                     todayContentColor = Color.Black
                 )
             ) //TODO (Design of Date Picker)
+            UnitFieldFloat(
+                unit = unit, onUnitChange = onUnitChange, // Pass value handler
+                Modifier.padding(top = 10.dp)
+            )
+            SubUnitField(
+                subUnit = subUnit, onSubUnitChange = onSubUnitChange, // Pass value handler
+                Modifier.padding(vertical = 10.dp)
+            )
             Row {
-                Column(Modifier.weight(1f)) {
-                    UnitFieldFloat(
-                        unit = unit, onUnitChange = onUnitChange, // Pass value handler
-                        Modifier.padding(top = 10.dp)
-                    )
-                }
-                Column(Modifier.weight(1f)) {
-                    SubUnitField(
-                        subUnit = subUnit, onSubUnitChange = onSubUnitChange, // Pass value handler
-                        Modifier.padding(vertical = 10.dp)
-                    )
-                }
-            }
-            Row {
-                CancelButton(onClick = { onDismiss() },)
+                CancelButton(onClick = { onDismiss() })
                 ConfirmButton("Deduct Stock") {
                     val date = datePickerState.selectedDateMillis
                     val exist = batch.firstOrNull { it.expiryDate == date }

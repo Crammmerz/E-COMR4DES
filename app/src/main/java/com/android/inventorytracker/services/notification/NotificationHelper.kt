@@ -2,8 +2,6 @@ package com.android.inventorytracker.services.notification
 
 import android.Manifest
 import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -14,6 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.android.inventorytracker.R
+import com.android.inventorytracker.data.model.ItemModel
 
 
 object NotificationHelper {
@@ -22,13 +21,10 @@ object NotificationHelper {
         channelId: String,
         title: String = "Inventory",
         text: String,
+        subtext: List<String> = emptyList(),
         priority: Int,
         intent: Intent? = null,
         ongoing: Boolean = false,
-        expired: String? = null,
-        noStock: String? = null,
-        lowStock: String? = null,
-        expiring: String? = null,
     ): Notification {
         val pending = intent?.let {
             PendingIntent.getActivity(
@@ -52,12 +48,13 @@ object NotificationHelper {
 
         // Collect all lines into one InboxStyle
         val inboxStyle = NotificationCompat.InboxStyle()
-        if (!expired.isNullOrBlank()) inboxStyle.addLine("Expired: $expired")
-        if (!noStock.isNullOrBlank()) inboxStyle.addLine("Depleted: $noStock")
-        if (!lowStock.isNullOrBlank()) inboxStyle.addLine("Low Stock: $lowStock")
-        if (!expiring.isNullOrBlank()) inboxStyle.addLine("Expiring Soon: $expiring")
+        if (subtext.isNotEmpty()){
+            subtext.forEach { it ->
+                inboxStyle.addLine(it)
+            }
+        }
 
-        if (!expired.isNullOrBlank() || !noStock.isNullOrBlank() || !lowStock.isNullOrBlank() || !expiring.isNullOrBlank()){
+        if (subtext.isNotEmpty()){
             builder.setStyle(inboxStyle)
         }
 

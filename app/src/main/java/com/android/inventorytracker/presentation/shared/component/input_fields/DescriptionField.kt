@@ -33,7 +33,7 @@ fun DescriptionField(
             text = "Description",
             color = Color.DarkGray,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 15.sp,
+            fontSize = 13.sp,
         )
 
         Box(

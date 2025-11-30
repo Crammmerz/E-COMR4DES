@@ -59,29 +59,29 @@ fun FloatField(
             text = header,
             color = Color.DarkGray,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 15.sp,
+            fontSize = 13.sp,
         )
         Box(
             modifier = Modifier
                 .height(30.dp)
                 .background(Color.White)
                 .border(1.dp, Color.DarkGray, RoundedCornerShape(5.dp)),
-            contentAlignment = Alignment.Center // centers both vertically & horizontally
+            contentAlignment = Alignment.Center
         ) {
             BasicTextField(
                 value = textValue,
-                onValueChange = { textValue = it }, // only local update
+                onValueChange = { textValue = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp)
                     .onFocusChanged { focusState ->
                         isFocused = focusState.isFocused
                         if (isFocused) {
-                            textValue = "" // clear when focused
+                            textValue = ""
                         } else {
                             val parsed = textValue.toFloatOrNull()
                             if (parsed != null && parsed > 0f) {
-                                onNumChange(parsed) // commit on blur
+                                onNumChange(parsed)
                                 isError = false
                             } else {
                                 isError = true
@@ -96,11 +96,11 @@ fun FloatField(
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
+                        focusManager.clearFocus(true)
                         val parsed = textValue.toFloatOrNull()
                         if (parsed != null && parsed > 0f) {
                             onNumChange(parsed)
                         }
-                        focusManager.clearFocus()
                     }
                 )
             )

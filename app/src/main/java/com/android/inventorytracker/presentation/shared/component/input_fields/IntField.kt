@@ -43,7 +43,6 @@ fun IntField(
     modifier: Modifier = Modifier
 ) {
     var textValue by rememberSaveable { mutableStateOf(num.toString()) }
-    val requester = remember { FocusRequester() }
     var isFocused by remember { mutableStateOf(false) }
     var isError by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
@@ -60,7 +59,7 @@ fun IntField(
             text = header,
             color = Color.DarkGray,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 15.sp,
+            fontSize = 13.sp,
         )
         Box(
             modifier = Modifier
@@ -75,7 +74,6 @@ fun IntField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp)
-                    .focusProperties { next = requester }
                     .onFocusChanged { focusState ->
                         isFocused = focusState.isFocused
                         if (isFocused) {
@@ -83,7 +81,7 @@ fun IntField(
                         } else {
                             val parsed = textValue.toIntOrNull()
                             if (parsed != null && parsed > 0) {
-                                onNumChange(parsed) // commit only on blur
+                                onNumChange(parsed)
                                 isError = false
                             } else {
                                 isError = true
@@ -98,7 +96,7 @@ fun IntField(
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        focusManager.clearFocus()
+                        focusManager.clearFocus(true)
                         val parsed = textValue.toIntOrNull()
                         if (parsed != null && parsed > 0) {
                             onNumChange(parsed)

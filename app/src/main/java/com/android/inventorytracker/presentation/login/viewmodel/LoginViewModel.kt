@@ -24,7 +24,7 @@ class LoginViewModel @Inject constructor(
     var loginState by mutableStateOf(LoginState.LOGGED_OUT)
         private set
 
-    var userRole by mutableStateOf(UserRole.STAFF)
+    var userRole by mutableStateOf(UserRole.ADMIN)
         private set
 
     fun onLogin(username: String, password: String, userRole: String) {

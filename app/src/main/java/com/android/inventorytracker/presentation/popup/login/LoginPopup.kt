@@ -30,7 +30,7 @@ fun LoginPopup(
 
     val header = when (userRole) {
         UserRole.ADMIN -> "Admin Login"
-        UserRole.STAFF -> "User Login"
+        UserRole.STAFF -> "Staff Login"
     }
 
     AlertDialog(

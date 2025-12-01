@@ -119,7 +119,6 @@ fun ItemDataRow(
     if (showItemDetail) {
         ItemDetailPopup(
             itemModel = itemModel,
-            batchViewModel = batchViewModel,
             onDismiss = { showItemDetail = false },
             onUpdateItem = itemViewModel::updateItem,
             onUpdateBatch = batchViewModel::onConvertBatch

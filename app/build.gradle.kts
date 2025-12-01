@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.common)
     implementation(libs.androidx.hilt.work)
+    implementation(libs.androidx.foundation.layout)
     ksp(libs.androidx.hilt.compiler)
 
     // Debug BOM for debug config

@@ -8,8 +8,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.data.model.ItemModel
+import com.android.inventorytracker.data.model.UserRole
 import com.android.inventorytracker.presentation.inventory.component.*
+import com.android.inventorytracker.presentation.login.viewmodel.LoginViewModel
 import com.android.inventorytracker.presentation.popup.item_insertion.InsertItemPopup
 import com.android.inventorytracker.presentation.popup.item_removal.DeleteItemPopup
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
@@ -18,8 +21,9 @@ import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 @Composable
 fun Inventory(
     itemModels: List<ItemModel>,
-    itemViewModel: ItemViewModel,
-    batchViewModel: BatchViewModel,
+    itemViewModel: ItemViewModel = hiltViewModel(),
+    batchViewModel: BatchViewModel = hiltViewModel(),
+    loginViewModel: LoginViewModel = hiltViewModel()
 ) {
     var showAddItem by rememberSaveable { mutableStateOf(false) }
     var showDeleteItem by rememberSaveable { mutableStateOf(false) }
@@ -33,8 +37,10 @@ fun Inventory(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            AddNewItemButton(onClick = { showAddItem = true })
-            DeleteItemButton(onClick = { showDeleteItem = true}, enabled = itemModels.isNotEmpty())
+            if(loginViewModel.userRole == UserRole.ADMIN){
+                AddNewItemButton(onClick = { showAddItem = true })
+                DeleteItemButton(onClick = { showDeleteItem = true}, enabled = itemModels.isNotEmpty())
+            }
             Spacer(Modifier.weight(1f))
             SearchBar(itemViewModel, Modifier.width(275.dp).height(40.dp))
             SortDropdownMenu(itemViewModel)

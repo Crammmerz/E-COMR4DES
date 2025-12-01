@@ -35,8 +35,8 @@ object DatabaseModule {
             try {
                 if (db.userDao().getCount() == 0) {
                     db.withTransaction {
-                        db.userDao().insert(UserEntity(0, "admin", hashPassword("admin"), "ADMIN"))
-                        db.userDao().insert(UserEntity(1, "staff", hashPassword("staff"), "STAFF"))
+                        db.userDao().insert(UserEntity(1, "admin", hashPassword("admin"), "ADMIN"))
+                        db.userDao().insert(UserEntity(2, "staff", hashPassword("staff"), "STAFF"))
                     }
                 }
             } catch (e: Exception) {

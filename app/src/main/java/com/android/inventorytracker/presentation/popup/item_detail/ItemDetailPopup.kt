@@ -1,73 +1,136 @@
 package com.android.inventorytracker.presentation.popup.item_detail
 
+import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.data.local.entities.ItemEntity
 import com.android.inventorytracker.data.model.ItemModel
-import com.android.inventorytracker.presentation.popup.batch_insertion.BatchInsertionPopup
-import com.android.inventorytracker.presentation.popup.batch_targeted_removal.BatchTargetedRemoval
-import com.android.inventorytracker.presentation.popup.item_detail.component.ItemDetailView
-import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
+import com.android.inventorytracker.data.model.UserRole
+import com.android.inventorytracker.presentation.login.viewmodel.LoginViewModel
+import com.android.inventorytracker.presentation.popup.item_detail.component.BatchExpirySection
+import com.android.inventorytracker.presentation.popup.item_detail.component.PhotoSelection
+import com.android.inventorytracker.presentation.shared.component.input_fields.DescriptionField
+import com.android.inventorytracker.presentation.shared.component.input_fields.IntField
+import com.android.inventorytracker.presentation.shared.component.input_fields.StringField
+import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
 
-enum class ScreenMode{
-    ITEM, ADD_BATCH, DELETE_BATCH
-}
 @Composable
 fun ItemDetailPopup(
     itemModel: ItemModel,
-    batchViewModel: BatchViewModel,
+    loginViewModel: LoginViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
     onUpdateItem: (ItemEntity) -> Unit,
-    onUpdateBatch: (List<ItemBatchEntity>, Int, Int) -> Unit,
-) {
-    var currentMode by rememberSaveable { mutableStateOf(ScreenMode.ITEM) }
+    onUpdateBatch: (List<ItemBatchEntity>, Int, Int) -> Unit
+){
+    var name by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.name) }
+    var unitThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.unitThreshold) }
+    var subUnitThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.subUnitThreshold) }
+    var expiryThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.expiryThreshold) }
+    var description by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.description) }
 
-    when(currentMode){
-        ScreenMode.ITEM -> {
-            ItemDetailView(
-                itemModel = itemModel,
-                onDismiss = onDismiss,
-                onUpdateItem = onUpdateItem,
-                onUpdateBatch = onUpdateBatch,
-                onSetMode = {currentMode = it}
+    val context = LocalContext.current
+
+    DialogHost(
+        modifier = Modifier
+            .fillMaxSize(0.85f),
+        useImePadding = true,
+        onDismissRequest = {
+            val updatedItem = itemModel.item.copy(
+                name = name,
+                unitThreshold = unitThreshold,
+                subUnitThreshold = subUnitThreshold,
+                expiryThreshold = expiryThreshold,
+                description = description
             )
-        }
-        ScreenMode.ADD_BATCH -> {
-            LaunchedEffect(currentMode) {
-                if (currentMode == ScreenMode.ADD_BATCH) {
-                    batchViewModel.onUnitReset()
+            if (itemModel.item != updatedItem && loginViewModel.userRole == UserRole.ADMIN) {
+                if (itemModel.item.subUnitThreshold != updatedItem.subUnitThreshold) {
+                    onUpdateBatch(
+                        itemModel.batch,
+                        itemModel.item.subUnitThreshold,
+                        updatedItem.subUnitThreshold
+                    )
+                }
+                onUpdateItem(updatedItem)
+                Toast.makeText(context, "Item updated successfully", Toast.LENGTH_SHORT).show()
+            }
+            if(itemModel.item != updatedItem && loginViewModel.userRole == UserRole.STAFF){
+                Toast.makeText(context, "You are not authorized to edit this item", Toast.LENGTH_SHORT).show()
+            }
+            onDismiss()
+        },
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(10.dp)
+        ) {
+            Row(
+                Modifier.weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Column(Modifier.weight(0.40f)) {
+                    PhotoSelection()
+
+                    StringField(
+                        text = name,
+                        onTextChange = { name = it },
+                        header = "Item Name"
+                    )
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Column(Modifier.weight(1f)) {
+                            IntField(
+                                num = unitThreshold,
+                                onNumChange = { unitThreshold = it },
+                                header = "Unit"
+                            )
+                        }
+                        Column(Modifier.weight(1f)) {
+                            IntField(
+                                num = subUnitThreshold,
+                                onNumChange = { subUnitThreshold = it },
+                                header = "Sub Unit"
+                            )
+                        }
+                    }
+                    IntField(
+                        num = expiryThreshold,
+                        onNumChange = { expiryThreshold = it },
+                        header = "Expiry Threshold"
+                    )
+                }
+
+                Column(Modifier.weight(0.60f)) {
+                    DescriptionField(
+                        description = description,
+                        onDescriptionChange = { description = it },
+                        modifier = Modifier.weight(0.45f)
+                    )
+
+                    Spacer(Modifier.height(10.dp))
+
+                    BatchExpirySection(
+                        model = itemModel,
+                        modifier = Modifier.weight(0.55f)
+                    )
                 }
             }
-            BatchInsertionPopup(
-                itemModel = itemModel,
-                unit = batchViewModel.unit,
-                subUnit = batchViewModel.subUnit,
-                onUnitChange = { batchViewModel.onUnitChange(it, itemModel.item.subUnitThreshold) },
-                onSubUnitChange = { batchViewModel.onSubUnitChange(it, itemModel.item.subUnitThreshold) },
-                onDismiss = { currentMode = ScreenMode.ITEM },
-                onStore = batchViewModel::onStoreBatch
-            )
-        }
-        ScreenMode.DELETE_BATCH -> {
-            LaunchedEffect(currentMode) {
-                if (currentMode == ScreenMode.DELETE_BATCH) {
-                    batchViewModel.onUnitReset()
-                }
-            }
-            BatchTargetedRemoval(
-                batch = itemModel.batch,
-                unit = batchViewModel.unit,
-                subUnit = batchViewModel.subUnit,
-                onUnitChange = { batchViewModel.onUnitChange(it, itemModel.item.subUnitThreshold) },
-                onSubUnitChange = { batchViewModel.onSubUnitChange(it, itemModel.item.subUnitThreshold) },
-                onDismiss = { currentMode = ScreenMode.ITEM },
-                onTargetedDeduct = batchViewModel::onTargetedDeductStock
-            )
         }
     }
 }

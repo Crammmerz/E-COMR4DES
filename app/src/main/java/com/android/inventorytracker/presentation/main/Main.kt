@@ -10,11 +10,8 @@ import com.android.inventorytracker.presentation.main.component.ContentSection
 import com.android.inventorytracker.presentation.main.component.NavBar
 import com.android.inventorytracker.presentation.main.component.TopBar
 import com.android.inventorytracker.presentation.main.viewmodel.MainViewModel
-import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
-import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.android.inventorytracker.presentation.login.viewmodel.LoginViewModel
 
 
 @Composable
@@ -23,19 +20,18 @@ fun Main(
 ) {
     val showNavBar by mainViewModel.showNavBar.collectAsState()
     Scaffold(topBar = { TopBar(mainViewModel) }) { inner ->
-        Row(modifier = Modifier
-            .padding(inner)
-            .fillMaxSize()
-        ) {
-            if (showNavBar){
-                NavBar(
-                    modifier = Modifier.widthIn(min = 150.dp, max = 175.dp),
-                    viewModel = mainViewModel
-                )
-            }
+        Box(modifier = Modifier.padding(inner).fillMaxSize()){
             ContentSection(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxSize(),
                 mainViewModel = mainViewModel,
+            )
+            NavBar(
+                isOpen = showNavBar,
+                onDismiss = { mainViewModel.setNavBar(false) },
+                modifier = Modifier
+                    .widthIn(min = 150.dp, max = 175.dp)
+                    .fillMaxHeight(),
+                mainViewModel = mainViewModel
             )
         }
     }

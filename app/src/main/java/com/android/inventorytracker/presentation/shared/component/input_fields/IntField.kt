@@ -105,7 +105,6 @@ fun IntField(
                 )
             )
         }
-
         Text(text = if(isError)"Invalid Input" else "", color = Color.Red, fontSize = 10.sp)
     }
 }

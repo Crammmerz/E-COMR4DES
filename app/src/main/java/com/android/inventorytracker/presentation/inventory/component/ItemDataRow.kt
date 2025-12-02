@@ -29,7 +29,9 @@ import com.android.inventorytracker.presentation.popup.batch_targeted_removal.Ba
 import com.android.inventorytracker.presentation.popup.item_detail.ItemDetailPopup
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
+import com.android.inventorytracker.ui.theme.DarkRed
 import com.android.inventorytracker.ui.theme.LightSand
+import com.android.inventorytracker.ui.theme.Orange
 import com.android.inventorytracker.util.toLocalDate
 import java.time.LocalDate
 
@@ -53,9 +55,6 @@ fun ItemDataRow(
     val totalUnit = itemModel.totalUnit
     val threshold = itemModel.item.unitThreshold
     val nearestExpiry = itemModel.nearestExpiry
-    val DarkRed = Color(0xFF8B0000)
-    val Orange = Color(0xFFFFA500)
-
 
     val stockColor = when {//TODO: Adjust Colors
         totalUnit == 0.0 -> DarkRed
@@ -66,7 +65,8 @@ fun ItemDataRow(
     val expiryDate = nearestExpiry?.toLocalDate()
     val expiryColor = when {
         expiryDate == null -> Color.Gray
-        expiryDate.isBefore(today) -> Color.Red
+        expiryDate.isBefore(today) -> DarkRed
+        expiryDate.isEqual(today) -> Color.Red
         !expiryDate.isAfter(today.plusDays(itemModel.item.expiryThreshold.toLong())) -> Orange
         else -> Color.Green
     }
@@ -92,7 +92,7 @@ fun ItemDataRow(
         )
         ItemText(text = itemModel.item.name, modifier = Modifier.weight(0.75f))
         ItemText(
-            text =itemModel.nearestExpiryFormatted(),
+            text = itemModel.nearestExpiryFormatted(),
             modifier = Modifier.weight(0.5f),
             color = expiryColor
         )

@@ -17,3 +17,5 @@ val Stone = Color(0xFFAE9372)
 val LightBrown = Color(0xFFE5D7BD)
 val Bistre = Color(0xFF3e2723)
 val Ochre = Color(0xFF7F4B30)
+val Orange = Color(0xFFFFA500) // Orange
+val DarkRed = Color(0xFF8B0000) // Dark Red

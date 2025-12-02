@@ -2,6 +2,7 @@ package com.android.inventorytracker.presentation.popup.change_password
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,12 +27,12 @@ fun ChangePasswordPopup(
 ) {
     var password by rememberSaveable { mutableStateOf("") }
 
-    DialogHost(modifier = Modifier.size(400.dp), onDismissRequest = onDismiss) {
-        Column {
+    DialogHost(modifier = Modifier.size(300.dp), onDismissRequest = onDismiss) {
+        Column (modifier = Modifier.padding(20.dp)) {
             Text(
                 text = when (role) {
-                    UserRole.ADMIN -> "Admin Password Change"
-                    UserRole.STAFF -> "Staff Password Change"
+                        UserRole.ADMIN -> "Admin Password Change"
+                        UserRole.STAFF -> "Staff Password Change"
                 },
                 style = MaterialTheme.typography.titleLarge
             )

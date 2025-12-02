@@ -29,7 +29,7 @@ fun ContentSection(
         modifier = modifier.fillMaxSize()
     ) {
         when (currentContent) {
-            Content.Home -> Home()
+            Content.Home -> Home(itemModels = itemModels)
             Content.Inventory -> Inventory(itemModels = itemModels)
             Content.Setting -> Setting()
         }

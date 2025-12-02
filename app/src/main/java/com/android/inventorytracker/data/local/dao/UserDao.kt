@@ -24,6 +24,13 @@ interface UserDao {
     @Update
     suspend fun update(user: UserEntity)
 
+    @Query("UPDATE users SET passwordHash = :hashed WHERE username = :username AND role = :role")
+    suspend fun updatePasswordByUsername(username: String, hashed: String, role: String): Int
+
+    @Query("SELECT * FROM users WHERE username = :username AND role = :role")
+    suspend fun getByUsernameAndRole(username: String, role: String): UserEntity?
+
+
     @Query("SELECT * FROM users WHERE role = :role")
     suspend fun getUsersByRole(role: String): List<UserEntity>
 

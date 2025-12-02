@@ -1,5 +1,6 @@
 package com.android.inventorytracker.data.repository
 
+import android.util.Log
 import com.android.inventorytracker.data.local.dao.UserDao
 import com.android.inventorytracker.data.local.entities.UserEntity
 import com.android.inventorytracker.di.IoDispatcher
@@ -26,5 +27,10 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun register(username: String, rawPassword: String, role: String) {
         val hashed = hashPassword(rawPassword)
         userDao.insert(UserEntity(username = username, passwordHash = hashed, role = role))
+    }
+
+    override suspend fun changePassword(user: String, password: String, role: String) {
+        val hashed = hashPassword(password)
+        userDao.updatePasswordByUsername(user, hashed, role)
     }
 }

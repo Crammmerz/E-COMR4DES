@@ -37,7 +37,7 @@ fun ItemDetailPopup(
     onDismiss: () -> Unit,
     onUpdateItem: (ItemEntity) -> Unit,
     onUpdateBatch: (List<ItemBatchEntity>, Int, Int) -> Unit
-){
+) {
     var name by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.name) }
     var unitThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.unitThreshold) }
     var subUnitThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.subUnitThreshold) }

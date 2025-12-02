@@ -16,8 +16,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.android.inventorytracker.data.model.LoginState
 import com.android.inventorytracker.data.model.UserRole
+import com.android.inventorytracker.presentation.shared.component.input_fields.PasswordField
 
 @Composable
 fun LoginPopup(
@@ -45,10 +45,10 @@ fun LoginPopup(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
+                PasswordField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Password") },
+                    header = "Password",
                     modifier = Modifier.fillMaxWidth()
                 )
             }

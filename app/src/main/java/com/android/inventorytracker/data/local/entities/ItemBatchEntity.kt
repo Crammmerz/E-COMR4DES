@@ -19,5 +19,5 @@ data class ItemBatchEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val itemId: Int,
     var subUnit: Int,
-    val expiryDate: String
+    val expiryDate: Long
 )

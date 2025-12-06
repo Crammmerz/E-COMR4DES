@@ -18,21 +18,15 @@ import androidx.compose.ui.unit.dp
 
 //TODO: Button Design
 @Composable
-fun AddItemButton(onClick: () -> Unit){
+fun ConfirmButton(text: String = "Confirm", onClick: () -> Unit){
     Button(onClick = onClick) {
-        Text("Add Item")
+        Text(text)
     }
 }
 @Composable
-fun DeleteItemButton(onClick: () -> Unit){
+fun CancelButton(text: String = "Cancel",onClick: () -> Unit){
     Button(onClick = onClick) {
-        Text("Delete Item")
-    }
-}
-@Composable
-fun CancelButton(onClick: () -> Unit){
-    Button(onClick = onClick) {
-        Text("Cancel Item")
+        Text(text)
     }
 }
 @Composable
@@ -101,10 +95,12 @@ fun CenterButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     bgColor: Color = Color.Gray,
-    contentColor: Color = Color.White
+    contentColor: Color = Color.White,
+    enabled: Boolean = true,
 ) {
     Button(
         onClick = onClick,
+        enabled = enabled,
         shape = RoundedCornerShape(5.dp),
         contentPadding = PaddingValues(0.dp),
         colors = ButtonDefaults.buttonColors(
@@ -112,7 +108,7 @@ fun CenterButton(
             contentColor = contentColor
         ),
         modifier = modifier
-            .height(30.dp)
+            .height(30.dp),
     ) {
         Text(text = label)
     }

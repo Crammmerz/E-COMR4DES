@@ -6,23 +6,43 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
 import com.android.inventorytracker.data.local.entities.UserEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(user: UserEntity)
 
+    @Upsert
+    suspend fun upsert(user: UserEntity)
+
     @Delete
-    fun delete(user: UserEntity)
+    suspend fun delete(user: UserEntity)
 
     @Update
     suspend fun update(user: UserEntity)
 
+    @Query("UPDATE users SET passwordHash = :hashed WHERE username = :username AND role = :role")
+    suspend fun updatePasswordByUsername(username: String, hashed: String, role: String): Int
+
+    @Query("SELECT * FROM users WHERE username = :username AND role = :role")
+    suspend fun getByUsernameAndRole(username: String, role: String): UserEntity?
+
+
+    @Query("SELECT * FROM users WHERE role = :role")
+    suspend fun getUsersByRole(role: String): List<UserEntity>
+
+    @Query("SELECT * FROM users WHERE username = :username AND passwordHash = :passwordHash AND role= :role")
+    suspend fun getUserCredential(username: String, passwordHash: String, role: String): UserEntity?
+
     @Query("SELECT * FROM users WHERE id = :id")
-    suspend fun getUserById(id: String): UserEntity
+    fun getUserById(id: Int): UserEntity?
 
     @Query("SELECT * FROM users ORDER BY username ASC")
-    suspend fun getUsersOrderedByUsername(): Flow<List<UserEntity>>
+    fun getUsersOrderedByUsername(): Flow<List<UserEntity>>
+
+    @Query("SELECT COUNT(*) FROM users")
+    suspend fun getCount(): Int
 }

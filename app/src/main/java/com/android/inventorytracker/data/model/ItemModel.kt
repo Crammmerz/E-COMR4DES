@@ -1,28 +1,39 @@
 package com.android.inventorytracker.data.model
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.data.local.entities.ItemEntity
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
+enum class SortBy {
+    NAME_ASC, NAME_DESC, EXPIRY_SOONEST, STOCK_LOW_HIGH, STOCK_HIGH_LOW
+}
 data class ItemModel(
     val item: ItemEntity,
-    val batch: List<ItemBatchEntity>
+    val batch: List<ItemBatchEntity>,
+    val expiryParser: (String) -> LocalDate? = { s -> runCatching { LocalDate.parse(s) }.getOrNull() },
+    val unitFormatter: (Double) -> String = { d -> java.text.DecimalFormat("#.####").format(d) }
 ) {
-    val totalUnitValue: Double
-        get() = batch.sumOf {
-            it.subUnit.toDouble() / item.subUnitThreshold
+    val totalUnit: Double
+        get() {
+            val threshold = item.subUnitThreshold.takeIf { it != 0 } ?: 1
+            return batch.sumOf { it.subUnit / threshold.toDouble() }
         }
+    val totalUnitFormatted: String get() = unitFormatter(totalUnit)
 
-    val nearestExpiryFormatted: String
-        @RequiresApi(Build.VERSION_CODES.O)
-        get() = nearestExpiryDate?.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")) ?: "N/A"
+    val totalSubUnit: Int get() = batch.sumOf { it.subUnit }
 
-    val nearestExpiryDate: LocalDate?
-        @RequiresApi(Build.VERSION_CODES.O)
-        get() = batch
-            .mapNotNull { runCatching { LocalDate.parse(it.expiryDate) }.getOrNull() }
-            .minOrNull()
+    val nearestExpiry: Long? get() = batch.minOfOrNull { it.expiryDate }
+
+    fun nearestExpiryFormatted(
+        dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
+    ): String {
+        return nearestExpiry?.let { millis ->
+            val instant = Instant.ofEpochMilli(millis)
+            val localDate = instant.atZone(ZoneId.systemDefault()).toLocalDate()
+            dateFormatter.format(localDate)
+        } ?: "N/A"
+    }
 }

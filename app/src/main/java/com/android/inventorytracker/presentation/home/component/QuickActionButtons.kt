@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,13 +18,13 @@ fun QuickActions() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.15f),
+            .height(75.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally)
     ) {
+        Buttons("Add Stock", Modifier.weight(1f)){}
+        Buttons("Deduct Stock", Modifier.weight(1f)){}
         Buttons("Place Holder", Modifier.weight(1f)){}
-        Buttons("Place Holder", Modifier.weight(1f)){}
-        Buttons("Place Holder", Modifier.weight(1f)){}
-        Buttons("Place Holder", Modifier.weight(1f)){}
+//        Buttons("Place Holder", Modifier.weight(1f)){}
     }
 }
 

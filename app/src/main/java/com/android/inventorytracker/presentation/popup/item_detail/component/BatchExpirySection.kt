@@ -27,59 +27,56 @@ fun BatchExpirySection(
     model: ItemModel,
     modifier: Modifier
 ){
-    Text(
-        text = "Batch Expiry Information",
-        color = Color.DarkGray,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 15.sp,
-        modifier = Modifier.padding(top = 5.dp, bottom = 3.dp)
-    )
-    Column (modifier
-        .fillMaxWidth()
-        .background(Color.White)
-        .clip(RoundedCornerShape(10.dp))
-        .border(1.dp, Color.Black, RoundedCornerShape(10.dp))){
-        Row (Modifier.padding(horizontal = 10.dp, vertical = 5.dp)) {
-            Text(
-                text = "Batch ID",
-                color = Color.Black,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
-                modifier = Modifier.weight(0.2f)
-            )
-            Text(
-                text = "Expiry Date",
-                color = Color.Black,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(0.45f)
-            )
-            Text(
-                text = "Unit",
-                color = Color.Black,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                textAlign = TextAlign.End,
-                modifier = Modifier.weight(0.15f)
-            )
-            Text(
-                text = "Sub Unit",
-                color = Color.Black,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.End,
-                modifier = Modifier.weight(0.2f)
-            )
-        }
-        HorizontalDivider(color = Color.Black, thickness = 1.dp)
-        if(model.batch.isNotEmpty()){
-            LazyColumn(Modifier.padding(horizontal = 5.dp)) {
-                items(items = model.batch, key = {it.id}){ batch ->
-                    BatchDataRow(model.item.subUnitThreshold,batch)
+    Column (modifier = modifier.fillMaxWidth()) {
+        Text(
+            text = "Batch Expiry Information",
+            color = Color.DarkGray,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 15.sp,
+            modifier = Modifier.padding(horizontal= 5.dp)
+        )
+        Column (
+            modifier = Modifier
+                .weight(1f)
+                .background(Color.White)
+                .clip(RoundedCornerShape(10.dp))
+                .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
+        ) {
+            Row (Modifier.padding(horizontal = 10.dp, vertical = 5.dp)) {
+                Text(
+                    text = "Expiry Date",
+                    color = Color.Black,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 14.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(0.5f)
+                )
+                Text(
+                    text = "Unit",
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.weight(0.25f)
+                )
+                Text(
+                    text = "Sub Unit",
+                    color = Color.Black,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 14.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.weight(0.25f)
+                )
+            }
+            HorizontalDivider(color = Color.Black, thickness = 1.dp)
+            if(model.batch.isNotEmpty()){
+                LazyColumn(Modifier.padding(horizontal = 5.dp)) {
+                    items(items = model.batch, key = {it.id}){ batch ->
+                        BatchDataRow(model.item.subUnitThreshold,batch)
+                    }
                 }
             }
         }

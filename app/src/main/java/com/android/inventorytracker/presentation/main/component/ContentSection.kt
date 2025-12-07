@@ -14,6 +14,7 @@ import com.android.inventorytracker.presentation.main.viewmodel.Content
 import com.android.inventorytracker.presentation.main.viewmodel.MainViewModel
 import com.android.inventorytracker.presentation.settings.Setting
 import com.android.inventorytracker.ui.theme.Sand
+import com.android.inventorytracker.util.toLocalDate
 
 @Composable
 fun ContentSection(
@@ -26,7 +27,7 @@ fun ContentSection(
 
     Surface(
         color = Sand,
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
     ) {
         when (currentContent) {
             Content.Home -> Home(itemModels = itemModels)

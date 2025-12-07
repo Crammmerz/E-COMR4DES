@@ -26,6 +26,7 @@ fun ChangePasswordPopup(
     onConfirm: (user: String, password: String, role: String) -> Unit
 ) {
     var password by rememberSaveable { mutableStateOf("") }
+    var valid by rememberSaveable { mutableStateOf(false) }
 
     DialogHost(modifier = Modifier.size(300.dp), onDismissRequest = onDismiss) {
         Column (modifier = Modifier.padding(20.dp)) {
@@ -36,11 +37,24 @@ fun ChangePasswordPopup(
                 },
                 style = MaterialTheme.typography.titleLarge
             )
-            PasswordField(value = password, onValueChange = { password = it }, header = "New Password")
+            PasswordField(
+                value = password,
+                onValueChange = { password = it },
+                header = "New Password",
+                isValid = { valid = it },
+                onDone = {
+                    if (password.isNotEmpty()) {
+                        when (role) {
+                            UserRole.ADMIN -> onConfirm("admin", password, "ADMIN")
+                            UserRole.STAFF -> onConfirm("staff", password, "STAFF")
+                        }
+                    }
+                }
+            )
             Row {
                 CancelButton { onDismiss() }
                 ConfirmButton (text = "Change") {
-                    if(password.isNotEmpty()){
+                    if(password.isNotEmpty() && valid){
                         when (role) {
                             UserRole.ADMIN -> onConfirm("admin", password, "ADMIN")
                             UserRole.STAFF -> onConfirm("staff", password, "STAFF")

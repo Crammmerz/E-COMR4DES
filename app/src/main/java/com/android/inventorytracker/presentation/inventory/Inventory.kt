@@ -15,6 +15,7 @@ import com.android.inventorytracker.presentation.inventory.component.*
 import com.android.inventorytracker.presentation.login.viewmodel.LoginViewModel
 import com.android.inventorytracker.presentation.popup.item_insertion.InsertItemPopup
 import com.android.inventorytracker.presentation.popup.item_removal.DeleteItemPopup
+import com.android.inventorytracker.presentation.shared.component.input_fields.SearchBar
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 
@@ -42,7 +43,7 @@ fun Inventory(
                 DeleteItemButton(onClick = { showDeleteItem = true}, enabled = itemModels.isNotEmpty())
             }
             Spacer(Modifier.weight(1f))
-            SearchBar(itemViewModel, Modifier.width(275.dp).height(40.dp))
+            SearchBar(Modifier.width(275.dp).height(40.dp))
             SortDropdownMenu(itemViewModel)
         }
 
@@ -54,7 +55,7 @@ fun Inventory(
         ) {
             items(items = itemModels, key = { it.item.id }) { itemModel ->
                 ItemDataRow(
-                    itemModel = itemModel,
+                    model = itemModel,
                     itemViewModel = itemViewModel,
                     batchViewModel = batchViewModel,
                 )

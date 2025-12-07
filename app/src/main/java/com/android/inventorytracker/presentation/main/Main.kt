@@ -20,11 +20,7 @@ fun Main(
 ) {
     val showNavBar by mainViewModel.showNavBar.collectAsState()
     Scaffold(topBar = { TopBar(mainViewModel) }) { inner ->
-        Box(modifier = Modifier.padding(inner).fillMaxSize()){
-            ContentSection(
-                modifier = Modifier.fillMaxSize(),
-                mainViewModel = mainViewModel,
-            )
+        Row(modifier = Modifier.padding(inner).fillMaxSize()){
             NavBar(
                 isOpen = showNavBar,
                 onDismiss = { mainViewModel.setNavBar(false) },
@@ -32,6 +28,10 @@ fun Main(
                     .widthIn(min = 150.dp, max = 175.dp)
                     .fillMaxHeight(),
                 mainViewModel = mainViewModel
+            )
+            ContentSection(
+                modifier = Modifier.weight(1f),
+                mainViewModel = mainViewModel,
             )
         }
     }

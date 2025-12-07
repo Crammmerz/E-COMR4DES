@@ -5,12 +5,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.presentation.shared.component.input_fields.IntField
 import com.android.inventorytracker.presentation.shared.component.input_fields.FloatField
@@ -40,13 +38,18 @@ fun BatchDeductPopup(
         Column {
             Text("Stock Deduction")
             FloatField(
-                num = unit, onNumChange = onUnitChange,
-                header = "Unit"
+                value = unit, onValueChange = onUnitChange,
+                header = "Unit",
+                placeholder = "Enter number of units",
+                isValid = {}
             )
             IntField(
-                num = subUnit,
-                onNumChange = onSubUnitChange,
+                value = subUnit,
+                onValueChange = onSubUnitChange,
                 header = "Sub Unit",
+                placeholder = "Enter number of sub units",
+                doClear = true,
+                isValid = {}
             )
             Row {
                 CancelButton(onClick = { onDismiss() },)

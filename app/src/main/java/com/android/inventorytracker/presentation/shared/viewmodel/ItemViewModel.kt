@@ -13,8 +13,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -43,7 +45,7 @@ class ItemViewModel @Inject constructor(
         when (sort) {
             SortBy.NAME_ASC -> models.sortedBy { it.item.name }
             SortBy.NAME_DESC -> models.sortedByDescending { it.item.name }
-            SortBy.EXPIRY_SOONEST -> models.sortedWith(compareBy(nullsLast()) { it.nearestExpiry })
+            SortBy.EXPIRY_SOONEST -> models.sortedWith(compareBy(nullsLast()) { it.nearestExpiryDate })
             SortBy.STOCK_LOW_HIGH -> models.sortedBy { it.totalUnit }
             SortBy.STOCK_HIGH_LOW -> models.sortedByDescending { it.totalUnit }
         }

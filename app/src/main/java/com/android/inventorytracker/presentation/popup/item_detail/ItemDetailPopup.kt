@@ -16,6 +16,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
@@ -38,11 +39,21 @@ fun ItemDetailPopup(
     onUpdateItem: (ItemEntity) -> Unit,
     onUpdateBatch: (List<ItemBatchEntity>, Int, Int) -> Unit
 ) {
+    var imageUri by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.imageUri) }
     var name by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.name) }
     var unitThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.unitThreshold) }
     var subUnitThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.subUnitThreshold) }
     var expiryThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.expiryThreshold) }
     var description by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.description) }
+
+    var nameValid by rememberSaveable { mutableStateOf(true) }
+    var unitThresholdValid by rememberSaveable { mutableStateOf(true) }
+    var expiryThresholdValid by rememberSaveable { mutableStateOf(true) }
+    var subUnitThresholdValid by rememberSaveable { mutableStateOf(true) }
+
+    val allValid = nameValid && unitThresholdValid && expiryThresholdValid && subUnitThresholdValid
+
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     val context = LocalContext.current
 
@@ -52,25 +63,30 @@ fun ItemDetailPopup(
         useImePadding = true,
         onDismissRequest = {
             val updatedItem = itemModel.item.copy(
+                imageUri = imageUri,
                 name = name,
                 unitThreshold = unitThreshold,
                 subUnitThreshold = subUnitThreshold,
                 expiryThreshold = expiryThreshold,
                 description = description
             )
-            if (itemModel.item != updatedItem && loginViewModel.userRole == UserRole.ADMIN) {
-                if (itemModel.item.subUnitThreshold != updatedItem.subUnitThreshold) {
-                    onUpdateBatch(
-                        itemModel.batch,
-                        itemModel.item.subUnitThreshold,
-                        updatedItem.subUnitThreshold
-                    )
+            if (allValid && itemModel.item != updatedItem) {
+                when (loginViewModel.userRole) {
+                    UserRole.ADMIN -> {
+                        if (itemModel.item.subUnitThreshold != updatedItem.subUnitThreshold) {
+                            onUpdateBatch(
+                                itemModel.batch,
+                                itemModel.item.subUnitThreshold,
+                                updatedItem.subUnitThreshold
+                            )
+                        }
+                        onUpdateItem(updatedItem)
+                        Toast.makeText(context, "Item updated successfully", Toast.LENGTH_SHORT).show()
+                    }
+                    UserRole.STAFF -> {
+                        Toast.makeText(context, "You are not authorized to edit this item", Toast.LENGTH_SHORT).show()
+                    }
                 }
-                onUpdateItem(updatedItem)
-                Toast.makeText(context, "Item updated successfully", Toast.LENGTH_SHORT).show()
-            }
-            if(itemModel.item != updatedItem && loginViewModel.userRole == UserRole.STAFF){
-                Toast.makeText(context, "You are not authorized to edit this item", Toast.LENGTH_SHORT).show()
             }
             onDismiss()
         },
@@ -85,41 +101,55 @@ fun ItemDetailPopup(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Column(Modifier.weight(0.40f)) {
-                    PhotoSelection()
+                    PhotoSelection(
+                        image = imageUri,
+                        onPickImage = { imageUri = it })
 
                     StringField(
-                        text = name,
-                        onTextChange = { name = it },
-                        header = "Item Name"
+                        value = name,
+                        onValueChange = { name = it },
+                        header = "Item Name",
+                        placeholder = "Enter item name",
+                        isValid = { valid -> nameValid = valid },
+                        onDone = { keyboardController?.hide() }
                     )
 
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         Column(Modifier.weight(1f)) {
                             IntField(
-                                num = unitThreshold,
-                                onNumChange = { unitThreshold = it },
-                                header = "Unit"
+                                value = unitThreshold,
+                                onValueChange = { unitThreshold = it },
+                                header = "Low Stock Threshold",
+                                placeholder = "Enter unit threshold",
+                                isValid = { valid -> unitThresholdValid = valid },
+                                onDone = { keyboardController?.hide() }
                             )
                         }
                         Column(Modifier.weight(1f)) {
                             IntField(
-                                num = subUnitThreshold,
-                                onNumChange = { subUnitThreshold = it },
-                                header = "Sub Unit"
+                                value = expiryThreshold,
+                                onValueChange = { expiryThreshold = it },
+                                header = "Expiry Threshold",
+                                placeholder = "Enter expiry threshold",
+                                isValid = { valid -> expiryThresholdValid = valid },
+                                onDone = { keyboardController?.hide() }
                             )
                         }
                     }
                     IntField(
-                        num = expiryThreshold,
-                        onNumChange = { expiryThreshold = it },
-                        header = "Expiry Threshold"
+                        value = subUnitThreshold,
+                        onValueChange = { subUnitThreshold = it },
+                        header = "Sub Unit",
+                        placeholder = "Enter sub unit threshold",
+                        isValid = { valid -> subUnitThresholdValid = valid },
+                        onDone = { keyboardController?.hide() }
                     )
                 }
 
                 Column(Modifier.weight(0.60f)) {
                     DescriptionField(
-                        description = description,
-                        onDescriptionChange = { description = it },
+                        value = description,
+                        onValueChange = { description = it },
                         modifier = Modifier.weight(0.45f)
                     )
 

@@ -1,4 +1,4 @@
-package com.android.inventorytracker.presentation.inventory.component
+package com.android.inventorytracker.presentation.shared.component.input_fields
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,6 +23,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
@@ -33,8 +34,8 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(FlowPreview::class)
 @Composable
 fun SearchBar(
-    itemViewModel: ItemViewModel,
     modifier: Modifier = Modifier,
+    itemViewModel: ItemViewModel = hiltViewModel(),
     maxLength: Int = 30
 ) {
     var name by rememberSaveable { mutableStateOf("") }

@@ -2,10 +2,8 @@ package com.android.inventorytracker.presentation.shared.component.input_fields
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,13 +17,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -36,21 +32,23 @@ import java.text.DecimalFormat
 
 @Composable
 fun FloatField(
-    num: Float,
-    onNumChange: (Float) -> Unit,
+    modifier: Modifier = Modifier,
+    fieldModifier: Modifier = Modifier,
+    value: Float,
+    onValueChange: (Float) -> Unit,
+    isValid: (Boolean) -> Unit,
+    onDone: () -> Unit = {},
     header: String,
-    modifier: Modifier = Modifier
+    placeholder: String,
 ) {
     val df = DecimalFormat("#.####")
-    var textValue by rememberSaveable { mutableStateOf(df.format(num)) }
+    var textValue by remember { mutableStateOf(df.format(value)) }
     var isFocused by remember { mutableStateOf(false) }
     var isError by remember { mutableStateOf(false) }
-    val focusManager = LocalFocusManager.current
 
-    // Sync external changes only when not focused
-    LaunchedEffect(num, isFocused) {
+    LaunchedEffect(value, isFocused) {
         if (!isFocused) {
-            textValue = df.format(num)
+            textValue = df.format(value)
         }
     }
 
@@ -63,50 +61,57 @@ fun FloatField(
         )
         Box(
             modifier = Modifier
-                .height(30.dp)
+                .height(40.dp)
                 .background(Color.White)
                 .border(1.dp, Color.DarkGray, RoundedCornerShape(5.dp)),
             contentAlignment = Alignment.Center
         ) {
             BasicTextField(
                 value = textValue,
-                onValueChange = { textValue = it },
-                modifier = Modifier
+                onValueChange = {
+                    textValue = it
+                    val parsed = it.toFloatOrNull()
+                    val valid = parsed != null && parsed > 0
+
+                    if (valid) {
+                        isError = false
+                        isValid(true)
+                        onValueChange(parsed)
+                    } else {
+                        isError = true
+                        isValid(false)
+                    }
+                },
+                decorationBox = { innerTextField ->
+                    if (textValue.isEmpty()) {
+                        Text(placeholder, color = Color.Gray, fontSize = 13.sp)
+                    }
+                    innerTextField()
+                },
+                modifier = fieldModifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp)
                     .onFocusChanged { focusState ->
                         isFocused = focusState.isFocused
                         if (isFocused) {
                             textValue = ""
-                        } else {
-                            val parsed = textValue.toFloatOrNull()
-                            if (parsed != null && parsed > 0f) {
-                                onNumChange(parsed)
-                                isError = false
-                            } else {
-                                isError = true
-                            }
+                            isValid(false)
                         }
                     },
                 textStyle = TextStyle(fontSize = 15.sp),
                 singleLine = true,
+                keyboardActions = KeyboardActions(onDone = { onDone() }),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Done
                 ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        focusManager.clearFocus(true)
-                        val parsed = textValue.toFloatOrNull()
-                        if (parsed != null && parsed > 0f) {
-                            onNumChange(parsed)
-                        }
-                    }
-                )
             )
         }
-
-        Text(text = if(isError)"Invalid Input" else "", color = Color.Red, fontSize = 10.sp)
+        Text(
+            text = if(isError)"Invalid Input" else "",
+            color = Color.Red,
+            fontSize = 10.sp
+        )
     }
 }
 

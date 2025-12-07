@@ -5,17 +5,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.presentation.shared.component.input_fields.IntField
 import com.android.inventorytracker.presentation.shared.component.input_fields.FloatField
@@ -33,6 +35,10 @@ fun BatchTargetedRemoval(
     onDismiss: () -> Unit,
     onTargetedDeduct: (batch: ItemBatchEntity, toRemove: Int) -> Unit,
 ){
+    var validUnit by rememberSaveable { mutableStateOf(false) }
+    var validSubUnit by rememberSaveable { mutableStateOf(false) }
+
+
     val datePickerState = rememberDatePickerState(initialDisplayMode = DisplayMode.Input)
     val context = LocalContext.current
 
@@ -54,13 +60,18 @@ fun BatchTargetedRemoval(
                 )
             ) //TODO (Design of Date Picker)
             FloatField(
-                num = unit, onNumChange = onUnitChange,
-                header = "Unit"
+                value = unit, onValueChange = onUnitChange,
+                header = "Unit",
+                placeholder = "Enter number of units",
+                isValid = { validUnit = it },
             )
             IntField(
-                num = subUnit,
-                onNumChange = onSubUnitChange,
-                header = "Sub Unit"
+                value = subUnit,
+                onValueChange = onSubUnitChange,
+                header = "Sub Unit",
+                placeholder = "Enter number of sub units",
+                doClear = true,
+                isValid = { validSubUnit = it },
             )
             Row {
                 CancelButton(onClick = { onDismiss() })
@@ -70,10 +81,8 @@ fun BatchTargetedRemoval(
                     when {
                         date == null || exist == null ->
                             Toast.makeText(context, "Please enter a valid Date", Toast.LENGTH_SHORT).show()
-                        subUnit <= 0 ->
-                            Toast.makeText(context, "Amount must be greater than 0", Toast.LENGTH_SHORT).show()
-                        exist.subUnit < subUnit ->
-                            Toast.makeText(context, "Amount exceeds available stock", Toast.LENGTH_SHORT).show()
+                        !validUnit && !validSubUnit ->
+                            Toast.makeText(context, "Invalid Input", Toast.LENGTH_SHORT).show()
                         else -> {
                             onTargetedDeduct(exist, subUnit)
                             onDismiss()

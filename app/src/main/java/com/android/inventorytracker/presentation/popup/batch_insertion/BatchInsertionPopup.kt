@@ -6,16 +6,19 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalFocusManager
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.presentation.shared.component.input_fields.IntField
@@ -36,7 +39,12 @@ fun BatchInsertionPopup(
     onDismiss: () -> Unit,
     onStore: (ItemBatchEntity) -> Unit,
 ) {
+    var validUnit by rememberSaveable { mutableStateOf(false) }
+    var validSubUnit by rememberSaveable { mutableStateOf(false) }
+
+
     val datePickerState = rememberDatePickerState(initialDisplayMode = DisplayMode.Input)
+    val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
     DialogHost(
@@ -58,13 +66,20 @@ fun BatchInsertionPopup(
             ) // TODO (Date Picker Design)
 
             FloatField(
-                num = unit, onNumChange = onUnitChange,
-                header = "Unit"
+                value = unit, onValueChange = onUnitChange,
+                header = "Unit",
+                placeholder = "Enter number of units",
+                isValid = { validUnit = it },
+                onDone = { focusManager.clearFocus(force = true) }
             )
 
             IntField(
-                num = subUnit, onNumChange = onSubUnitChange,
-                header = "Sub Unit"
+                value = subUnit, onValueChange = onSubUnitChange,
+                header = "Sub Unit",
+                placeholder = "Enter number of sub units",
+                doClear = true,
+                isValid = { validSubUnit = it },
+                onDone = { focusManager.clearFocus(force = true) }
             )
             Row {
                 CancelButton(onClick = { onDismiss() },)
@@ -75,7 +90,7 @@ fun BatchInsertionPopup(
                     when {
                         selectedDate == null || selectedDate.isBefore(LocalDate.now()) ->
                             Toast.makeText(context, "Please enter a valid date", Toast.LENGTH_SHORT).show()
-                        subUnit <= 0 ->
+                        !validUnit && !validSubUnit ->
                             Toast.makeText(context, "Please enter a valid unit", Toast.LENGTH_SHORT).show()
                         else -> {
                             val batch = ItemBatchEntity(

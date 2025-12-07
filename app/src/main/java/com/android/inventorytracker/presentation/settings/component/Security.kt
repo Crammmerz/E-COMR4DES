@@ -43,50 +43,56 @@ fun Security(viewModel: SettingsViewModel = hiltViewModel()){
             onCheckedChange = { checked -> viewModel.toggleAuth(checked) }
         )
     }
-    if(isAuthEnabled){
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = "Role Authentication",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.weight(1f)
-            )
-            Checkbox(
-                checked = isRoleAuthEnabled,
-                onCheckedChange = { checked -> viewModel.toggleRoleAuth(checked) }
-            )
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            text = "Role Authentication",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.weight(1f)
+        )
+        Checkbox(
+            checked = isRoleAuthEnabled,
+            onCheckedChange = { checked -> viewModel.toggleRoleAuth(checked) }
+        )
+    }
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            text = "Admin Password Change",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.weight(1f)
+        )
+        Button(
+            onClick = { roleToChangePassword = UserRole.ADMIN },
+            enabled = isAuthEnabled
+        ) {
+            Text(text = "Change Password")
         }
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = "Admin Password Change",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.weight(1f)
-            )
-            Button(onClick = {roleToChangePassword = UserRole.ADMIN}) {
-                Text(text = "Change Password")
-            }
+    }
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Staff Password Change",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.weight(1f)
+        )
+        Button(
+            onClick = { roleToChangePassword = UserRole.STAFF },
+            enabled = isAuthEnabled && isRoleAuthEnabled
+        ) {
+            Text(text = "Change Password")
         }
-        if(isRoleAuthEnabled){
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "Staff Password Change",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.weight(1f)
-                )
-                Button(onClick = {roleToChangePassword = UserRole.STAFF}) {
-                    Text(text = "Change Password")
-                }
-            }
-        }
+    }
 
-        if (roleToChangePassword != null) {
-            ChangePasswordPopup(
-                role = roleToChangePassword!!,
-                onDismiss = { roleToChangePassword = null },
-                onConfirm = { user, password, role ->
-                    viewModel.changePassword(user, password, role)
-                    roleToChangePassword = null
-                }
-            )
-        }
+
+    if (roleToChangePassword != null) {
+        ChangePasswordPopup(
+            role = roleToChangePassword!!,
+            onDismiss = { roleToChangePassword = null },
+            onConfirm = { user, password, role ->
+                viewModel.changePassword(user, password, role)
+                roleToChangePassword = null
+            }
+        )
     }
 }

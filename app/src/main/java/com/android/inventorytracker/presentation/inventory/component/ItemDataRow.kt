@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.android.inventorytracker.R
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.presentation.popup.batch_insertion.BatchInsertionPopup
@@ -29,22 +30,17 @@ import com.android.inventorytracker.presentation.popup.batch_targeted_removal.Ba
 import com.android.inventorytracker.presentation.popup.item_detail.ItemDetailPopup
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
-import com.android.inventorytracker.ui.theme.DarkRed
 import com.android.inventorytracker.ui.theme.LightSand
-import com.android.inventorytracker.ui.theme.Orange
-import com.android.inventorytracker.util.toLocalDate
-import java.time.LocalDate
 
 
 @SuppressLint("DefaultLocale")
 @Composable
 fun ItemDataRow(
-    itemModel: ItemModel,
+    model: ItemModel,
     itemViewModel: ItemViewModel,
     batchViewModel: BatchViewModel,
     modifier: Modifier = Modifier
 ) {
-    val today = LocalDate.now()
     var showItemDetail by rememberSaveable { mutableStateOf(false) }
     var showInsertBatch by rememberSaveable { mutableStateOf(false) }
     var showDeleteBatch by rememberSaveable { mutableStateOf(false) }
@@ -52,24 +48,6 @@ fun ItemDataRow(
     val unit = batchViewModel.unit
     val subUnit = batchViewModel.subUnit
 
-    val totalUnit = itemModel.totalUnit
-    val threshold = itemModel.item.unitThreshold
-    val nearestExpiry = itemModel.nearestExpiry
-
-    val stockColor = when {//TODO: Adjust Colors
-        totalUnit == 0.0 -> DarkRed
-        totalUnit <= threshold * 0.2 -> Orange
-        else -> Color.Gray
-    }
-
-    val expiryDate = nearestExpiry?.toLocalDate()
-    val expiryColor = when {
-        expiryDate == null -> Color.Gray
-        expiryDate.isBefore(today) -> DarkRed
-        expiryDate.isEqual(today) -> Color.Red
-        !expiryDate.isAfter(today.plusDays(itemModel.item.expiryThreshold.toLong())) -> Orange
-        else -> Color.Green
-    }
 
     Row(
         modifier = modifier
@@ -82,30 +60,45 @@ fun ItemDataRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(5.dp),
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.outline_add_photo_alternate_24),
-            contentDescription = "Placeholder image",
-            modifier = Modifier
-                .clip(RoundedCornerShape(5.dp))
-                .size(64.dp)
-                .padding(horizontal = 10.dp),
-        )
-        ItemText(text = itemModel.item.name, modifier = Modifier.weight(0.75f))
+        if(model.item.imageUri != null){
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = model.item.imageUri,
+                    placeholder = painterResource(R.drawable.outline_add_photo_alternate_24),
+                    error = painterResource(R.drawable.outline_add_photo_alternate_24)
+                ),
+                contentDescription = "Selected image",
+                modifier = Modifier
+                    .clip(RoundedCornerShape(5.dp))
+                    .size(64.dp)
+                    .padding(horizontal = 10.dp),
+            )
+        } else {
+            Image(
+                painter = painterResource(id = R.drawable.outline_add_photo_alternate_24),
+                contentDescription = "Placeholder image",
+                modifier = Modifier
+                    .clip(RoundedCornerShape(5.dp))
+                    .size(64.dp)
+                    .padding(horizontal = 10.dp),
+            )
+        }
+        ItemText(text = model.item.name, modifier = Modifier.weight(0.75f))
         ItemText(
-            text = itemModel.nearestExpiryFormatted(),
+            text = model.nearestExpiryFormatted,
             modifier = Modifier.weight(0.5f),
-            color = expiryColor
+            color = model.expiryColor
         )
         ItemText(
-            text = itemModel.totalUnitFormatted,
+            text = model.totalUnitFormatted,
             modifier = Modifier
                 .weight(0.5f),
             textAlign = TextAlign.Center,
-            color = stockColor,
+            color = model.stockColor,
             )
         ItemButton(
             modifier =  Modifier.weight(0.25f),
-            enabled = itemModel.totalSubUnit > 0,
+            enabled = model.totalSubUnit > 0,
             onClick = { showDeleteBatch = true },
             text = "-"
         )
@@ -119,7 +112,7 @@ fun ItemDataRow(
 
     if (showItemDetail) {
         ItemDetailPopup(
-            itemModel = itemModel,
+            itemModel = model,
             onDismiss = { showItemDetail = false },
             onUpdateItem = itemViewModel::updateItem,
             onUpdateBatch = batchViewModel::onConvertBatch
@@ -131,11 +124,11 @@ fun ItemDataRow(
             batchViewModel.onUnitReset()
         }
         BatchInsertionPopup(
-            itemModel = itemModel,
+            itemModel = model,
             unit = unit,
             subUnit = subUnit,
-            onUnitChange = { batchViewModel.onUnitChange(it, itemModel.item.subUnitThreshold) },
-            onSubUnitChange = { batchViewModel.onSubUnitChange(it, itemModel.item.subUnitThreshold) },
+            onUnitChange = { batchViewModel.onUnitChange(it, model.item.subUnitThreshold) },
+            onSubUnitChange = { batchViewModel.onSubUnitChange(it, model.item.subUnitThreshold) },
             onDismiss = { showInsertBatch = false },
             onStore = batchViewModel::onStoreBatch
         )
@@ -146,11 +139,11 @@ fun ItemDataRow(
             batchViewModel.onUnitReset()
         }
         BatchTargetedRemoval(
-            batch = itemModel.batch,
+            batch = model.batch,
             unit = unit,
             subUnit = subUnit,
-            onUnitChange = { batchViewModel.onUnitChange(it, itemModel.item.subUnitThreshold) },
-            onSubUnitChange = { batchViewModel.onSubUnitChange(it, itemModel.item.subUnitThreshold) },
+            onUnitChange = { batchViewModel.onUnitChange(it, model.item.subUnitThreshold) },
+            onSubUnitChange = { batchViewModel.onSubUnitChange(it, model.item.subUnitThreshold) },
             onDismiss = { showDeleteBatch = false },
             onTargetedDeduct = batchViewModel::onTargetedDeductStock
         )

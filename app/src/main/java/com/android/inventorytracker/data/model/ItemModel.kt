@@ -1,39 +1,69 @@
 package com.android.inventorytracker.data.model
 
+import androidx.compose.ui.graphics.Color
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.data.local.entities.ItemEntity
+import com.android.inventorytracker.ui.theme.DarkRed
+import com.android.inventorytracker.ui.theme.Orange
+import java.text.DecimalFormat
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 enum class SortBy {
     NAME_ASC, NAME_DESC, EXPIRY_SOONEST, STOCK_LOW_HIGH, STOCK_HIGH_LOW
 }
 data class ItemModel(
     val item: ItemEntity,
-    val batch: List<ItemBatchEntity>,
-    val expiryParser: (String) -> LocalDate? = { s -> runCatching { LocalDate.parse(s) }.getOrNull() },
-    val unitFormatter: (Double) -> String = { d -> java.text.DecimalFormat("#.####").format(d) }
+    val batch: List<ItemBatchEntity>
 ) {
-    val totalUnit: Double
-        get() {
-            val threshold = item.subUnitThreshold.takeIf { it != 0 } ?: 1
-            return batch.sumOf { it.subUnit / threshold.toDouble() }
-        }
-    val totalUnitFormatted: String get() = unitFormatter(totalUnit)
-
-    val totalSubUnit: Int get() = batch.sumOf { it.subUnit }
-
-    val nearestExpiry: Long? get() = batch.minOfOrNull { it.expiryDate }
-
-    fun nearestExpiryFormatted(
-        dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
-    ): String {
-        return nearestExpiry?.let { millis ->
-            val instant = Instant.ofEpochMilli(millis)
-            val localDate = instant.atZone(ZoneId.systemDefault()).toLocalDate()
-            dateFormatter.format(localDate)
-        } ?: "N/A"
+    companion object {
+        private val df = DecimalFormat("#.####")
+        private val dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
     }
+
+    val totalUnit: Double = batch.sumOf {
+        it.subUnit / (item.subUnitThreshold.takeIf { it != 0 } ?: 1).toDouble()
+    }
+    val totalUnitFormatted: String = df.format(totalUnit)
+
+    val totalSubUnit: Int = batch.sumOf { it.subUnit }
+
+    private val nearestExpiryMillis: Long? = batch.minOfOrNull { it.expiryDate }
+    val nearestExpiryDate: LocalDate? = nearestExpiryMillis?.let {
+        Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
+    }
+
+    val daysLeft: Long? = nearestExpiryDate?.let { ChronoUnit.DAYS.between(LocalDate.now(), it) }
+
+    val expiryMessage: String = when {
+        daysLeft == null -> "N/A"
+        daysLeft < 0 -> "Expired"
+        daysLeft == 0L -> "Expires today"
+        else -> "$daysLeft days"
+    }
+
+    val expiryColor: Color = when {
+        daysLeft == null -> Color.Gray
+        daysLeft < 0 -> DarkRed
+        daysLeft == 0L -> Color.Red
+        else -> Orange
+    }
+
+    val stockColor: Color = when {
+        totalUnit <= 0.0 -> DarkRed
+        totalUnit < item.unitThreshold * 0.20 -> Color.Red
+        else -> Orange
+    }
+
+    val nearestExpiryFormatted: String = nearestExpiryDate?.let { dateFormatter.format(it) } ?: "N/A"
+
+    val isExpiringSoon: Boolean = nearestExpiryDate?.isBefore(
+        LocalDate.now().plusDays(item.expiryThreshold.toLong())
+    ) == true
+
+    val isLowStock: Boolean = totalUnit <= item.unitThreshold * 0.20
 }
+

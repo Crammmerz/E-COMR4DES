@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">InventoryTracker</string>
+
+    <!-- Channel Names -->
+    <string name="channel_name_critical">Critical Alerts</string>
+    <string name="channel_name_warning">Warning Alerts</string>
+    <string name="channel_name_info">Inventory Updates</string>
+    <string name="channel_name_silent">Background Sync</string>
+
+    <!-- Channel Descriptions -->
+    <string name="channel_desc_critical">Alerts for items that are out of stock or already expired — immediate action required</string>
+    <string name="channel_desc_warning">Alerts for items that are nearly depleted or nearing expiry — review soon</string>
+    <string name="channel_desc_info">Informational updates about inventory changes, stock summaries, and confirmations</string>
+    <string name="channel_desc_silent">Non‑intrusive background notifications for sync, maintenance, or status updates</string>
 </resources>

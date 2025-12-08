@@ -46,6 +46,7 @@ class ItemViewModel @Inject constructor(
             SortBy.NAME_ASC -> models.sortedBy { it.item.name }
             SortBy.NAME_DESC -> models.sortedByDescending { it.item.name }
             SortBy.EXPIRY_SOONEST -> models.sortedWith(compareBy(nullsLast()) { it.nearestExpiryDate })
+            SortBy.STOCK_LOW -> models.sortedBy { (it.totalUnit / it.item.unitThreshold).toFloat() }
             SortBy.STOCK_LOW_HIGH -> models.sortedBy { it.totalUnit }
             SortBy.STOCK_HIGH_LOW -> models.sortedByDescending { it.totalUnit }
         }

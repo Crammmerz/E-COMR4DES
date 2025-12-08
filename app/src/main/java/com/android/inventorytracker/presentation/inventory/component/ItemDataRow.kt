@@ -33,7 +33,7 @@ import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import com.android.inventorytracker.ui.theme.LightSand
 
 
-@SuppressLint("DefaultLocale")
+
 @Composable
 fun ItemDataRow(
     model: ItemModel,
@@ -44,9 +44,6 @@ fun ItemDataRow(
     var showItemDetail by rememberSaveable { mutableStateOf(false) }
     var showInsertBatch by rememberSaveable { mutableStateOf(false) }
     var showDeleteBatch by rememberSaveable { mutableStateOf(false) }
-
-    val unit = batchViewModel.unit
-    val subUnit = batchViewModel.subUnit
 
 
     Row(
@@ -98,7 +95,7 @@ fun ItemDataRow(
             )
         ItemButton(
             modifier =  Modifier.weight(0.25f),
-            enabled = model.totalSubUnit > 0,
+            enabled = model.batch.isNotEmpty(),
             onClick = { showDeleteBatch = true },
             text = "-"
         )
@@ -120,32 +117,17 @@ fun ItemDataRow(
     }
 
     if(showInsertBatch){
-        LaunchedEffect(true) {
-            batchViewModel.onUnitReset()
-        }
         BatchInsertionPopup(
             itemModel = model,
-            unit = unit,
-            subUnit = subUnit,
-            onUnitChange = { batchViewModel.onUnitChange(it, model.item.subUnitThreshold) },
-            onSubUnitChange = { batchViewModel.onSubUnitChange(it, model.item.subUnitThreshold) },
             onDismiss = { showInsertBatch = false },
-            onStore = batchViewModel::onStoreBatch
         )
     }
 
     if(showDeleteBatch){
-        LaunchedEffect(true) {
-            batchViewModel.onUnitReset()
-        }
         BatchTargetedRemoval(
+            threshold = model.item.unitThreshold,
             batch = model.batch,
-            unit = unit,
-            subUnit = subUnit,
-            onUnitChange = { batchViewModel.onUnitChange(it, model.item.subUnitThreshold) },
-            onSubUnitChange = { batchViewModel.onSubUnitChange(it, model.item.subUnitThreshold) },
             onDismiss = { showDeleteBatch = false },
-            onTargetedDeduct = batchViewModel::onTargetedDeductStock
         )
     }
 }

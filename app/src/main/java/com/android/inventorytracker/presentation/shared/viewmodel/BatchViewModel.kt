@@ -1,5 +1,6 @@
 package com.android.inventorytracker.presentation.shared.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -11,6 +12,7 @@ import com.android.inventorytracker.data.repository.ItemRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 @HiltViewModel
 class BatchViewModel @Inject constructor(
@@ -23,8 +25,8 @@ class BatchViewModel @Inject constructor(
         private set
 
     fun onUnitReset(){
-        unit = 1f
-        subUnit = 1
+        unit = 0f
+        subUnit = 0
     }
     fun onUnitChange(newUnit: Float, threshold: Int) {
         unit = newUnit
@@ -51,7 +53,7 @@ class BatchViewModel @Inject constructor(
         viewModelScope.launch {
             batches.forEach { batch ->
                 val unit = batch.subUnit.toDouble()/subUnitThreshold
-                batch.subUnit = (unit*newSubUnitThreshold).toInt()
+                batch.subUnit = maxOf(1, (unit * newSubUnitThreshold).roundToInt())
                 itemRepository.updateBatch(batch)
             }
         }

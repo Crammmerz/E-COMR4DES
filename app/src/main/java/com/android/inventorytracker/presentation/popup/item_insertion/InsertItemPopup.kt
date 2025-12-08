@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -37,12 +38,12 @@ fun InsertItemPopup(
     onInsert: (ItemEntity) -> Unit
 ) {
     val context = LocalContext.current
+
     var name by rememberSaveable { mutableStateOf("") }
     var unitThreshold by rememberSaveable { mutableIntStateOf(1) }
     var subUnitThreshold by rememberSaveable { mutableIntStateOf(1) }
     var expiryThreshold by rememberSaveable { mutableIntStateOf(1) }
     var description by rememberSaveable { mutableStateOf("") }
-
 
     var nameValid by rememberSaveable { mutableStateOf(false) }
     var unitThresholdValid by rememberSaveable { mutableStateOf(false) }
@@ -57,9 +58,11 @@ fun InsertItemPopup(
     val focusExpiry = remember { FocusRequester() }
     val focusDescription = remember { FocusRequester() }
 
-    focusName.requestFocus()
+    LaunchedEffect(Unit) {
+        focusName.requestFocus()
+    }
 
-    DialogHost( // TODO: DialogHost for App testing while DialogMockup for Preview Testing
+    DialogHost(
         modifier = Modifier
             .fillMaxWidth(0.4f)
             .fillMaxHeight(0.8f),
@@ -77,48 +80,47 @@ fun InsertItemPopup(
                 onValueChange = { name = it },
                 header = "Item Name",
                 placeholder = "Enter item name",
-                fieldModifier = Modifier.focusRequester(focusName),
-                isValid = { valid -> nameValid = valid },
+                modifier = Modifier.focusRequester(focusName),
+                onValidationChange = { valid -> nameValid = valid },
                 onDone = { focusUnit.requestFocus() }
             )
-            Row (horizontalArrangement = Arrangement.spacedBy(10.dp)){
+
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 IntField(
+                    modifier = Modifier.weight(1f),
                     value = unitThreshold,
                     onValueChange = { unitThreshold = it },
-                    header = "Stock Threshold",
+                    label = "Stock Threshold",
                     placeholder = "Enter unit threshold",
-
-                    modifier = Modifier.weight(1f),
-                    fieldModifier = Modifier.focusRequester(focusUnit),
+                    inputModifier = Modifier.focusRequester(focusUnit),
+                    onValidityChange = { unitThresholdValid = it },
+                    onDone = { focusExpiry.requestFocus() },
                     doClear = true,
-                    isValid = { valid -> unitThresholdValid = valid },
-                    onDone = { focusSubUnit.requestFocus() }
                 )
 
                 IntField(
+                    modifier = Modifier.weight(1f),
                     value = expiryThreshold,
                     onValueChange = { expiryThreshold = it },
-                    header = "Expiry Threshold",
+                    label = "Expiry Threshold",
                     placeholder = "Enter expiry threshold",
-                    modifier = Modifier.weight(1f),
-                    fieldModifier = Modifier.focusRequester(focusExpiry),
+                    inputModifier = Modifier.focusRequester(focusExpiry),
+                    onValidityChange = { expiryThresholdValid = it },
+                    onDone = { focusSubUnit.requestFocus() },
                     doClear = true,
-                    isValid = { valid -> expiryThresholdValid = valid },
-                    onDone = { focusDescription.requestFocus() }
                 )
             }
 
             IntField(
                 value = subUnitThreshold,
                 onValueChange = { subUnitThreshold = it },
-                header = "Sub Unit Threshold",
+                label = "Sub Unit Threshold",
                 placeholder = "Enter sub unit threshold",
-                fieldModifier = Modifier.focusRequester(focusSubUnit),
+                inputModifier = Modifier.focusRequester(focusSubUnit),
+                onDone = { focusDescription.requestFocus() },
+                onValidityChange = { subUnitThresholdValid = it },
                 doClear = true,
-                isValid = { valid -> subUnitThresholdValid = valid },
-                onDone = { focusExpiry.requestFocus() }
             )
-
 
             DescriptionField(
                 value = description,
@@ -135,27 +137,26 @@ fun InsertItemPopup(
             CancelButton(onClick = onDismiss)
 
             ConfirmButton("Add Item", onClick = {
-                    if (allValid) {
-                        val item = ItemEntity(
-                            imageUri = null,
-                            name = name.trim(),
-                            unitThreshold = unitThreshold,
-                            subUnitThreshold = subUnitThreshold,
-                            expiryThreshold = expiryThreshold,
-                            description = description.trim()
-                        )
-                        onInsert(item)
-                        onDismiss()
-                        Toast.makeText(context, "Item added!", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(context, "Please fill required fields", Toast.LENGTH_SHORT)
-                            .show()
-                    }
+                if (allValid) {
+                    val item = ItemEntity(
+                        imageUri = null,
+                        name = name.trim(),
+                        unitThreshold = unitThreshold,
+                        subUnitThreshold = subUnitThreshold,
+                        expiryThreshold = expiryThreshold,
+                        description = description.trim()
+                    )
+                    onInsert(item)
+                    onDismiss()
+                    Toast.makeText(context, "Item added!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Please fill required fields", Toast.LENGTH_SHORT).show()
                 }
-            )
+            })
         }
     }
 }
+
 
 
 @Preview(

@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,22 +32,29 @@ import androidx.compose.ui.text.input.ImeAction
 @Composable
 fun IntField(
     modifier: Modifier = Modifier,
-    fieldModifier: Modifier = Modifier,
+    inputModifier: Modifier = Modifier,
     value: Int,
     onValueChange: (Int) -> Unit,
     valueRange: IntRange = 1..9999,
-    isValid: (Boolean) -> Unit,
+    onValidityChange: (Boolean) -> Unit,
     onDone: () -> Unit = {},
-    header: String,
+    label: String,
     placeholder: String,
     doClear: Boolean = false
 ) {
     var textValue by remember { mutableStateOf(value.toString()) }
+    var isFocused by remember { mutableStateOf(false) }
     var isError by remember { mutableStateOf(false) }
+
+    LaunchedEffect(value, isFocused) {
+        if (!isFocused) {
+            textValue = value.toString()
+        }
+    }
 
     Column(modifier) {
         Text(
-            text = header,
+            text = label,
             color = Color.DarkGray,
             fontWeight = FontWeight.SemiBold,
             fontSize = 13.sp,
@@ -67,12 +75,11 @@ fun IntField(
 
                     if (valid) {
                         isError = false
-                        isValid(true)      // notify parent it's valid
+                        onValidityChange(true)
                         onValueChange(parsed)
                     } else {
                         isError = true
-                        isValid(false)     // notify parent it's invalid
-
+                        onValidityChange(false)
                     }
                 },
                 decorationBox = { innerTextField ->
@@ -83,14 +90,14 @@ fun IntField(
                 },
                 singleLine = true,
                 textStyle = TextStyle(fontSize = 15.sp),
-                modifier = fieldModifier
+                modifier = inputModifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp)
                     .onFocusChanged { focusState ->
-                        val isFocused = focusState.isFocused
+                        isFocused = focusState.isFocused
                         if (isFocused && doClear) {
                             textValue = ""
-                            isValid(false)
+                            onValidityChange(false)
                         }
                     },
                 keyboardActions = KeyboardActions( onDone = { onDone() }),
@@ -100,8 +107,8 @@ fun IntField(
                 ),
             )
         }
-        Text(
-            text = if (isError) "Invalid Input" else "",
+        if (isError) Text(
+            text = "Invalid Input",
             color = Color.Red,
             fontSize = 10.sp
         )

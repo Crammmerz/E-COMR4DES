@@ -5,6 +5,7 @@ import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.data.local.entities.ItemEntity
 import com.android.inventorytracker.ui.theme.DarkRed
 import com.android.inventorytracker.ui.theme.Orange
+import kotlinx.coroutines.flow.StateFlow
 import java.text.DecimalFormat
 import java.time.Instant
 import java.time.LocalDate
@@ -13,7 +14,7 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 enum class SortBy {
-    NAME_ASC, NAME_DESC, EXPIRY_SOONEST, STOCK_LOW_HIGH, STOCK_HIGH_LOW
+    NAME_ASC, NAME_DESC, EXPIRY_SOONEST, STOCK_LOW, STOCK_LOW_HIGH, STOCK_HIGH_LOW,
 }
 data class ItemModel(
     val item: ItemEntity,

@@ -1,9 +1,12 @@
 package com.android.inventorytracker.presentation.popup.change_password
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,41 +29,56 @@ fun ChangePasswordPopup(
     onConfirm: (user: String, password: String, role: String) -> Unit
 ) {
     var password by rememberSaveable { mutableStateOf("") }
-    var valid by rememberSaveable { mutableStateOf(false) }
+    var isInputValid by rememberSaveable { mutableStateOf(false) }
 
-    DialogHost(modifier = Modifier.size(300.dp), onDismissRequest = onDismiss) {
-        Column (modifier = Modifier.padding(20.dp)) {
+    // 1. Logic Extraction: Define submission logic once
+    fun submitAction() {
+        if (password.isNotEmpty() && isInputValid) {
+            // Centralize the role mapping logic
+            val (username, roleString) = when (role) {
+                UserRole.ADMIN -> "admin" to "ADMIN"
+                UserRole.STAFF -> "staff" to "STAFF"
+                // Fallback safety
+            }
+            onConfirm(username, password, roleString)
+        }
+    }
+
+    DialogHost(modifier = Modifier.width(320.dp), onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier.padding(24.dp),
+            // 3. Layout: Add consistent spacing between elements
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
             Text(
                 text = when (role) {
-                        UserRole.ADMIN -> "Admin Password Change"
-                        UserRole.STAFF -> "Staff Password Change"
+                    UserRole.ADMIN -> "Admin Password Change"
+                    UserRole.STAFF -> "Staff Password Change"
                 },
                 style = MaterialTheme.typography.titleLarge
             )
+
             PasswordField(
                 value = password,
                 onValueChange = { password = it },
                 header = "New Password",
-                isValid = { valid = it },
-                onDone = {
-                    if (password.isNotEmpty()) {
-                        when (role) {
-                            UserRole.ADMIN -> onConfirm("admin", password, "ADMIN")
-                            UserRole.STAFF -> onConfirm("staff", password, "STAFF")
-                        }
-                    }
-                }
+                onValidityChange = { isInputValid = it },
+                onDone = { submitAction() }
             )
-            Row {
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                // 4. Layout: Align buttons to the end (standard dialog UX)
+                horizontalArrangement = Arrangement.End
+            ) {
                 CancelButton { onDismiss() }
-                ConfirmButton (text = "Change") {
-                    if(password.isNotEmpty() && valid){
-                        when (role) {
-                            UserRole.ADMIN -> onConfirm("admin", password, "ADMIN")
-                            UserRole.STAFF -> onConfirm("staff", password, "STAFF")
-                        }
-                    }
-                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                ConfirmButton(
+                    text = "Change",
+                    onClick = { submitAction() }
+                )
             }
         }
     }

@@ -11,13 +11,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,95 +28,108 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun StringField(
     modifier: Modifier = Modifier,
-    fieldModifier: Modifier = Modifier,
+    inputModifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
-    isValid: (Boolean) -> Unit,
+    onValidationChange: ((Boolean) -> Unit)? = null,
     onDone: () -> Unit,
     header: String,
     placeholder: String,
-    maxLength: Int = 30
+    maxLength: Int = 30,
+    showCounter: Boolean = true
 ) {
-    var textValue by remember { mutableStateOf(value) }
-    var isNotInLimit by remember { mutableStateOf(false) }
-    var isEmpty by remember { mutableStateOf(false) }
+    val isTooLong = value.length > maxLength
+    val isEmpty = value.isBlank()
+    val hasError = isTooLong || isEmpty
 
-    Column (modifier) {
+    LaunchedEffect(hasError) {
+        onValidationChange?.invoke(!hasError)
+    }
+
+    Column(modifier = modifier) {
+        // Header
         Text(
             text = header,
+            style = MaterialTheme.typography.labelMedium, // Use Theme styles
             color = Color.DarkGray,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 13.sp,
+            modifier = Modifier.padding(bottom = 4.dp)
         )
 
-        Box (
+        Box(
             modifier = Modifier
-            .fillMaxWidth()
-            .height(40.dp)
-            .background(Color.White)
-            .border(
-                width = 1.dp,
-                color = Color.DarkGray,
-                shape = RoundedCornerShape(5.dp)
-            )
-            .padding(horizontal = 10.dp, vertical = 5.dp)
+                .fillMaxWidth()
+                .height(40.dp)
+                .background(Color.White, RoundedCornerShape(5.dp))
+                .border(
+                    width = 1.dp,
+                    // Visual feedback for error state
+                    color = if (hasError) Color.Red else Color.DarkGray,
+                    shape = RoundedCornerShape(5.dp)
+                )
+                .padding(horizontal = 10.dp, vertical = 5.dp)
         ) {
             BasicTextField(
-                value = textValue,
-                onValueChange = {
-                    textValue = it
-                    isNotInLimit = it.length >= maxLength
-                    isEmpty = it.isEmpty()
-                    if(!isNotInLimit && !isEmpty) {
-                        onValueChange(it)
-                        isValid(true)
-                    } else {
-                        isValid(false)
-                    }
+                value = value,
+                onValueChange = { newValue ->
+                    onValueChange(newValue)
                 },
                 decorationBox = { innerTextField ->
-                    if (textValue.isEmpty()) {
-                        Text(placeholder, color = Color.Gray, fontSize = 13.sp)
-                        isValid(false)
+                    Box(contentAlignment = Alignment.CenterStart) {
+                        if (value.isEmpty()) {
+                            Text(
+                                text = placeholder,
+                                color = Color.Gray,
+                                fontSize = 13.sp
+                            )
+                        }
+                        innerTextField()
                     }
-                    innerTextField()
                 },
-                modifier = fieldModifier
+                modifier = inputModifier
                     .fillMaxWidth()
-                    .align(Alignment.CenterStart),
+                    .align(Alignment.CenterStart)
+                    .padding(end = if (showCounter) 35.dp else 0.dp), // Prevent text overlapping counter
                 maxLines = 1,
                 singleLine = true,
-                textStyle = TextStyle(fontSize = 15.sp),
+                textStyle = TextStyle(fontSize = 15.sp, color = Color.Black),
                 cursorBrush = SolidColor(Color.Black),
-                keyboardOptions = KeyboardOptions( imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions( onDone = { if(!isNotInLimit && !isEmpty) onDone() }),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        if (!hasError) onDone()
+                    }
+                ),
             )
-            if(maxLength!=99){
+
+            if (showCounter) {
                 Text(
                     text = "${value.length}/$maxLength",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.DarkGray,
+                    color = if (isTooLong) Color.Red else Color.DarkGray,
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
-                        .background(Color.White)
+                        .background(Color.White.copy(alpha = 0.8f)) // Slight scrim for readability
                 )
             }
         }
-        when {
-            isNotInLimit -> Text(
-                text = "Input is too long",
-                color = Color.Red, fontSize = 10.sp
-            )
-            isEmpty -> Text(
-                text = "Input cannot be empty",
-                color = Color.Red, fontSize = 10.sp
-            )
-            else -> Text(
-                text = "",
-                color = Color.Red, fontSize = 10.sp
+
+        // Error Messages
+        // 5. Layout: Reserve space or use specific padding to prevent layout jumping?
+        // Currently, this will push content down when error appears.
+        if (hasError) {
+            Text(
+                text = when {
+                    isTooLong -> "Input is too long"
+                    isEmpty -> "Input cannot be empty"
+                    else -> ""
+                },
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall,
+                fontSize = 10.sp,
+                modifier = Modifier.padding(top = 2.dp)
             )
         }
     }
 }
-

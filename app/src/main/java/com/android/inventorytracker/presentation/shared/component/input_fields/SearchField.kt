@@ -33,7 +33,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(FlowPreview::class)
 @Composable
-fun SearchBar(
+fun SearchField(
     modifier: Modifier = Modifier,
     itemViewModel: ItemViewModel = hiltViewModel(),
     maxLength: Int = 30

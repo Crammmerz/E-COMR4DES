@@ -23,7 +23,6 @@ fun Main(
         Row(modifier = Modifier.padding(inner).fillMaxSize()){
             NavBar(
                 isOpen = showNavBar,
-                onDismiss = { mainViewModel.setNavBar(false) },
                 modifier = Modifier
                     .widthIn(min = 150.dp, max = 175.dp)
                     .fillMaxHeight(),

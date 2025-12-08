@@ -54,8 +54,8 @@ fun LoginPopup(
                     placeholder = "Enter username",
                     modifier = Modifier.fillMaxWidth(),
                     maxLength = 99,
-                    fieldModifier = Modifier.focusRequester(focusUsername),
-                    isValid = { validUsername = it },
+                    inputModifier = Modifier.focusRequester(focusUsername),
+                    onValidationChange = { validUsername = it },
                     onDone = {
                         focusPassword.requestFocus()
                     },
@@ -65,9 +65,8 @@ fun LoginPopup(
                     value = password,
                     onValueChange = { password = it },
                     header = "Password",
-                    modifier = Modifier.fillMaxWidth(),
-                    fieldModifier = Modifier.focusRequester(focusPassword),
-                    isValid = { validPassword = it },
+                    modifier = Modifier.fillMaxWidth().focusRequester(focusPassword),
+                    onValidityChange = { validPassword = it },
                     onDone = {
                         onLogin(username, password, userRole.name)
                     }

@@ -11,6 +11,7 @@ import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -18,28 +19,39 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
+import com.android.inventorytracker.presentation.shared.component.input_fields.DateField
 import com.android.inventorytracker.presentation.shared.component.input_fields.IntField
 import com.android.inventorytracker.presentation.shared.component.input_fields.FloatField
 import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
 import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
+import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun BatchTargetedRemoval(
+    threshold: Int,
     batch: List<ItemBatchEntity>,
-    unit: Float,
-    subUnit: Int,
-    onUnitChange: (Float) -> Unit,
-    onSubUnitChange: (Int) -> Unit,
+    batchViewModel: BatchViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
-    onTargetedDeduct: (batch: ItemBatchEntity, toRemove: Int) -> Unit,
-){
+) {
+    val unit = batchViewModel.unit
+    val subUnit = batchViewModel.subUnit
+
+    LaunchedEffect(true) {
+        batchViewModel.onUnitReset()
+    }
+
     var validUnit by rememberSaveable { mutableStateOf(false) }
-    var validSubUnit by rememberSaveable { mutableStateOf(false) }
+    var dateValue by rememberSaveable { mutableStateOf("") }
 
-
-    val datePickerState = rememberDatePickerState(initialDisplayMode = DisplayMode.Input)
+    val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
     DialogHost(
@@ -51,40 +63,56 @@ fun BatchTargetedRemoval(
     ) {
         Column {
             Text("Stock Deduction")
-            DatePicker(
-                state = datePickerState,
-                colors = DatePickerDefaults.colors(
-                    containerColor = Color.Transparent,
-                    selectedDayContainerColor = Color(0xFF4CAF50),
-                    todayContentColor = Color.Black
-                )
-            ) //TODO (Design of Date Picker)
-            FloatField(
-                value = unit, onValueChange = onUnitChange,
-                header = "Unit",
-                placeholder = "Enter number of units",
-                isValid = { validUnit = it },
+
+            DateField(
+                value = dateValue,
+                onValueChange = { dateValue = it },
+                onValidityChange = { /* optional */ },
+                onDone = { focusManager.clearFocus(force = true) },
+                header = "Expiry Date",
+                placeholder = "MM/DD/YYYY"
             )
+
+            FloatField(
+                value = unit,
+                onValueChange = { batchViewModel.onUnitChange(it, threshold) },
+                onValidityChange = { validUnit = it },
+                label = "Unit",
+                placeholder = "Enter number of units",
+            )
+
             IntField(
                 value = subUnit,
-                onValueChange = onSubUnitChange,
-                header = "Sub Unit",
+                onValueChange = { batchViewModel.onSubUnitChange(it, threshold) },
+                onValidityChange = { validUnit = it },
+                label = "Sub Unit",
                 placeholder = "Enter number of sub units",
-                doClear = true,
-                isValid = { validSubUnit = it },
             )
+
             Row {
                 CancelButton(onClick = { onDismiss() })
                 ConfirmButton("Deduct Stock") {
-                    val date = datePickerState.selectedDateMillis
-                    val exist = batch.firstOrNull { it.expiryDate == date }
+                    val selectedDate = runCatching {
+                        LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+                    }.getOrNull()
+
+                    // Convert batch expiryDate (Long) back to LocalDate for comparison
+                    val exist = selectedDate?.let { date ->
+                        batch.firstOrNull {
+                            val batchDate = Instant.ofEpochMilli(it.expiryDate)
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate()
+                            batchDate == date
+                        }
+                    }
+
                     when {
-                        date == null || exist == null ->
+                        selectedDate == null || exist == null ->
                             Toast.makeText(context, "Please enter a valid Date", Toast.LENGTH_SHORT).show()
-                        !validUnit && !validSubUnit ->
+                        !validUnit ->
                             Toast.makeText(context, "Invalid Input", Toast.LENGTH_SHORT).show()
                         else -> {
-                            onTargetedDeduct(exist, subUnit)
+                            batchViewModel.onTargetedDeductStock(exist, subUnit)
                             onDismiss()
                         }
                     }

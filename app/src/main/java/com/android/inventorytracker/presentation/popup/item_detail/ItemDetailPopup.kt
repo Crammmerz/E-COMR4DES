@@ -47,11 +47,11 @@ fun ItemDetailPopup(
     var description by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.description) }
 
     var nameValid by rememberSaveable { mutableStateOf(true) }
-    var unitThresholdValid by rememberSaveable { mutableStateOf(true) }
+    var isStockThresholdValid by rememberSaveable { mutableStateOf(true) }
     var expiryThresholdValid by rememberSaveable { mutableStateOf(true) }
     var subUnitThresholdValid by rememberSaveable { mutableStateOf(true) }
 
-    val allValid = nameValid && unitThresholdValid && expiryThresholdValid && subUnitThresholdValid
+    val allValid = nameValid && isStockThresholdValid && expiryThresholdValid && subUnitThresholdValid
 
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -110,7 +110,7 @@ fun ItemDetailPopup(
                         onValueChange = { name = it },
                         header = "Item Name",
                         placeholder = "Enter item name",
-                        isValid = { valid -> nameValid = valid },
+                        onValidationChange = { valid -> nameValid = valid },
                         onDone = { keyboardController?.hide() }
                     )
 
@@ -118,30 +118,36 @@ fun ItemDetailPopup(
                         Column(Modifier.weight(1f)) {
                             IntField(
                                 value = unitThreshold,
-                                onValueChange = { unitThreshold = it },
-                                header = "Low Stock Threshold",
+                                onValueChange = {
+                                    unitThreshold = it
+                                },
+                                label = "Low Stock Threshold",
                                 placeholder = "Enter unit threshold",
-                                isValid = { valid -> unitThresholdValid = valid },
+                                onValidityChange = { isStockThresholdValid = it },
                                 onDone = { keyboardController?.hide() }
                             )
                         }
                         Column(Modifier.weight(1f)) {
                             IntField(
                                 value = expiryThreshold,
-                                onValueChange = { expiryThreshold = it },
-                                header = "Expiry Threshold",
+                                onValueChange = {
+                                    expiryThreshold = it
+                                },
+                                label = "Expiry Threshold",
                                 placeholder = "Enter expiry threshold",
-                                isValid = { valid -> expiryThresholdValid = valid },
+                                onValidityChange = { expiryThresholdValid = it },
                                 onDone = { keyboardController?.hide() }
                             )
                         }
                     }
                     IntField(
                         value = subUnitThreshold,
-                        onValueChange = { subUnitThreshold = it },
-                        header = "Sub Unit",
+                        onValueChange = {
+                            subUnitThreshold = it
+                        },
+                        label = "Sub Unit",
                         placeholder = "Enter sub unit threshold",
-                        isValid = { valid -> subUnitThresholdValid = valid },
+                        onValidityChange = { subUnitThresholdValid = it },
                         onDone = { keyboardController?.hide() }
                     )
                 }

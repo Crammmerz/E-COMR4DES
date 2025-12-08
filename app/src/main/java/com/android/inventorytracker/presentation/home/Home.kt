@@ -15,7 +15,7 @@ import com.android.inventorytracker.util.toLocalDate
 @Composable
 fun Home(modifier: Modifier = Modifier, itemModels: List<ItemModel>) {
     val expiryItems = itemModels.filter { it.isExpiringSoon }.sortedBy { it.nearestExpiryDate }
-    val stockItems = itemModels.filter { it.isLowStock }.sortedBy { it.totalUnit }
+    val stockItems = itemModels.filter { it.isLowStock }.sortedBy { it.totalUnit/it.item.unitThreshold*0.20f }
 
     Column(modifier = modifier.fillMaxSize().padding(20.dp)) {
         Header()

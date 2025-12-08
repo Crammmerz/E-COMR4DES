@@ -29,7 +29,6 @@ fun NavBar(
     loginViewModel: LoginViewModel = hiltViewModel(),
     itemViewModel: ItemViewModel = hiltViewModel(),
     isOpen: Boolean,
-    onDismiss: () -> Unit
 ) {
     val current by mainViewModel.currentContent.collectAsState()
     val highlight = Color.Black.copy(alpha = 0.25f)

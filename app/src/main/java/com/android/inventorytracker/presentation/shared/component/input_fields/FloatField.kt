@@ -36,9 +36,9 @@ fun FloatField(
     fieldModifier: Modifier = Modifier,
     value: Float,
     onValueChange: (Float) -> Unit,
-    isValid: (Boolean) -> Unit,
+    onValidityChange: (Boolean) -> Unit,
     onDone: () -> Unit = {},
-    header: String,
+    label: String,
     placeholder: String,
 ) {
     val df = DecimalFormat("#.####")
@@ -54,7 +54,7 @@ fun FloatField(
 
     Column(modifier) {
         Text(
-            text = header,
+            text = label,
             color = Color.DarkGray,
             fontWeight = FontWeight.SemiBold,
             fontSize = 13.sp,
@@ -75,11 +75,11 @@ fun FloatField(
 
                     if (valid) {
                         isError = false
-                        isValid(true)
+                        onValidityChange(true)
                         onValueChange(parsed)
                     } else {
                         isError = true
-                        isValid(false)
+                        onValidityChange(false)
                     }
                 },
                 decorationBox = { innerTextField ->
@@ -88,6 +88,8 @@ fun FloatField(
                     }
                     innerTextField()
                 },
+                singleLine = true,
+                textStyle = TextStyle(fontSize = 15.sp),
                 modifier = fieldModifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp)
@@ -95,11 +97,9 @@ fun FloatField(
                         isFocused = focusState.isFocused
                         if (isFocused) {
                             textValue = ""
-                            isValid(false)
+                            onValidityChange(false)
                         }
                     },
-                textStyle = TextStyle(fontSize = 15.sp),
-                singleLine = true,
                 keyboardActions = KeyboardActions(onDone = { onDone() }),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
@@ -107,11 +107,10 @@ fun FloatField(
                 ),
             )
         }
-        Text(
-            text = if(isError)"Invalid Input" else "",
+        if(isError) Text(
+            text = "Invalid Input",
             color = Color.Red,
             fontSize = 10.sp
         )
     }
 }
-

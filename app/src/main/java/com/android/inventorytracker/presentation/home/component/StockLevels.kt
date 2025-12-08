@@ -39,7 +39,7 @@ fun StockLevels(modifier: Modifier, itemModel: List<ItemModel>){
                         Text(
                             text = "${model.totalUnitFormatted} / ${model.item.unitThreshold}",
                             modifier = Modifier.width(100.dp),
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.End
                         )
                     }
                 }

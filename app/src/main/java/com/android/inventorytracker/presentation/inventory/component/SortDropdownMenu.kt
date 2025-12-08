@@ -50,6 +50,11 @@ fun SortDropdownMenu(itemViewModel: ItemViewModel) {
             )
             HorizontalDivider()
             DropdownMenuItem(
+                text = { Text("Low Stock (Less Than 20%)") },
+                onClick = { itemViewModel.setSort(SortBy.STOCK_LOW) }
+            )
+            HorizontalDivider()
+            DropdownMenuItem(
                 text = { Text("Stock (Low-High)") },
                 onClick = { itemViewModel.setSort(SortBy.STOCK_LOW_HIGH) }
             )

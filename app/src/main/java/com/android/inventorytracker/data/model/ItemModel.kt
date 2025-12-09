@@ -5,7 +5,6 @@ import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.data.local.entities.ItemEntity
 import com.android.inventorytracker.ui.theme.DarkRed
 import com.android.inventorytracker.ui.theme.Orange
-import kotlinx.coroutines.flow.StateFlow
 import java.text.DecimalFormat
 import java.time.Instant
 import java.time.LocalDate
@@ -14,7 +13,7 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 enum class SortBy {
-    NAME_ASC, NAME_DESC, EXPIRY_SOONEST, STOCK_LOW, STOCK_LOW_HIGH, STOCK_HIGH_LOW,
+    NAME_ASC, NAME_DESC, EXPIRY_ASCENDING, STOCK_LOW, STOCK_LOW_HIGH, STOCK_HIGH_LOW,
 }
 data class ItemModel(
     val item: ItemEntity,
@@ -25,12 +24,12 @@ data class ItemModel(
         private val dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
     }
 
-    val totalUnit: Double = batch.sumOf {
+    fun totalUnit(): Double = batch.sumOf {
         it.subUnit / (item.subUnitThreshold.takeIf { it != 0 } ?: 1).toDouble()
     }
-    val totalUnitFormatted: String = df.format(totalUnit)
+    fun totalUnitFormatted(): String = df.format(totalUnit())
 
-    val totalSubUnit: Int = batch.sumOf { it.subUnit }
+    fun totalSubUnit(): Int = batch.sumOf { it.subUnit }
 
     private val nearestExpiryMillis: Long? = batch.minOfOrNull { it.expiryDate }
     val nearestExpiryDate: LocalDate? = nearestExpiryMillis?.let {
@@ -54,8 +53,8 @@ data class ItemModel(
     }
 
     val stockColor: Color = when {
-        totalUnit <= 0.0 -> DarkRed
-        totalUnit < item.unitThreshold * 0.20 -> Color.Red
+        totalUnit() <= 0.0 -> DarkRed
+        totalUnit() < item.unitThreshold * 0.20 -> Color.Red
         else -> Orange
     }
 
@@ -65,6 +64,6 @@ data class ItemModel(
         LocalDate.now().plusDays(item.expiryThreshold.toLong())
     ) == true
 
-    val isLowStock: Boolean = totalUnit <= item.unitThreshold * 0.20
+    val isLowStock: Boolean = totalUnit() <= item.unitThreshold * 0.20
 }
 

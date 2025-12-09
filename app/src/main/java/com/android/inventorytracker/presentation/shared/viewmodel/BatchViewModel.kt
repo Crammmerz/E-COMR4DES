@@ -19,24 +19,6 @@ class BatchViewModel @Inject constructor(
     private val itemRepository: ItemRepository
 ): ViewModel() {
 
-    var unit by mutableFloatStateOf(0f)
-        private set
-    var subUnit by mutableIntStateOf(0)
-        private set
-
-    fun onUnitReset(){
-        unit = 0f
-        subUnit = 0
-    }
-    fun onUnitChange(newUnit: Float, threshold: Int) {
-        unit = newUnit
-        subUnit = (newUnit * threshold).toInt()
-    }
-
-    fun onSubUnitChange(newSubUnit: Int, threshold: Int) {
-        subUnit = newSubUnit
-        unit = newSubUnit.toFloat() / threshold
-    }
     fun onStoreBatch(batch: ItemBatchEntity) {
         viewModelScope.launch {
             val existing = itemRepository.findBatch(batch.itemId, batch.expiryDate)

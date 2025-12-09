@@ -55,20 +55,19 @@ fun SearchField(
         modifier = modifier
             .background(Color.White, RoundedCornerShape(8.dp))
             .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+            .height(40.dp)
             .padding(horizontal = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Leading search icon
         Icon(
             imageVector = Icons.Default.Search,
             contentDescription = "Search Icon",
             tint = Color.Gray,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(15.dp)
         )
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        // Text field with placeholder
         Box(
             modifier = Modifier.weight(1f),
             contentAlignment = Alignment.CenterStart
@@ -99,7 +98,7 @@ fun SearchField(
         // Trailing clear button
         if (name.isNotEmpty()) {
             IconButton(
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(15.dp),
                 onClick = {
                     name = ""
                     itemViewModel.setSearchQuery("")

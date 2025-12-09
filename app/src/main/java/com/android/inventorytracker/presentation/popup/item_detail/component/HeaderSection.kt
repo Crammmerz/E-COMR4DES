@@ -21,7 +21,7 @@ import com.android.inventorytracker.data.model.ItemModel
 
 @Composable
 fun HeaderSection(itemModel: ItemModel){
-    val totalUnit = itemModel.totalUnit
+    val totalUnit = itemModel.totalUnit()
     val threshold = itemModel.item.unitThreshold
     val darkRed = Color(0xFF8B0000)
 
@@ -55,7 +55,7 @@ fun HeaderSection(itemModel: ItemModel){
                 fontSize = 10.sp
             )
             Text(
-                text = "${itemModel.totalUnitFormatted} units",
+                text = "${itemModel.totalUnitFormatted()} units",
                 color = Color.Black,
                 fontWeight = FontWeight.Bold,
                 fontSize = 10.sp

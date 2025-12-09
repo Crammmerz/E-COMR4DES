@@ -8,6 +8,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -18,6 +23,8 @@ import com.android.inventorytracker.presentation.shared.component.primitive.Canc
 import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
+import com.android.inventorytracker.util.onSubUnitChange
+import com.android.inventorytracker.util.onUnitChange
 
 @Composable
 fun BatchDeductPopup(
@@ -26,12 +33,8 @@ fun BatchDeductPopup(
     batchViewModel: BatchViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
 ) {
-    val unit = batchViewModel.unit
-    val subUnit = batchViewModel.subUnit
-
-    LaunchedEffect(true) {
-        batchViewModel.onUnitReset()
-    }
+    var unit by rememberSaveable { mutableFloatStateOf(0f) }
+    var subUnit by rememberSaveable { mutableIntStateOf(0) }
 
     val context = LocalContext.current
     DialogHost(
@@ -45,14 +48,26 @@ fun BatchDeductPopup(
             Text("Stock Deduction")
             FloatField(
                 value = unit,
-                onValueChange = { batchViewModel.onUnitChange(it, threshold) },
+                onValueChange = { value ->
+                    onUnitChange(
+                        unit = value, threshold,
+                        onUnit = { unit = it },
+                        onSubUnit = { subUnit = it }
+                    )
+                },
                 onValidityChange = {},
                 label = "Unit",
                 placeholder = "Enter number of units",
             )
             IntField(
                 value = subUnit,
-                onValueChange = { batchViewModel.onSubUnitChange(it, threshold) },
+                onValueChange = { value ->
+                    onSubUnitChange(
+                        subUnit = value, threshold,
+                        onUnit = { unit = it },
+                        onSubUnit = { subUnit = it }
+                    )
+                },
                 onValidityChange = {},
                 label = "Sub Unit",
                 placeholder = "Enter number of sub units",

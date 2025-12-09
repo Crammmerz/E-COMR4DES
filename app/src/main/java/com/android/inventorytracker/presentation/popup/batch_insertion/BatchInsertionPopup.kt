@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -26,6 +27,8 @@ import com.android.inventorytracker.presentation.shared.component.primitive.Conf
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
+import com.android.inventorytracker.util.onSubUnitChange
+import com.android.inventorytracker.util.onUnitChange
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -36,12 +39,8 @@ fun BatchInsertionPopup(
     batchViewModel: BatchViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
 ) {
-    val unit = batchViewModel.unit
-    val subUnit = batchViewModel.subUnit
-
-    LaunchedEffect(true) {
-        batchViewModel.onUnitReset()
-    }
+    var unit by rememberSaveable { mutableFloatStateOf(0f) }
+    var subUnit by rememberSaveable { mutableIntStateOf(0) }
 
     var validUnit by rememberSaveable { mutableStateOf(false) }
     var dateValue by rememberSaveable { mutableStateOf("") }
@@ -68,7 +67,13 @@ fun BatchInsertionPopup(
 
             FloatField(
                 value = unit,
-                onValueChange = { batchViewModel.onUnitChange(it, itemModel.item.unitThreshold) },
+                onValueChange = { value ->
+                    onUnitChange(
+                        unit = value, itemModel.item.unitThreshold,
+                        onUnit = { unit = it },
+                        onSubUnit = { subUnit = it }
+                    )
+                },
                 onValidityChange = { validUnit = it },
                 label = "Unit",
                 placeholder = "Enter number of units",
@@ -77,7 +82,13 @@ fun BatchInsertionPopup(
 
             IntField(
                 value = subUnit,
-                onValueChange = { batchViewModel.onSubUnitChange(it, itemModel.item.unitThreshold) },
+                onValueChange = { value ->
+                    onSubUnitChange(
+                        subUnit = value, itemModel.item.unitThreshold,
+                        onUnit = { unit = it },
+                        onSubUnit = { subUnit = it }
+                    )
+                },
                 label = "Sub Unit",
                 placeholder = "Enter number of sub units",
                 onValidityChange = { validUnit = it },

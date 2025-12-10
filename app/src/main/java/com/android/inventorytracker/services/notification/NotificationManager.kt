@@ -6,9 +6,9 @@ import com.android.inventorytracker.data.model.ItemModel
 import java.time.LocalDate
 
 fun inventoryNotifier(itemModels: List<ItemModel>, context: Context, today: LocalDate) {
-    val zeroItems = itemModels.filter { it.totalSubUnit == 0 }
+    val zeroItems = itemModels.filter { it.totalSubUnit() == 0 }
     val expiredItems = itemModels.filter { it.nearestExpiryDate?.isBefore(today) ?: false }
-    val lowItems = itemModels.filter { it.totalSubUnit > 0 && it.totalUnit <= it.item.unitThreshold * 0.20 }
+    val lowItems = itemModels.filter { it.totalSubUnit() > 0 && it.totalUnit() <= it.item.unitThreshold * 0.20 }
     val expiringItems = itemModels.filter { model ->
         model.nearestExpiryDate?.let { date ->
             !date.isBefore(today) && !date.isAfter(today.plusDays(model.item.expiryThreshold.toLong()))
@@ -51,7 +51,7 @@ fun inventoryNotifier(itemModels: List<ItemModel>, context: Context, today: Loca
         channel = AppChannel.WARNING,
         title = "Inventory Status Notice",
         text = "[LOW STOCK] ${lowItems.count()}",
-        subtext = lowItems.map { "${it.item.name}: ${it.totalUnit} remaining" },
+        subtext = lowItems.map { "${it.item.name}: ${it.totalUnit()} remaining" },
         id = "low_stock".hashCode()
     )
 }

@@ -27,7 +27,6 @@ fun NavBar(
     modifier: Modifier = Modifier,
     mainViewModel: MainViewModel,
     loginViewModel: LoginViewModel = hiltViewModel(),
-    itemViewModel: ItemViewModel = hiltViewModel(),
     isOpen: Boolean,
 ) {
     val current by mainViewModel.currentContent.collectAsState()
@@ -42,20 +41,20 @@ fun NavBar(
         ) {
             NavButton(
                 label = "🏠 Home",
-                bgColor = if (current == Content.Home) highlight else default
-            ) {
-                itemViewModel.setSearchQuery("")
-                mainViewModel.setContent(Content.Home)
-            }
+                bgColor = if (current == Content.Home) highlight else default,
+                onClick = { mainViewModel.setContent(Content.Home)}
+            )
             NavButton(
                 label = "📦 Inventory",
-                bgColor = if (current == Content.Inventory) highlight else default
-            ) { mainViewModel.setContent(Content.Inventory) }
+                bgColor = if (current == Content.Inventory) highlight else default,
+                onClick = { mainViewModel.setContent(Content.Inventory) }
+            )
             if (loginViewModel.userRole == UserRole.ADMIN) {
                 NavButton(
                     label = "⚙️ Setting",
-                    bgColor = if (current == Content.Setting) highlight else default
-                ) { mainViewModel.setContent(Content.Setting) }
+                    bgColor = if (current == Content.Setting) highlight else default,
+                    onClick = { mainViewModel.setContent(Content.Setting) }
+                )
             }
         }
     }

@@ -32,12 +32,12 @@ fun StockLevels(modifier: Modifier, itemModel: List<ItemModel>){
                     Text(model.item.name)
                     Row (verticalAlignment = Alignment.CenterVertically) {
                         LinearProgressIndicator(
-                            progress = { (model.totalUnit / model.item.unitThreshold).toFloat() },
+                            progress = { (model.totalUnit() / model.item.unitThreshold).toFloat() },
                             modifier = Modifier.weight(1f),
                             color = (model.stockColor)
                         )
                         Text(
-                            text = "${model.totalUnitFormatted} / ${model.item.unitThreshold}",
+                            text = "${model.totalUnitFormatted()} / ${model.item.unitThreshold}",
                             modifier = Modifier.width(100.dp),
                             textAlign = TextAlign.End
                         )

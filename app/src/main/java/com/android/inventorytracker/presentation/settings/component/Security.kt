@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.data.model.UserRole
-import com.android.inventorytracker.presentation.popup.change_password.ChangePasswordPopup
+import com.android.inventorytracker.presentation.popup.user_change_password.ChangePasswordPopup
 import com.android.inventorytracker.presentation.settings.viewmodel.SettingsViewModel
 
 @Composable

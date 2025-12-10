@@ -87,7 +87,7 @@ fun ItemDataRow(
             color = model.expiryColor
         )
         ItemText(
-            text = model.totalUnitFormatted,
+            text = model.totalUnitFormatted(),
             modifier = Modifier
                 .weight(0.5f),
             textAlign = TextAlign.Center,

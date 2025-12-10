@@ -19,10 +19,8 @@ import com.android.inventorytracker.util.toLocalDate
 @Composable
 fun ContentSection(
     modifier: Modifier = Modifier,
-    itemViewModel: ItemViewModel = hiltViewModel(),
     mainViewModel: MainViewModel,
 ) {
-    val itemModels by itemViewModel.itemModelList.collectAsState()
     val currentContent by mainViewModel.currentContent.collectAsState()
 
     Surface(
@@ -30,8 +28,8 @@ fun ContentSection(
         modifier = modifier
     ) {
         when (currentContent) {
-            Content.Home -> Home(itemModels = itemModels)
-            Content.Inventory -> Inventory(itemModels = itemModels)
+            Content.Home -> Home()
+            Content.Inventory -> Inventory()
             Content.Setting -> Setting()
         }
     }

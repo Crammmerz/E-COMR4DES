@@ -1,4 +1,4 @@
-package com.android.inventorytracker.presentation.popup.change_password
+package com.android.inventorytracker.presentation.popup.user_change_password
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

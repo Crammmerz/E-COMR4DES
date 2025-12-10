@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -59,7 +60,8 @@ fun ItemDetailPopup(
 
     DialogHost(
         modifier = Modifier
-            .fillMaxSize(0.85f),
+            .height(500.dp)
+            .width(800.dp),
         useImePadding = true,
         onDismissRequest = {
             val updatedItem = itemModel.item.copy(
@@ -122,7 +124,7 @@ fun ItemDetailPopup(
                                     unitThreshold = it
                                 },
                                 label = "Low Stock Threshold",
-                                placeholder = "Enter unit threshold",
+                                placeholder = "Enter threshold",
                                 onValidityChange = { isStockThresholdValid = it },
                                 onDone = { keyboardController?.hide() }
                             )
@@ -134,7 +136,7 @@ fun ItemDetailPopup(
                                     expiryThreshold = it
                                 },
                                 label = "Expiry Threshold",
-                                placeholder = "Enter expiry threshold",
+                                placeholder = "Enter threshold",
                                 onValidityChange = { expiryThresholdValid = it },
                                 onDone = { keyboardController?.hide() }
                             )
@@ -146,7 +148,7 @@ fun ItemDetailPopup(
                             subUnitThreshold = it
                         },
                         label = "Sub Unit",
-                        placeholder = "Enter sub unit threshold",
+                        placeholder = "Enter threshold",
                         onValidityChange = { subUnitThresholdValid = it },
                         onDone = { keyboardController?.hide() }
                     )

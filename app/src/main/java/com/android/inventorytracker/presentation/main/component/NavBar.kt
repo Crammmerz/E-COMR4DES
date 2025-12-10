@@ -19,6 +19,7 @@ import com.android.inventorytracker.data.model.UserRole
 import com.android.inventorytracker.presentation.login.viewmodel.LoginViewModel
 import com.android.inventorytracker.presentation.main.viewmodel.Content
 import com.android.inventorytracker.presentation.main.viewmodel.MainViewModel
+import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import com.android.inventorytracker.ui.theme.Ochre
 
 @Composable
@@ -27,42 +28,33 @@ fun NavBar(
     mainViewModel: MainViewModel,
     loginViewModel: LoginViewModel = hiltViewModel(),
     isOpen: Boolean,
-    onDismiss: () -> Unit
 ) {
     val current by mainViewModel.currentContent.collectAsState()
     val highlight = Color.Black.copy(alpha = 0.25f)
     val default = Color.Transparent
 
     if (isOpen) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Transparent)
-                    .clickable { onDismiss() } // dismiss when tapped outside
+        Column(
+            modifier = modifier
+                .background(Ochre)
+                .padding(10.dp),
+        ) {
+            NavButton(
+                label = "🏠 Home",
+                bgColor = if (current == Content.Home) highlight else default,
+                onClick = { mainViewModel.setContent(Content.Home)}
             )
-
-            Column (
-                modifier = modifier
-                    .fillMaxHeight()
-                    .align(Alignment.CenterStart)
-                    .background(Ochre)
-                    .padding(10.dp),
-            ) {
+            NavButton(
+                label = "📦 Inventory",
+                bgColor = if (current == Content.Inventory) highlight else default,
+                onClick = { mainViewModel.setContent(Content.Inventory) }
+            )
+            if (loginViewModel.userRole == UserRole.ADMIN) {
                 NavButton(
-                    label = "🏠 Home",
-                    bgColor = if (current == Content.Home) highlight else default
-                ) { mainViewModel.setContent(Content.Home) }
-                NavButton(
-                    label = "📦 Inventory",
-                    bgColor = if (current == Content.Inventory) highlight else default
-                ) { mainViewModel.setContent(Content.Inventory) }
-                if(loginViewModel.userRole == UserRole.ADMIN){
-                    NavButton(
-                        label = "⚙️ Setting",
-                        bgColor = if (current == Content.Setting) highlight else default
-                    ) { mainViewModel.setContent(Content.Setting) }
-                }
+                    label = "⚙️ Setting",
+                    bgColor = if (current == Content.Setting) highlight else default,
+                    onClick = { mainViewModel.setContent(Content.Setting) }
+                )
             }
         }
     }

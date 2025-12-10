@@ -20,21 +20,26 @@ import com.android.inventorytracker.data.model.ItemModel
 
 @Composable
 fun StockLevels(modifier: Modifier, itemModel: List<ItemModel>){
-    Column(modifier = modifier.background(Color.White).padding(50.dp)){
+    Column(modifier = modifier
+        .background(Color.White)
+        .padding(10.dp)){
         Text(text = "Stocks", style = MaterialTheme.typography.titleLarge)
-        LazyColumn (modifier = Modifier.padding(vertical = 10.dp).weight(1f)) {
+        LazyColumn (modifier = Modifier
+            .padding(vertical = 10.dp)
+            .weight(1f)) {
             items(itemModel) { model ->
                 Column {
                     Text(model.item.name)
                     Row (verticalAlignment = Alignment.CenterVertically) {
                         LinearProgressIndicator(
-                            progress = { (model.totalUnit / model.item.unitThreshold).toFloat() },
-                            modifier = Modifier.weight(1f)
+                            progress = { (model.totalUnit() / model.item.unitThreshold).toFloat() },
+                            modifier = Modifier.weight(1f),
+                            color = (model.stockColor)
                         )
                         Text(
-                            text = "${model.totalUnitFormatted} / ${model.item.unitThreshold}",
+                            text = "${model.totalUnitFormatted()} / ${model.item.unitThreshold}",
                             modifier = Modifier.width(100.dp),
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.End
                         )
                     }
                 }

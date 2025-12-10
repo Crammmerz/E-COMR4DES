@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,28 +29,48 @@ class ItemViewModel @Inject constructor(
     private val _query = MutableStateFlow("")
     val query: StateFlow<String> = _query
 
+    private val _persistentItems = MutableStateFlow<Set<Int>>(emptySet())
+    val persistentItems: StateFlow<Set<Int>> = _persistentItems
+
     val itemModelList: StateFlow<List<ItemModel>> = combine(
         itemRepository.observeItemModels(),
         _sortBy,
-        _query.debounce(250)
-    ) { models, sort, q ->
-        val filtered = if (q.isBlank()) models else models.filter {
-            it.item.name.contains(q, true) || it.item.description?.contains(q, true) == true
+        _query.debounce(250),
+        _persistentItems
+    ) { models, sort, q, persist ->
+        val filtered = if (q.isBlank()) {
+            models
+        } else {
+            models.filter { model ->
+                model.item.id in persist || (
+                        model.item.name.contains(q, ignoreCase = true) ||
+                                model.item.description?.contains(q, ignoreCase = true) == true
+                        )
+            }
         }
-        applySort(filtered, sort)
+        applySort(filtered, sort, persist)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    private fun applySort(models: List<ItemModel>, sort: SortBy) =
+    private fun applySort(models: List<ItemModel>, sort: SortBy, persist: Set<Int>) =
         when (sort) {
             SortBy.NAME_ASC -> models.sortedBy { it.item.name }
             SortBy.NAME_DESC -> models.sortedByDescending { it.item.name }
-            SortBy.EXPIRY_SOONEST -> models.sortedWith(compareBy(nullsLast()) { it.nearestExpiry })
-            SortBy.STOCK_LOW_HIGH -> models.sortedBy { it.totalUnit }
-            SortBy.STOCK_HIGH_LOW -> models.sortedByDescending { it.totalUnit }
+            SortBy.EXPIRY_ASCENDING -> models.sortedWith(compareBy(nullsLast()) { it.nearestExpiryDate })
+            SortBy.STOCK_LOW -> models.sortedBy { (it.totalUnit() / it.item.unitThreshold).toFloat() }.filter { it.isLowStock || it.item.id in persist }
+            SortBy.STOCK_LOW_HIGH -> models.sortedBy { it.totalUnit() }
+            SortBy.STOCK_HIGH_LOW -> models.sortedByDescending { it.totalUnit() }
         }
 
     fun setSearchQuery(q: String) { _query.value = q }
     fun setSort(option: SortBy) { _sortBy.value = option }
+
+    fun resetPersistence() { _persistentItems.value = emptySet() }
+
+    fun togglePersistence(itemId: Int, persistent: Boolean) {
+        _persistentItems.update { current ->
+            if (persistent) current + itemId else current - itemId
+        }
+    }
 
     fun insertItem(item: ItemEntity) {
         viewModelScope.launch { itemRepository.insertItem(item) }

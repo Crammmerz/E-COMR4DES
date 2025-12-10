@@ -15,16 +15,18 @@ import com.android.inventorytracker.presentation.inventory.component.*
 import com.android.inventorytracker.presentation.login.viewmodel.LoginViewModel
 import com.android.inventorytracker.presentation.popup.item_insertion.InsertItemPopup
 import com.android.inventorytracker.presentation.popup.item_removal.DeleteItemPopup
+import com.android.inventorytracker.presentation.shared.component.SortDropdownMenu
+import com.android.inventorytracker.presentation.shared.component.input_fields.SearchField
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 
 @Composable
 fun Inventory(
-    itemModels: List<ItemModel>,
     itemViewModel: ItemViewModel = hiltViewModel(),
     batchViewModel: BatchViewModel = hiltViewModel(),
     loginViewModel: LoginViewModel = hiltViewModel()
 ) {
+    val itemModels by itemViewModel.itemModelList.collectAsState()
     var showAddItem by rememberSaveable { mutableStateOf(false) }
     var showDeleteItem by rememberSaveable { mutableStateOf(false) }
 
@@ -42,8 +44,8 @@ fun Inventory(
                 DeleteItemButton(onClick = { showDeleteItem = true}, enabled = itemModels.isNotEmpty())
             }
             Spacer(Modifier.weight(1f))
-            SearchBar(itemViewModel, Modifier.width(275.dp).height(40.dp))
-            SortDropdownMenu(itemViewModel)
+            SearchField(Modifier.width(275.dp))
+            SortDropdownMenu()
         }
 
         HeaderSection()
@@ -54,7 +56,7 @@ fun Inventory(
         ) {
             items(items = itemModels, key = { it.item.id }) { itemModel ->
                 ItemDataRow(
-                    itemModel = itemModel,
+                    model = itemModel,
                     itemViewModel = itemViewModel,
                     batchViewModel = batchViewModel,
                 )

@@ -1,5 +1,6 @@
 package com.android.inventorytracker.presentation.shared.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -11,30 +12,13 @@ import com.android.inventorytracker.data.repository.ItemRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 @HiltViewModel
 class BatchViewModel @Inject constructor(
     private val itemRepository: ItemRepository
 ): ViewModel() {
 
-    var unit by mutableFloatStateOf(0f)
-        private set
-    var subUnit by mutableIntStateOf(0)
-        private set
-
-    fun onUnitReset(){
-        unit = 1f
-        subUnit = 1
-    }
-    fun onUnitChange(newUnit: Float, threshold: Int) {
-        unit = newUnit
-        subUnit = (newUnit * threshold).toInt()
-    }
-
-    fun onSubUnitChange(newSubUnit: Int, threshold: Int) {
-        subUnit = newSubUnit
-        unit = newSubUnit.toFloat() / threshold
-    }
     fun onStoreBatch(batch: ItemBatchEntity) {
         viewModelScope.launch {
             val existing = itemRepository.findBatch(batch.itemId, batch.expiryDate)
@@ -51,7 +35,7 @@ class BatchViewModel @Inject constructor(
         viewModelScope.launch {
             batches.forEach { batch ->
                 val unit = batch.subUnit.toDouble()/subUnitThreshold
-                batch.subUnit = (unit*newSubUnitThreshold).toInt()
+                batch.subUnit = maxOf(1, (unit * newSubUnitThreshold).roundToInt())
                 itemRepository.updateBatch(batch)
             }
         }

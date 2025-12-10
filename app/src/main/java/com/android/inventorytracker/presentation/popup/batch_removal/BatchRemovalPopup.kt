@@ -5,30 +5,37 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.presentation.shared.component.input_fields.IntField
 import com.android.inventorytracker.presentation.shared.component.input_fields.FloatField
 import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
 import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
+import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
+import com.android.inventorytracker.util.onSubUnitChange
+import com.android.inventorytracker.util.onUnitChange
 
 @Composable
 fun BatchDeductPopup(
+    threshold: Int,
     batch: List<ItemBatchEntity>,
-    unit: Float,
-    subUnit: Int,
-    onUnitChange: (Float) -> Unit,
-    onSubUnitChange: (Int) -> Unit,
+    batchViewModel: BatchViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
-    onDeductStock: (List<ItemBatchEntity>, toRemove: Int) -> Unit
-    ,
-){
+) {
+    var unit by rememberSaveable { mutableFloatStateOf(0f) }
+    var subUnit by rememberSaveable { mutableIntStateOf(0) }
+
     val context = LocalContext.current
     DialogHost(
         Modifier
@@ -40,13 +47,31 @@ fun BatchDeductPopup(
         Column {
             Text("Stock Deduction")
             FloatField(
-                num = unit, onNumChange = onUnitChange,
-                header = "Unit"
+                value = unit,
+                onValueChange = { value ->
+                    onUnitChange(
+                        unit = value, threshold,
+                        onUnit = { unit = it },
+                        onSubUnit = { subUnit = it }
+                    )
+                },
+                onValidityChange = {},
+                label = "Unit",
+                placeholder = "Enter number of units",
             )
             IntField(
-                num = subUnit,
-                onNumChange = onSubUnitChange,
-                header = "Sub Unit",
+                value = subUnit,
+                onValueChange = { value ->
+                    onSubUnitChange(
+                        subUnit = value, threshold,
+                        onUnit = { unit = it },
+                        onSubUnit = { subUnit = it }
+                    )
+                },
+                onValidityChange = {},
+                label = "Sub Unit",
+                placeholder = "Enter number of sub units",
+                doClear = true,
             )
             Row {
                 CancelButton(onClick = { onDismiss() },)
@@ -55,7 +80,7 @@ fun BatchDeductPopup(
                         subUnit > batch.sumOf { it.subUnit } || subUnit <= 0 ->
                             Toast.makeText(context, "Please enter a valid amount", Toast.LENGTH_SHORT).show()
                         else ->
-                            onDeductStock(batch, subUnit)
+                            batchViewModel.onDeductStock(batch, subUnit)
                     }
                 }
             }

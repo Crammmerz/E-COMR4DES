@@ -5,7 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -22,12 +21,13 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun DescriptionField(
-    description: String?,
-    onDescriptionChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    fieldModifier: Modifier = Modifier,
+    value: String?,
+    onValueChange: (String) -> Unit,
     maxLength: Int = 350
 ) {
-    val safeDescription = description ?: ""
+    val safeDescription = value ?: ""
     Column (modifier){
         Text(
             text = "Description",
@@ -50,15 +50,19 @@ fun DescriptionField(
             BasicTextField(
                 value = safeDescription,
                 onValueChange = {
-                    if (it.length <= maxLength) onDescriptionChange(it)
+                    if (it.length <= maxLength) onValueChange(it)
                 },
-                modifier = Modifier.fillMaxSize(),
+                modifier = fieldModifier.fillMaxSize(),
                 textStyle = TextStyle(fontSize = 15.sp),
                 cursorBrush = SolidColor(Color.Black),
                 maxLines = 12,
-                decorationBox = { innerTextField -> Box(Modifier.fillMaxSize()) { innerTextField() } }
+                decorationBox = { innerTextField ->
+                    if (safeDescription.isEmpty()) {
+                        Text("Enter description...", color = Color.Gray, fontSize = 15.sp)
+                    }
+                    Box(Modifier.fillMaxSize()) { innerTextField() }
+                }
             )
-
             Text(
                 text = "${safeDescription.length}/$maxLength",
                 fontSize = 12.sp,

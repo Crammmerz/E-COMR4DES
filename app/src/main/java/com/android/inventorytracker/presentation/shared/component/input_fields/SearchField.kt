@@ -1,4 +1,4 @@
-package com.android.inventorytracker.presentation.inventory.component
+package com.android.inventorytracker.presentation.shared.component.input_fields
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,6 +23,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
@@ -32,9 +33,9 @@ import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(FlowPreview::class)
 @Composable
-fun SearchBar(
-    itemViewModel: ItemViewModel,
+fun SearchField(
     modifier: Modifier = Modifier,
+    itemViewModel: ItemViewModel = hiltViewModel(),
     maxLength: Int = 30
 ) {
     var name by rememberSaveable { mutableStateOf("") }
@@ -54,20 +55,19 @@ fun SearchBar(
         modifier = modifier
             .background(Color.White, RoundedCornerShape(8.dp))
             .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+            .height(40.dp)
             .padding(horizontal = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Leading search icon
         Icon(
             imageVector = Icons.Default.Search,
             contentDescription = "Search Icon",
             tint = Color.Gray,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(15.dp)
         )
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        // Text field with placeholder
         Box(
             modifier = Modifier.weight(1f),
             contentAlignment = Alignment.CenterStart
@@ -98,7 +98,7 @@ fun SearchBar(
         // Trailing clear button
         if (name.isNotEmpty()) {
             IconButton(
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(15.dp),
                 onClick = {
                     name = ""
                     itemViewModel.setSearchQuery("")

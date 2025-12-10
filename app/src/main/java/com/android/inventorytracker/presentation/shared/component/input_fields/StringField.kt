@@ -11,95 +11,125 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
 fun StringField(
-    text: String,
-    onTextChange: (String) -> Unit,
-    header: String,
     modifier: Modifier = Modifier,
-    maxLength: Int = 30
+    inputModifier: Modifier = Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    onValidationChange: ((Boolean) -> Unit)? = null,
+    onDone: () -> Unit,
+    header: String,
+    placeholder: String,
+    maxLength: Int = 30,
+    showCounter: Boolean = true
 ) {
-    var textValue by rememberSaveable { mutableStateOf(text) }
-    var isError by remember { mutableStateOf(false) }
-    val focusManager = LocalFocusManager.current
+    val isTooLong = value.length > maxLength
+    val isEmpty = value.isBlank()
+    val hasError = isTooLong || isEmpty
 
-    Column (modifier) {
+    LaunchedEffect(hasError) {
+        onValidationChange?.invoke(!hasError)
+    }
+
+    Column(modifier = modifier) {
+        // Header
         Text(
             text = header,
+            style = MaterialTheme.typography.labelMedium, // Use Theme styles
             color = Color.DarkGray,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 13.sp,
+            modifier = Modifier.padding(bottom = 4.dp)
         )
 
-        Box (
+        Box(
             modifier = Modifier
-            .fillMaxWidth()
-            .height(30.dp)
-            .background(Color.White)
-            .border(
-                width = 1.dp,
-                color = Color.DarkGray,
-                shape = RoundedCornerShape(5.dp)
-            )
-            .padding(horizontal = 10.dp, vertical = 5.dp)
+                .fillMaxWidth()
+                .height(40.dp)
+                .background(Color.White, RoundedCornerShape(5.dp))
+                .border(
+                    width = 1.dp,
+                    // Visual feedback for error state
+                    color = if (hasError) Color.Red else Color.DarkGray,
+                    shape = RoundedCornerShape(5.dp)
+                )
+                .padding(horizontal = 10.dp, vertical = 5.dp)
         ) {
             BasicTextField(
-                value = textValue,
-                onValueChange = { textValue = it },
-                modifier = Modifier
+                value = value,
+                onValueChange = { newValue ->
+                    onValueChange(newValue)
+                },
+                decorationBox = { innerTextField ->
+                    Box(contentAlignment = Alignment.CenterStart) {
+                        if (value.isEmpty()) {
+                            Text(
+                                text = placeholder,
+                                color = Color.Gray,
+                                fontSize = 13.sp
+                            )
+                        }
+                        innerTextField()
+                    }
+                },
+                modifier = inputModifier
                     .fillMaxWidth()
-                    .align(Alignment.CenterStart),
-                textStyle = TextStyle(fontSize = 15.sp),
-                cursorBrush = SolidColor(Color.Black),
+                    .align(Alignment.CenterStart)
+                    .padding(end = if (showCounter) 35.dp else 0.dp), // Prevent text overlapping counter
                 maxLines = 1,
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Done
-                ),
+                textStyle = TextStyle(fontSize = 15.sp, color = Color.Black),
+                cursorBrush = SolidColor(Color.Black),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        focusManager.clearFocus(true)
-                        if(textValue.length <= maxLength && textValue.isNotEmpty()){
-                            onTextChange(textValue)
-                            isError = false
-                        } else {
-                            onTextChange(text)
-                            isError = true
-                        }
+                        if (!hasError) onDone()
                     }
-                )
+                ),
             )
+
+            if (showCounter) {
+                Text(
+                    text = "${value.length}/$maxLength",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isTooLong) Color.Red else Color.DarkGray,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .background(Color.White.copy(alpha = 0.8f)) // Slight scrim for readability
+                )
+            }
+        }
+
+        // Error Messages
+        // 5. Layout: Reserve space or use specific padding to prevent layout jumping?
+        // Currently, this will push content down when error appears.
+        if (hasError) {
             Text(
-                text = "${text.length}/$maxLength",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.DarkGray,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .background(Color.White)
+                text = when {
+                    isTooLong -> "Input is too long"
+                    isEmpty -> "Input cannot be empty"
+                    else -> ""
+                },
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall,
+                fontSize = 10.sp,
+                modifier = Modifier.padding(top = 2.dp)
             )
         }
-        Text(text = if(isError) "Invalid Input" else "", color = Color.Red, fontSize = 10.sp)
     }
 }
-

@@ -3,15 +3,14 @@ package com.android.inventorytracker.services.notification
 import android.annotation.SuppressLint
 import android.content.Context
 import com.android.inventorytracker.data.model.ItemModel
-import com.android.inventorytracker.util.toLocalDate
 import java.time.LocalDate
 
 fun inventoryNotifier(itemModels: List<ItemModel>, context: Context, today: LocalDate) {
-    val zeroItems = itemModels.filter { it.totalSubUnit == 0 }
-    val expiredItems = itemModels.filter { it.nearestExpiry?.toLocalDate()?.isBefore(today) == true }
-    val lowItems = itemModels.filter { it.totalSubUnit > 0 && it.totalUnit <= it.item.unitThreshold * 0.20 }
+    val zeroItems = itemModels.filter { it.totalSubUnit() == 0 }
+    val expiredItems = itemModels.filter { it.nearestExpiryDate?.isBefore(today) ?: false }
+    val lowItems = itemModels.filter { it.totalSubUnit() > 0 && it.totalUnit() <= it.item.unitThreshold * 0.20 }
     val expiringItems = itemModels.filter { model ->
-        model.nearestExpiry?.toLocalDate()?.let { date ->
+        model.nearestExpiryDate?.let { date ->
             !date.isBefore(today) && !date.isAfter(today.plusDays(model.item.expiryThreshold.toLong()))
         } ?: false
     }
@@ -22,7 +21,7 @@ fun inventoryNotifier(itemModels: List<ItemModel>, context: Context, today: Loca
         channel = AppChannel.CRITICAL,
         title = "Urgent Inventory Alert",
         text = "[EXPIRED ITEMS] ${expiredItems.count()}",
-        subtext = expiredItems.map { "${it.item.name}: expired on ${it.nearestExpiryFormatted()}" },
+        subtext = expiredItems.map { "${it.item.name}: expired on ${it.nearestExpiryFormatted}" },
         id = "expired".hashCode()
     )
 
@@ -42,7 +41,7 @@ fun inventoryNotifier(itemModels: List<ItemModel>, context: Context, today: Loca
         channel = AppChannel.WARNING,
         title = "Inventory Status Notice",
         text = "[EXPIRING SOON] ${expiringItems.count()}",
-        subtext = expiringItems.map { "${it.item.name}: use before ${it.nearestExpiryFormatted()}" },
+        subtext = expiringItems.map { "${it.item.name}: use before ${it.nearestExpiryFormatted}" },
         id = "expiring".hashCode()
     )
 
@@ -52,7 +51,7 @@ fun inventoryNotifier(itemModels: List<ItemModel>, context: Context, today: Loca
         channel = AppChannel.WARNING,
         title = "Inventory Status Notice",
         text = "[LOW STOCK] ${lowItems.count()}",
-        subtext = lowItems.map { "${it.item.name}: ${it.totalUnit} remaining" },
+        subtext = lowItems.map { "${it.item.name}: ${it.totalUnit()} remaining" },
         id = "low_stock".hashCode()
     )
 }

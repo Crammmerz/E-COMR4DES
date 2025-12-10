@@ -22,6 +22,7 @@ import com.android.inventorytracker.presentation.notification_permission_request
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.data.preferences.AuthPreferences
+import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import com.android.inventorytracker.services.notification.NotificationHelper.canPostNotifications
 
 

@@ -1,4 +1,4 @@
-package com.android.inventorytracker.presentation.popup.batch_group_insertion
+package com.android.inventorytracker.presentation.popup.batch_group_removal
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,38 +16,34 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.android.inventorytracker.data.model.ItemModel
-import com.android.inventorytracker.presentation.popup.batch_group_insertion.component.ItemInsertionRow
-import com.android.inventorytracker.presentation.shared.component.SortDropdownMenu
-import com.android.inventorytracker.presentation.shared.component.input_fields.SearchField
-import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
-import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.android.inventorytracker.data.local.entities.ItemBatchEntity
-import com.android.inventorytracker.data.model.InsertBatch
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.data.model.RemoveBatch
+import com.android.inventorytracker.data.model.ItemModel
+import com.android.inventorytracker.presentation.popup.batch_group_removal.component.ItemRemovalRow
+import com.android.inventorytracker.presentation.shared.component.SortDropdownMenu
+import com.android.inventorytracker.presentation.shared.component.input_fields.SearchField
+import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
-import com.android.inventorytracker.util.toFormattedDateString
-import com.android.inventorytracker.util.toLocalDate
+import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 
 @Composable
-fun BatchGroupInsertionPopup(
+fun BatchGroupRemovalPopup(
     model: List<ItemModel>,
     itemViewModel: ItemViewModel = hiltViewModel(),
     batchViewModel: BatchViewModel = hiltViewModel(),
     onDismiss: () -> Unit
 ) {
     val persistentItems by itemViewModel.persistentItems.collectAsState()
-    var inputMap by remember { mutableStateOf<Map<Int, InsertBatch>>(emptyMap()) }
+    var inputMap by remember { mutableStateOf<Map<Int, RemoveBatch>>(emptyMap()) }
     var validityMap by remember { mutableStateOf<Map<Int, Boolean>>(emptyMap()) }
     var showConfirmation by remember { mutableStateOf(false) }
 
@@ -64,12 +60,12 @@ fun BatchGroupInsertionPopup(
             modifier = Modifier
                 .padding(10.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Quick Add")
+            Text("Quick Remove")
             Row (horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.End)) {
                 SearchField(Modifier.weight(1f))
                 SortDropdownMenu()
             }
-            Text("Select Items and Set Values", style = MaterialTheme.typography.bodySmall,)
+            Text("Select Items and Set Values (First Expiry, First Out (FEFO))", style = MaterialTheme.typography.bodySmall,)
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
@@ -80,7 +76,7 @@ fun BatchGroupInsertionPopup(
             ) {
                 items(model, key = { it.item.id }) { model ->
                     val persistence = model.item.id in persistentItems
-                    ItemInsertionRow(
+                    ItemRemovalRow (
                         model = model,
                         isPersistent = persistence,
                         onValueChange = { operation ->
@@ -111,7 +107,7 @@ fun BatchGroupInsertionPopup(
                         showConfirmation = true
                     }
                 }) {
-                    Text("Store Batch")
+                    Text("Remove Batch")
                 }
             }
         }
@@ -125,39 +121,25 @@ fun BatchGroupInsertionPopup(
             title = { Text("Confirm Action") },
             text = {
                 Column (verticalArrangement = Arrangement.spacedBy(4.dp) ){
-                    Text("Do you want to add these batches?")
+                    Text("Do you want to remove these batches?")
                     LazyColumn(
                         modifier = Modifier
                             .heightIn(max = 300.dp)
                             .fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        items(validPersistentItems) { insert ->
-                            Text(
-                                text = "• ${insert.itemName} " +
-                                        "(insert unit: ${insert.unit}, " +
-                                        "subunit: ${insert.subunit}, " +
-                                        "expiry: ${insert.expiryDate.toFormattedDateString()})",
-                                style = MaterialTheme.typography.bodySmall
-                            )
+                        items(validPersistentItems) { remove ->
+                            Text("• ${remove.itemName} (remove unit: ${remove.unit} subunit: ${remove.subunit})", style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 }
             },
-            onDismissRequest = {
-                onDismiss()
-            },
+            onDismissRequest = { showConfirmation = false },
             confirmButton = {
                 TextButton(
                     onClick = {
                         validPersistentItems.forEach { operation ->
-                            batchViewModel.onStoreBatch(
-                                batch = ItemBatchEntity(
-                                    itemId = operation.itemId,
-                                    subUnit = operation.subunit,
-                                    expiryDate = operation.expiryDate
-                                )
-                            )
+                            batchViewModel.onDeductStock(operation.batches, operation.subunit)
                         }
                         itemViewModel.reset()
                         onDismiss()
@@ -167,9 +149,7 @@ fun BatchGroupInsertionPopup(
                 }
             },
             dismissButton = {
-                TextButton(
-                    onClick = { onDismiss() }
-                ) {
+                TextButton(onClick = { showConfirmation = false }) {
                     Text("Cancel")
                 }
             }

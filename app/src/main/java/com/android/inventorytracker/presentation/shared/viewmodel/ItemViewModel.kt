@@ -64,7 +64,11 @@ class ItemViewModel @Inject constructor(
     fun setSearchQuery(q: String) { _query.value = q }
     fun setSort(option: SortBy) { _sortBy.value = option }
 
-    fun resetPersistence() { _persistentItems.value = emptySet() }
+    fun reset() {
+        _persistentItems.value = emptySet()
+        _query.value = ""
+        _sortBy.value = SortBy.NAME_ASC
+    }
 
     fun togglePersistence(itemId: Int, persistent: Boolean) {
         _persistentItems.update { current ->

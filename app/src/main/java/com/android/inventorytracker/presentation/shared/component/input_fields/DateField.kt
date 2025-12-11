@@ -50,13 +50,14 @@ import java.time.format.DateTimeParseException
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateField(
+    modifier: Modifier = Modifier,
+    fieldModifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
     onValidityChange: (Boolean) -> Unit,
-    onDone: () -> Unit,
+    onDone: () -> Unit = { },
     header: String,
     placeholder: String,
-    modifier: Modifier = Modifier
 ) {
     val isError = value.isNotEmpty() && !isValidDate(value)
     var showDatePicker by remember { mutableStateOf(false) }
@@ -107,7 +108,7 @@ fun DateField(
                         selection = TextRange(newCursor)
                     )
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = fieldModifier.fillMaxWidth(),
                 singleLine = true,
                 textStyle = TextStyle(fontSize = 15.sp, color = Color.Black),
                 cursorBrush = SolidColor(Color.Black),

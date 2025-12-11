@@ -1,5 +1,6 @@
 package com.android.inventorytracker.presentation.home.component
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -18,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.presentation.popup.batch_group_insertion.BatchGroupInsertionPopup
+import com.android.inventorytracker.presentation.popup.batch_group_removal.BatchGroupRemovalPopup
 import com.android.inventorytracker.presentation.shared.component.primitive.CenterButton
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import com.android.inventorytracker.ui.theme.Ochre
@@ -26,6 +28,7 @@ import com.android.inventorytracker.ui.theme.Ochre
 fun QuickActions(itemViewModel: ItemViewModel = hiltViewModel(),) {
     val model by itemViewModel.itemModelList.collectAsState(initial = emptyList())
     var showAddStock by rememberSaveable { mutableStateOf(false) }
+    var showRemoveStock by rememberSaveable { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
@@ -35,12 +38,15 @@ fun QuickActions(itemViewModel: ItemViewModel = hiltViewModel(),) {
         horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally)
     ) {
         Buttons("Add Stock", Modifier.weight(1f)){ showAddStock = true}
-        Buttons("Deduct Stock", Modifier.weight(1f)){}
+        Buttons("Deduct Stock", Modifier.weight(1f)){ showRemoveStock = true }
         Buttons("Place Holder", Modifier.weight(1f)){}
 //        Buttons("Place Holder", Modifier.weight(1f)){}
     }
     if(showAddStock){
         BatchGroupInsertionPopup(model = model, onDismiss = { showAddStock = false })
+    }
+    if(showRemoveStock){
+        BatchGroupRemovalPopup(model = model, onDismiss = { showRemoveStock = false })
     }
 }
 

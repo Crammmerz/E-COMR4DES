@@ -38,6 +38,14 @@ data class ItemModel(
 
     val daysLeft: Long? = nearestExpiryDate?.let { ChronoUnit.DAYS.between(LocalDate.now(), it) }
 
+    val nearestExpiryFormatted: String = nearestExpiryDate?.let { dateFormatter.format(it) } ?: "N/A"
+
+    val isExpiringSoon: Boolean = nearestExpiryDate?.isBefore(
+        LocalDate.now().plusDays(item.expiryThreshold.toLong())
+    ) == true
+
+    val isLowStock: Boolean = totalUnit() <= item.unitThreshold * 0.20
+
     val expiryMessage: String = when {
         daysLeft == null -> "N/A"
         daysLeft < 0 -> "Expired"
@@ -46,24 +54,18 @@ data class ItemModel(
     }
 
     val expiryColor: Color = when {
-        daysLeft == null -> Color.Gray
-        daysLeft < 0 -> DarkRed
-        daysLeft == 0L -> Color.Red
-        else -> Orange
+        daysLeft == null -> Color.Gray          // unknown
+        daysLeft < 0 -> DarkRed                 // already expired
+        daysLeft == 0L -> Color.Red             // expires today
+        isExpiringSoon -> Orange              // near expiry (within a week)
+        else -> Color.Gray                     // safe / normal stock
     }
 
     val stockColor: Color = when {
-        totalUnit() <= 0.0 -> DarkRed
-        totalUnit() < item.unitThreshold * 0.20 -> Color.Red
-        else -> Orange
+        totalUnit() <= 0.0 -> DarkRed           // no stock
+        totalUnit() < item.unitThreshold * 0.20 -> Color.Red   // critically low
+        totalUnit() < item.unitThreshold * 0.50 -> Orange      // warning zone
+        else -> Color.Gray                     // healthy stock
     }
-
-    val nearestExpiryFormatted: String = nearestExpiryDate?.let { dateFormatter.format(it) } ?: "N/A"
-
-    val isExpiringSoon: Boolean = nearestExpiryDate?.isBefore(
-        LocalDate.now().plusDays(item.expiryThreshold.toLong())
-    ) == true
-
-    val isLowStock: Boolean = totalUnit() <= item.unitThreshold * 0.20
 }
 

@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.data.model.ItemModel
@@ -77,4 +78,15 @@ fun Inventory(
             onDelete = itemViewModel::deleteItem
         )
     }
+}
+
+@Preview(
+    name = "Tablet Preview",
+    showBackground = true,
+    widthDp = 1280,
+    heightDp = 800
+)
+@Composable
+fun Try() {
+
 }

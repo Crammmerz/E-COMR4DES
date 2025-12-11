@@ -32,7 +32,7 @@ import androidx.compose.ui.text.input.ImeAction
 @Composable
 fun IntField(
     modifier: Modifier = Modifier,
-    inputModifier: Modifier = Modifier,
+    fieldModifier: Modifier = Modifier,
     value: Int,
     onValueChange: (Int) -> Unit,
     valueRange: IntRange = 1..9999,
@@ -49,6 +49,18 @@ fun IntField(
     LaunchedEffect(value, isFocused) {
         if (!isFocused) {
             textValue = value.toString()
+        }
+    }
+
+    LaunchedEffect(value) {
+        val valid = value in valueRange
+
+        if (valid) {
+            isError = false
+            onValidityChange(true)
+        } else {
+            isError = true
+            onValidityChange(false)
         }
     }
 
@@ -90,7 +102,7 @@ fun IntField(
                 },
                 singleLine = true,
                 textStyle = TextStyle(fontSize = 15.sp),
-                modifier = inputModifier
+                modifier = fieldModifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp)
                     .onFocusChanged { focusState ->

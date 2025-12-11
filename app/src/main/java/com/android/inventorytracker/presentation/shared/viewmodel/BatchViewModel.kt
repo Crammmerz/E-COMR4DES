@@ -47,7 +47,7 @@ class BatchViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             var remaining = toRemove
-
+            Log.d("DeductStock", "Remaining: $remaining")
             batches.forEach { batch ->
                 if (remaining <= 0) return@forEach
 

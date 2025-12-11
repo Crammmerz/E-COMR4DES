@@ -37,6 +37,7 @@ fun FloatField(
     value: Float,
     onValueChange: (Float) -> Unit,
     onValidityChange: (Boolean) -> Unit,
+    valueRange: ClosedFloatingPointRange<Float> = 0f..9999f,
     onDone: () -> Unit = {},
     label: String,
     placeholder: String,
@@ -48,7 +49,15 @@ fun FloatField(
 
     LaunchedEffect(value, isFocused) {
         if (!isFocused) {
-            textValue = df.format(value)
+            val valid = value > 0 && value in valueRange
+
+            if (valid) {
+                isError = false
+                onValidityChange(true)
+            } else {
+                isError = true
+                onValidityChange(false)
+            }
         }
     }
 
@@ -71,7 +80,7 @@ fun FloatField(
                 onValueChange = {
                     textValue = it
                     val parsed = it.toFloatOrNull()
-                    val valid = parsed != null && parsed > 0
+                    val valid = parsed != null && parsed > 0 && parsed in valueRange
 
                     if (valid) {
                         isError = false

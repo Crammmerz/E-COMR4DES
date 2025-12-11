@@ -46,9 +46,9 @@ fun InsertItemPopup(
     var description by rememberSaveable { mutableStateOf("") }
 
     var nameValid by rememberSaveable { mutableStateOf(false) }
-    var unitThresholdValid by rememberSaveable { mutableStateOf(false) }
-    var expiryThresholdValid by rememberSaveable { mutableStateOf(false) }
-    var subUnitThresholdValid by rememberSaveable { mutableStateOf(false) }
+    var unitThresholdValid by rememberSaveable { mutableStateOf(true) }
+    var expiryThresholdValid by rememberSaveable { mutableStateOf(true) }
+    var subUnitThresholdValid by rememberSaveable { mutableStateOf(true) }
 
     val allValid = nameValid && unitThresholdValid && expiryThresholdValid && subUnitThresholdValid
 
@@ -92,7 +92,7 @@ fun InsertItemPopup(
                     onValueChange = { unitThreshold = it },
                     label = "Stock Threshold",
                     placeholder = "Enter unit threshold",
-                    inputModifier = Modifier.focusRequester(focusUnit),
+                    fieldModifier = Modifier.focusRequester(focusUnit),
                     onValidityChange = { unitThresholdValid = it },
                     onDone = { focusExpiry.requestFocus() },
                     doClear = true,
@@ -104,7 +104,7 @@ fun InsertItemPopup(
                     onValueChange = { expiryThreshold = it },
                     label = "Expiry Threshold",
                     placeholder = "Enter expiry threshold",
-                    inputModifier = Modifier.focusRequester(focusExpiry),
+                    fieldModifier = Modifier.focusRequester(focusExpiry),
                     onValidityChange = { expiryThresholdValid = it },
                     onDone = { focusSubUnit.requestFocus() },
                     doClear = true,
@@ -116,7 +116,7 @@ fun InsertItemPopup(
                 onValueChange = { subUnitThreshold = it },
                 label = "Sub Unit Threshold",
                 placeholder = "Enter sub unit threshold",
-                inputModifier = Modifier.focusRequester(focusSubUnit),
+                fieldModifier = Modifier.focusRequester(focusSubUnit),
                 onDone = { focusDescription.requestFocus() },
                 onValidityChange = { subUnitThresholdValid = it },
                 doClear = true,

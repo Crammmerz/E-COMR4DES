@@ -1,10 +1,15 @@
 package com.android.inventorytracker.presentation.main.component
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.presentation.home.Home
@@ -22,10 +27,24 @@ fun ContentSection(
     mainViewModel: MainViewModel,
 ) {
     val currentContent by mainViewModel.currentContent.collectAsState()
+    val showNavBar by mainViewModel.showNavBar.collectAsState()
 
-    Surface(
+
+    Surface (
         color = Sand,
         modifier = modifier
+            .then(
+            if (showNavBar) {
+                Modifier.clickable (
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                )  {
+                    mainViewModel.setNavBar(false)
+                }
+            } else {
+                Modifier
+            }
+        )
     ) {
         when (currentContent) {
             Content.Home -> Home()

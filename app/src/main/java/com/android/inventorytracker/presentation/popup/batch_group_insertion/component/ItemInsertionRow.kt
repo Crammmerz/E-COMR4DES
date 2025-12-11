@@ -26,10 +26,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.android.inventorytracker.data.local.entities.ItemBatchEntity
+import com.android.inventorytracker.data.model.InsertBatch
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.presentation.shared.component.input_fields.DateField
 import com.android.inventorytracker.presentation.shared.component.input_fields.FloatField
@@ -43,14 +42,13 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun ItemRow(
+fun ItemInsertionRow(
     modifier: Modifier = Modifier,
     model: ItemModel,
     isPersistent: Boolean,
-    doStoreBatch: Boolean,
-    itemViewModel: ItemViewModel = hiltViewModel(),
-    onStoreBatch: (ItemBatchEntity) -> Unit,
+    onValueChange: (InsertBatch) -> Unit,
     onValidityChange: (Boolean) -> Unit,
+    itemViewModel: ItemViewModel = hiltViewModel(),
 ) {
     var unit by rememberSaveable { mutableFloatStateOf(0f) }
     var subUnit by rememberSaveable { mutableIntStateOf(0) }
@@ -60,35 +58,28 @@ fun ItemRow(
     var validDate by rememberSaveable { mutableStateOf(false) }
     val valid = validUnit && validDate
 
-
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val focusUnit = remember { FocusRequester() }
     val focusDate = remember { FocusRequester() }
 
-    LaunchedEffect(isPersistent) {
-        if (isPersistent) focusUnit.requestFocus()
-    }
-
     LaunchedEffect(valid) {
-        if(isPersistent) onValidityChange(valid)
-    }
-
-    LaunchedEffect(doStoreBatch) {
-        val selectedDate = runCatching {
-            LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
-        }.getOrNull()
-
-        if (selectedDate != null && doStoreBatch && validUnit && validDate) {
-            val batch = ItemBatchEntity(
-                itemId = model.item.id,
-                subUnit = subUnit,
-                expiryDate = selectedDate.atStartOfDay(ZoneId.systemDefault())
-                    .toInstant().toEpochMilli()
-            )
-            onStoreBatch(batch)
+        if (isPersistent) onValidityChange(valid)
+        if (valid) {
+            val parsedDate = runCatching {
+                LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+            }.getOrNull()
+            if (parsedDate != null) {
+                onValueChange(
+                    InsertBatch(
+                        itemId = model.item.id,
+                        itemName = model.item.name,
+                        unit = unit,
+                        subunit = subUnit,
+                        expiryDate = parsedDate.atStartOfDay(ZoneId.systemDefault())
+                            .toInstant().toEpochMilli()
+                    )
+                )
+            }
         }
     }
-
 
     Column(modifier = modifier
         .background(LightSand)
@@ -104,8 +95,8 @@ fun ItemRow(
             Column {
                 Text(model.item.name)
                 Row (horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-                    Text(text = "Current: ${model.totalUnitFormatted()}")
-                    Text(text = "Current: ${model.nearestExpiryFormatted}")
+                    Text(text = "Unit: ${model.totalUnitFormatted()}")
+                    Text(text = "Nearest Expiry: ${model.nearestExpiryFormatted}")
                 }
             }
             Spacer(modifier = Modifier.weight(1f))
@@ -131,13 +122,12 @@ fun ItemRow(
             ) {
                 FloatField(
                     modifier = Modifier.weight(1f),
-                    fieldModifier = Modifier,
                     label = "Unit",
                     placeholder = "Enter Unit",
                     value = unit,
                     onValueChange = { value ->
                         onUnitChange(
-                            unit = value, model.item.unitThreshold,
+                            unit = value, model.item.subUnitThreshold,
                             onUnit = { unit = it },
                             onSubUnit = { subUnit = it }
                         )
@@ -150,7 +140,7 @@ fun ItemRow(
                     value = subUnit,
                     onValueChange = { value ->
                         onSubUnitChange(
-                            subUnit = value, model.item.unitThreshold,
+                            subUnit = value, model.item.subUnitThreshold,
                             onUnit = { unit = it },
                             onSubUnit = { subUnit = it }
                         )
@@ -172,9 +162,8 @@ fun ItemRow(
                             LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
                         }.getOrNull()
 
-                        validDate = isFormatValid && parsedDate?.isBefore(LocalDate.now()) == false
+                        validDate = isFormatValid && parsedDate?.isAfter(LocalDate.now()) == true
                     },
-                    onDone = { keyboardController?.hide() },
                 )
             }
         }

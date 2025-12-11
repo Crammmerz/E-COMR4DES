@@ -125,7 +125,7 @@ fun ItemDataRow(
 
     if(showDeleteBatch){
         BatchTargetedRemoval(
-            threshold = model.item.unitThreshold,
+            threshold = model.item.subUnitThreshold,
             batch = model.batch,
             onDismiss = { showDeleteBatch = false },
         )

@@ -69,7 +69,7 @@ fun BatchInsertionPopup(
                 value = unit,
                 onValueChange = { value ->
                     onUnitChange(
-                        unit = value, itemModel.item.unitThreshold,
+                        unit = value, itemModel.item.subUnitThreshold,
                         onUnit = { unit = it },
                         onSubUnit = { subUnit = it }
                     )
@@ -84,7 +84,7 @@ fun BatchInsertionPopup(
                 value = subUnit,
                 onValueChange = { value ->
                     onSubUnitChange(
-                        subUnit = value, itemModel.item.unitThreshold,
+                        subUnit = value, itemModel.item.subUnitThreshold,
                         onUnit = { unit = it },
                         onSubUnit = { subUnit = it }
                     )

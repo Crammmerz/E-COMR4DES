@@ -118,12 +118,13 @@ fun Login(
                 }
             }
 
-        if (showDialog) {
-            LoginPopup(
-                userRole = userRole,
-                onDismiss = { showDialog = false },
-                onLogin = loginViewModel::onLogin
-            )
+            if (showDialog) {
+                LoginPopup(
+                    userRole = userRole,
+                    onDismiss = { showDialog = false },
+                    onLogin = loginViewModel::onLogin
+                )
+            }
         }
     }
 }

@@ -12,15 +12,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.presentation.home.component.ExpiryLevels
 import com.android.inventorytracker.presentation.home.component.Header
 import com.android.inventorytracker.presentation.home.component.StockLevels
 import com.android.inventorytracker.presentation.home.component.QuickActions
 import com.android.inventorytracker.presentation.home.viewmodel.HomeViewModel
 
-// Background similar to login screen
-private val LumiBackgroundWhite = Color(0xFFFFFBF4)
+// --- iOS-Inspired White/Beige Palette ---
+private val iOSBackgroundLight = Color(0xFFF2F2F7)
+private val iOSCardWhite = Color(0xFFFFFFFF)
 
 @Composable
 fun Home(
@@ -28,49 +28,56 @@ fun Home(
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val itemModels by homeViewModel.itemModelList.collectAsState(initial = emptyList())
+
     val expiryItems = itemModels
         .filter { it.isExpiringSoon }
         .sortedBy { it.nearestExpiryDate }
     val stockItems = itemModels
         .filter { it.isLowStock }
-        .sortedBy { it.totalUnit() / it.item.unitThreshold * 0.20f }
+        .sortedBy { (it.totalUnit().toFloat() / (it.item.unitThreshold * 0.20f)) }
 
     Surface(
         modifier = modifier
             .fillMaxSize()
-            .background(LumiBackgroundWhite),
-        color = LumiBackgroundWhite
+            .background(iOSBackgroundLight),
+        color = iOSBackgroundLight
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = 40.dp, vertical = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
+            // 1. Header
             Header()
 
-            QuickActions()
+            // 2. Quick Actions - FIX: WRAPPING IN BOX TO APPLY MODIFIER
+            // This ensures QuickActions still fills the width even if it doesn't take a Modifier param.
+            Box(modifier = Modifier.fillMaxWidth()) {
+                QuickActions()
+            }
 
-            // Main content cards row
+            // 3. Main Dashboard Cards Row (Expiry and Stock)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(32.dp),
                 verticalAlignment = Alignment.Top
             ) {
+                // Expiry Dashboard Card
                 if (expiryItems.isNotEmpty()) {
                     Surface(
                         modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(24.dp),
+                        shape = RoundedCornerShape(32.dp),
                         tonalElevation = 0.dp,
-                        shadowElevation = 0.dp,
-                        color = Color.White
+                        shadowElevation = 8.dp,
+                        color = iOSCardWhite
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(16.dp)
+                                .padding(32.dp)
                         ) {
                             ExpiryLevels(
                                 modifier = Modifier.fillMaxSize(),
@@ -80,18 +87,19 @@ fun Home(
                     }
                 }
 
+                // Stock Dashboard Card
                 if (stockItems.isNotEmpty()) {
                     Surface(
                         modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(24.dp),
+                        shape = RoundedCornerShape(32.dp),
                         tonalElevation = 0.dp,
-                        shadowElevation = 0.dp,
-                        color = Color.White
+                        shadowElevation = 8.dp,
+                        color = iOSCardWhite
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(16.dp)
+                                .padding(32.dp)
                         ) {
                             StockLevels(
                                 modifier = Modifier.fillMaxSize(),

@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,115 +16,139 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp // Import needed for explicit Text Style definition
 import coil.compose.rememberAsyncImagePainter
 import com.android.inventorytracker.R
 import com.android.inventorytracker.data.model.ItemModel
-import com.android.inventorytracker.ui.theme.LightSand
 
-// Soft card border to match login popup
-private val LumiCardBorder = Color(0xFFE7E4DD)
-private val LumiCardBg = Color(0xFFFFFFFF)
-private val ItemBg = Color(0xFFF9F3E6)   // very light beige for tiles
+// --- Pure White & Beige Palette (Uniform with Login.kt) ---
+private val PureWhite = Color(0xFFFFFFFF)
+private val DarkBeigeText = Color(0xFF523F31)
+private val LightBeigeText = Color(0xFF796254)
+private val InnerTileBackground = Color(0xFFFFFFFF)
+
+// --- Google Sans Font Family Definition ---
+private val GoogleSans = FontFamily(
+    Font(R.font.google_sans_regular, FontWeight.Normal),
+    Font(R.font.google_sans_medium, FontWeight.Medium),
+    Font(R.font.google_sans_semibold, FontWeight.SemiBold)
+)
 
 @Composable
 fun ExpiryLevels(
     modifier: Modifier = Modifier,
     itemModel: List<ItemModel>
 ) {
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(24.dp),
-        color = LumiCardBg,
-        shadowElevation = 0.dp,
-        tonalElevation = 0.dp,
-        border = androidx.compose.foundation.BorderStroke(1.dp, LumiCardBorder)
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(PureWhite)
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(
-                text = "Expiry",
-                style = MaterialTheme.typography.titleMedium
+        Text(
+            text = "Expiry",
+            // Apply Google Sans SemiBold for the title
+            style = TextStyle(
+                fontFamily = GoogleSans,
+                fontWeight = FontWeight.SemiBold, // Use SemiBold for the main header
+                fontSize = 24.sp, // Approximate size for titleLarge
+                color = DarkBeigeText
             )
+        )
 
-            BoxWithConstraints(
-                modifier = Modifier.weight(1f)
+        BoxWithConstraints(
+            modifier = Modifier.weight(1f)
+        ) {
+            val spacing = 16.dp
+            val rowsVisible = 2
+            val totalSpacing = spacing * (rowsVisible - 1)
+            val cellHeight = (maxHeight - totalSpacing) / rowsVisible
+            val gridHeight = cellHeight * rowsVisible + totalSpacing
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                horizontalArrangement = Arrangement.spacedBy(spacing),
+                verticalArrangement = Arrangement.spacedBy(spacing),
+                modifier = Modifier.height(gridHeight)
             ) {
-                val spacing = 12.dp
-                val rowsVisible = 2
-                val totalSpacing = spacing * (rowsVisible - 1)
-                val cellHeight = (maxHeight - totalSpacing) / rowsVisible
-                val gridHeight = cellHeight * rowsVisible + totalSpacing
-
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    horizontalArrangement = Arrangement.spacedBy(spacing),
-                    verticalArrangement = Arrangement.spacedBy(spacing),
-                    modifier = Modifier.height(gridHeight)
-                ) {
-                    items(itemModel) { model ->
-                        Column(
-                            modifier = Modifier
-                                .height(cellHeight)
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(ItemBg)
-                                .padding(10.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            if (model.item.imageUri != null) {
-                                Image(
-                                    painter = rememberAsyncImagePainter(
-                                        model = model.item.imageUri,
-                                        placeholder = painterResource(R.drawable.outline_add_photo_alternate_24),
-                                        error = painterResource(R.drawable.outline_add_photo_alternate_24)
-                                    ),
-                                    contentDescription = "Selected image",
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .weight(1f),
-                                    contentScale = ContentScale.Crop
-                                )
-                            } else {
-                                Image(
-                                    painter = painterResource(id = R.drawable.outline_add_photo_alternate_24),
-                                    contentDescription = "Placeholder image",
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .weight(1f),
-                                    contentScale = ContentScale.Crop
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.height(6.dp))
-
-                            Text(
-                                text = model.item.name,
-                                modifier = Modifier.fillMaxWidth(),
-                                style = MaterialTheme.typography.bodyMedium
+                items(itemModel) { model ->
+                    Column(
+                        modifier = Modifier
+                            .height(cellHeight)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(InnerTileBackground)
+                            .padding(12.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        val imagePainter = if (model.item.imageUri != null) {
+                            rememberAsyncImagePainter(
+                                model = model.item.imageUri,
+                                placeholder = painterResource(R.drawable.outline_add_photo_alternate_24),
+                                error = painterResource(R.drawable.outline_add_photo_alternate_24)
                             )
+                        } else {
+                            painterResource(id = R.drawable.outline_add_photo_alternate_24)
+                        }
 
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Expires in",
-                                    style = MaterialTheme.typography.bodySmall
+                        Image(
+                            painter = imagePainter,
+                            contentDescription = "Item image: ${model.item.name}",
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(12.dp))
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            contentScale = ContentScale.Crop
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = model.item.name,
+                            modifier = Modifier.fillMaxWidth(),
+                            // Apply Google Sans Medium for item name
+                            style = TextStyle(
+                                fontFamily = GoogleSans,
+                                fontWeight = FontWeight.Medium, // Use Medium for item name
+                                fontSize = 16.sp, // Approximate size for bodyMedium
+                                color = DarkBeigeText
+                            )
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Expires in",
+                                // Apply Google Sans Regular for detail text
+                                style = TextStyle(
+                                    fontFamily = GoogleSans,
+                                    fontWeight = FontWeight.Normal, // Use Regular for label text
+                                    fontSize = 12.sp, // Approximate size for bodySmall
+                                    color = DarkBeigeText
                                 )
-                                Text(
-                                    text = model.expiryMessage,
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(999.dp))
-                                        .background(model.expiryColor.copy(alpha = 0.12f))
-                                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                                    style = MaterialTheme.typography.bodySmall
+                            )
+                            Text(
+                                text = model.expiryMessage,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(999.dp))
+                                    .background(model.expiryColor.copy(alpha = 0.12f))
+                                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                                // Apply Google Sans Regular for detail text
+                                style = TextStyle(
+                                    fontFamily = GoogleSans,
+                                    fontWeight = FontWeight.Normal, // Use Regular
+                                    fontSize = 12.sp, // Approximate size for bodySmall
+                                    color = model.expiryColor
                                 )
-                            }
+                            )
                         }
                     }
                 }

@@ -29,12 +29,12 @@ import com.android.inventorytracker.presentation.shared.component.input_fields.P
 import com.android.inventorytracker.presentation.shared.component.input_fields.StringField
 import com.android.inventorytracker.R
 
-// Card + text colors
-private val LumiCardBg = Color(0xFFFFFFFF)
-private val LumiCardBorder = Color(0xFFE7E4DD)
-private val LumiTextDarkBeige = Color(0xFF523F31)
-private val LumiTextBlack = Color(0xFF111111)
-private val BeigeBorder = Color(0xFFC79F6D)
+// --- Pure White & Beige Palette (Uniform) ---
+private val PureWhite = Color(0xFFFFFFFF)           // Card background
+private val BorderLightBeige = Color(0xFFDDDCDA)    // Light border color (iOS-like divider)
+private val DarkBeigeText = Color(0xFF523F31)        // Dark text (Headers, primary contrast)
+private val LightBeigeText = Color(0xFF796254)       // Medium text color (Secondary actions)
+private val AccentBeigePrimary = Color(0xFFB08959)   // Primary action color (Deep Beige)
 
 // Google Sans
 private val GoogleSans = FontFamily(
@@ -63,7 +63,6 @@ fun LoginPopup(
     }
 
     Dialog(onDismissRequest = onDismiss) {
-        // Walang overlay, same background framing as main screen
         Box(
             modifier = Modifier.wrapContentSize(),
             contentAlignment = Alignment.Center
@@ -77,10 +76,10 @@ fun LoginPopup(
                 Column(
                     modifier = Modifier
                         .clip(RoundedCornerShape(24.dp))
-                        .background(LumiCardBg)
+                        .background(PureWhite) // Use Pure White background
                         .border(
                             width = 1.dp,
-                            color = LumiCardBorder,
+                            color = BorderLightBeige, // Use light beige border
                             shape = RoundedCornerShape(24.dp)
                         )
                         .padding(horizontal = 24.dp, vertical = 20.dp)
@@ -92,7 +91,7 @@ fun LoginPopup(
                             fontFamily = GoogleSans,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 22.sp,
-                            color = LumiTextDarkBeige
+                            color = DarkBeigeText // Use Dark Beige Text
                         )
                     )
 
@@ -111,6 +110,8 @@ fun LoginPopup(
                         onDone = {
                             focusPassword.requestFocus()
                         },
+                        // Assuming StringField and PasswordField use the global theme/GoogleSans.
+                        // If they are local, their TextStyle needs to be updated too.
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -177,7 +178,8 @@ private fun LoginTextAction(
             fontFamily = GoogleSans,
             fontWeight = FontWeight.Medium,
             fontSize = 15.sp,
-            color = if (enabled) BeigeBorder else BeigeBorder.copy(alpha = 0.4f)
+            // Use AccentBeigePrimary for primary action, dimmed when disabled
+            color = if (enabled) AccentBeigePrimary else AccentBeigePrimary.copy(alpha = 0.4f)
         )
     )
 }
@@ -193,7 +195,7 @@ private fun TextButtonSecondary(
         modifier = Modifier.height(44.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent,
-            contentColor = LumiTextBlack
+            contentColor = LightBeigeText // Use Light Beige for secondary/cancel action
         ),
         elevation = ButtonDefaults.buttonElevation(0.dp),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)

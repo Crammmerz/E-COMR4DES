@@ -27,21 +27,15 @@ import com.android.inventorytracker.data.model.UserRole
 import com.android.inventorytracker.presentation.popup.login.LoginPopup
 import com.android.inventorytracker.R
 
-// Colors
-private val LumiBackgroundWhite = Color(0xfffffbf4)
-private val LumiTextDarkBeige = Color(0xFF523f31)
-private val LumiTextBlack = Color(0xFF111111)
+// --- Pure White & Beige Palette ---
+private val PureWhite = Color(0xFFFFFFFF)        // Strict white background
+private val DarkBeigeText = Color(0xFF523F31)    // Dark text (Primary contrast)
+private val LightBeigeText = Color(0xFF796254)   // Lighter text (Secondary contrast)
+private val ButtonBeigeBase = Color(0xFFD3B386)  // Main beige for buttons (Lighter shade)
+private val ButtonBeigeEnd = Color(0xFFB08959)   // Deeper beige for gradient end
+private val ButtonBeigeHover = Color(0xFFE7D0AC) // Very light beige for hover feedback
 
-// Always‑on soft beige gradient (a bit deeper than background)
-private val BeigeTop = Color(0xFF796254)      // light beige
-private val BeigeBottom = Color(0xFF9d8a7c)   // warmer beige
-
-// Hover state: slightly darker beige for feedback
-private val BeigeHoverTop = Color(0xFFE7C89E)
-private val BeigeHoverBottom = Color(0xFFD1A26E)
-private val BeigeHoverBorder = Color(0xFFAA7C46)
-
-// Google Sans / Product Sans font family (place fonts in res/font)
+// Google Sans / Product Sans font family (Retained)
 private val GoogleSans = FontFamily(
     Font(R.font.google_sans_regular, FontWeight.Normal),
     Font(R.font.google_sans_medium, FontWeight.Medium),
@@ -61,13 +55,13 @@ fun Login(
     Surface(
         modifier = Modifier
             .fillMaxSize()
-            .background(LumiBackgroundWhite),
-        color = LumiBackgroundWhite
+            .background(PureWhite), // Apply strict white background
+        color = PureWhite
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 32.dp),
+                .padding(horizontal = 64.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -78,11 +72,11 @@ fun Login(
                     fontFamily = GoogleSans,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 80.sp,
-                    color = LumiTextDarkBeige
+                    color = DarkBeigeText // Use dark beige for main title
                 )
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(30.dp))
 
             Text(
                 text = header,
@@ -90,14 +84,14 @@ fun Login(
                     fontFamily = GoogleSans,
                     fontWeight = FontWeight.Medium,
                     fontSize = 50.sp,
-                    color = LumiTextBlack
+                    color = LightBeigeText // Use lighter beige for sub-title
                 )
             )
 
-            Spacer(modifier = Modifier.height(50.dp))
+            Spacer(modifier = Modifier.height(70.dp))
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(0.7f),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -110,7 +104,7 @@ fun Login(
                 )
 
                 if (isRoleAuthEnabled) {
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(24.dp))
 
                     LoginButton(
                         label = "Staff Login",
@@ -141,38 +135,33 @@ fun LoginButton(
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
 
-    val backgroundBrush = if (isHovered) {
-        Brush.verticalGradient(
-            colors = listOf(
-                BeigeHoverTop,
-                BeigeHoverBottom
-            )
-        )
-    } else {
-        Brush.verticalGradient(
-            colors = listOf(
-                BeigeTop,
-                BeigeBottom
-            )
-        )
-    }
+    // Use a vertical gradient entirely within the beige shade
+    val backgroundBrush = Brush.verticalGradient(
+        colors = if (isHovered) {
+            // Hover state is slightly lighter beige
+            listOf(ButtonBeigeHover, ButtonBeigeBase)
+        } else {
+            // Default state is a gradient from lighter to deeper beige
+            listOf(ButtonBeigeBase, ButtonBeigeEnd)
+        }
+    )
 
     Button(
         modifier = Modifier
             .widthIn(min = 260.dp)
             .height(60.dp)
-            .clip(RoundedCornerShape(999.dp))
+            .clip(RoundedCornerShape(30.dp))
             .background(backgroundBrush)
             .hoverable(interactionSource = interactionSource),
         onClick = onClick,
         interactionSource = interactionSource,
-        shape = RoundedCornerShape(999.dp),
+        shape = RoundedCornerShape(30.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
-            contentColor = LumiTextBlack
+            containerColor = Color.Transparent, // Transparent since background is applied via brush
+            contentColor = PureWhite // White text inside the beige button
         ),
         contentPadding = PaddingValues(horizontal = 28.dp, vertical = 12.dp),
-        elevation = ButtonDefaults.buttonElevation(0.dp)
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
     ) {
         Text(
             text = label,
@@ -180,7 +169,7 @@ fun LoginButton(
                 fontFamily = GoogleSans,
                 fontWeight = FontWeight.Medium,
                 fontSize = 20.sp,
-                color = LumiBackgroundWhite
+                color = PureWhite // White text
             )
         )
     }

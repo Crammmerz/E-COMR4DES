@@ -41,13 +41,34 @@ fun BatchInsertionPopup(
 ) {
     var unit by rememberSaveable { mutableFloatStateOf(0f) }
     var subUnit by rememberSaveable { mutableIntStateOf(0) }
+    var dateValue by rememberSaveable { mutableStateOf("") }
 
     var validUnit by rememberSaveable { mutableStateOf(false) }
-    var dateValue by rememberSaveable { mutableStateOf("") }
+    var validDate by rememberSaveable { mutableStateOf(false) }
+    val valid = validDate && validUnit
+
+    var onSubmit by rememberSaveable { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
+    LaunchedEffect(onSubmit) {
+        if(valid){
+            val selectedDate = runCatching {
+                LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+            }.getOrNull()
+            if (selectedDate != null) {
+                val batch = ItemBatchEntity(
+                    itemId = itemModel.item.id,
+                    subUnit = subUnit,
+                    expiryDate = selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                        .toEpochMilli()
+                )
+                batchViewModel.onStoreBatch(batch)
+                onDismiss()
+            }
+        }
+    }
     DialogHost(
         Modifier
             .fillMaxHeight(0.8f)
@@ -59,7 +80,12 @@ fun BatchInsertionPopup(
             DateField(
                 value = dateValue,
                 onValueChange = { dateValue = it },
-                onValidityChange = {  },
+                onValidityChange = { isFormatValid ->
+                    val parsedDate = runCatching {
+                        LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+                    }.getOrNull()
+                    validDate = isFormatValid && parsedDate?.isAfter(LocalDate.now()) == true
+                },
                 onDone = { focusManager.clearFocus(force = true) },
                 header = "Expiry Date",
                 placeholder = "MM/DD/YYYY"
@@ -99,23 +125,12 @@ fun BatchInsertionPopup(
             Row {
                 CancelButton(onClick = { onDismiss() })
                 ConfirmButton("Add Stock") {
-                    val selectedDate = runCatching {
-                        LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
-                    }.getOrNull()
                     when {
-                        selectedDate == null || selectedDate.isBefore(LocalDate.now()) ->
+                        !validDate ->
                             Toast.makeText(context, "Please enter a valid date", Toast.LENGTH_SHORT).show()
                         !validUnit ->
                             Toast.makeText(context, "Please enter valid unit/subunit", Toast.LENGTH_SHORT).show()
-                        else -> {
-                            val batch = ItemBatchEntity(
-                                itemId = itemModel.item.id,
-                                subUnit = subUnit,
-                                expiryDate = selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                            )
-                            batchViewModel.onStoreBatch(batch)
-                            onDismiss()
-                        }
+                        valid -> onSubmit = true
                     }
                 }
             }

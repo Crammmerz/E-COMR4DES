@@ -7,5 +7,6 @@ enum class UserRole {
 
 enum class LoginState {
     LOGGED_IN,
-    LOGGED_OUT
+    LOGGED_OUT,
+    ERROR
 }

@@ -34,26 +34,17 @@ class InventoryActivity : ComponentActivity() {
         setContent {
 
             val loginViewModel: LoginViewModel = hiltViewModel()
-            val context = LocalContext.current
             val showNotificationRequest = rememberSaveable { mutableStateOf(true) }
+            val loginState = loginViewModel.loginState != LoginState.LOGGED_IN
+            val authEnable = loginViewModel.authEnabled
+            val context = LocalContext.current
             InventoryTrackerTheme {
                 when {
-                    loginViewModel.loginState == LoginState.LOGGED_OUT
-                            && loginViewModel.authEnabled -> {
-                        Login(
-                            userRole = loginViewModel.userRole,
-                            onSetUserRole = loginViewModel::updateUserRole,
-                            onLogin = loginViewModel::onLogin,
-                            isRoleAuthEnabled = loginViewModel.roleAuthEnabled
-                        )
-                    }
-                    else -> {
-                        Main()
-                    }
+                    authEnable && loginState -> Login()
+                    else -> Main()
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                    showNotificationRequest.value &&
-                    !canPostNotifications(context)
+                    showNotificationRequest.value && !canPostNotifications(context)
                 ) {
                     NotificationPermissionRequest(
                         modifier = Modifier.fillMaxSize(),

@@ -12,19 +12,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.data.model.LoginState
 import com.android.inventorytracker.data.model.UserRole
+import com.android.inventorytracker.presentation.login.viewmodel.LoginViewModel
 import com.android.inventorytracker.presentation.popup.login.LoginPopup
 
 @Composable
 fun Login(
-    userRole: UserRole,
-    onSetUserRole: (UserRole) -> Unit,
-    onLogin: (username: String, password: String, userRole: String) -> Unit,
-    isRoleAuthEnabled: Boolean
+    loginViewModel: LoginViewModel = hiltViewModel()
 ) {
+    val userRole = loginViewModel.userRole
+    val isRoleAuthEnabled = loginViewModel.roleAuthEnabled
     val header = if(isRoleAuthEnabled) "Select Login Type" else "Login"
     var showDialog by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -38,7 +40,7 @@ fun Login(
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(onClick = {
-            onSetUserRole(UserRole.ADMIN)
+            loginViewModel.updateUserRole(UserRole.ADMIN)
             showDialog = true
         }) {
             Text("Admin Login")
@@ -46,7 +48,7 @@ fun Login(
         if(isRoleAuthEnabled){
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
-                onSetUserRole(UserRole.STAFF)
+                loginViewModel.updateUserRole(UserRole.STAFF)
                 showDialog = true
             }) {
                 Text("User Login")
@@ -57,7 +59,7 @@ fun Login(
             LoginPopup(
                 userRole = userRole,
                 onDismiss = { showDialog = false },
-                onLogin = onLogin
+                onLogin = loginViewModel::onLogin
             )
         }
     }

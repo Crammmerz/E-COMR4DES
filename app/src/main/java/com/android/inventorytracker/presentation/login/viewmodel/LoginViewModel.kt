@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.inventorytracker.data.local.entities.UserEntity
 import com.android.inventorytracker.data.model.LoginState
 import com.android.inventorytracker.data.model.UserRole
 import com.android.inventorytracker.data.repository.PreferencesRepository
@@ -27,13 +28,11 @@ class LoginViewModel @Inject constructor(
     var userRole by mutableStateOf(UserRole.ADMIN)
         private set
 
-    fun onLogin(username: String, password: String, userRole: String) {
-        viewModelScope.launch {
-            val success = userRepository.login(username, password, userRole)
-            loginState = if (success) LoginState.LOGGED_IN else LoginState.LOGGED_OUT
-        }
+    suspend fun onLogin(user: UserEntity): Boolean {
+        val success = userRepository.authenticate(user)
+        loginState = if (success) LoginState.LOGGED_IN else LoginState.LOGGED_OUT
+        return success
     }
-
     fun updateUserRole(role: UserRole){
         this.userRole = role
     }

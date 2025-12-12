@@ -1,5 +1,6 @@
 package com.android.inventorytracker.presentation.popup.batch_group_insertion
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.data.model.InsertBatch
 import com.android.inventorytracker.data.model.RemoveBatch
@@ -46,6 +48,7 @@ fun BatchGroupInsertionPopup(
     batchViewModel: BatchViewModel = hiltViewModel(),
     onDismiss: () -> Unit
 ) {
+    val context = LocalContext.current
     val persistentItems by itemViewModel.persistentItems.collectAsState()
     var inputMap by remember { mutableStateOf<Map<Int, InsertBatch>>(emptyMap()) }
     var validityMap by remember { mutableStateOf<Map<Int, Boolean>>(emptyMap()) }
@@ -109,6 +112,12 @@ fun BatchGroupInsertionPopup(
                     }
                     if (validPersistentItems.isNotEmpty()) {
                         showConfirmation = true
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Oops! Looks like something’s missing — select an item or fill in the required fields.",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }) {
                     Text("Store Batch")
@@ -144,9 +153,7 @@ fun BatchGroupInsertionPopup(
                     }
                 }
             },
-            onDismissRequest = {
-                onDismiss()
-            },
+            onDismissRequest = { showConfirmation = false },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -168,7 +175,7 @@ fun BatchGroupInsertionPopup(
             },
             dismissButton = {
                 TextButton(
-                    onClick = { onDismiss() }
+                    onClick = { showConfirmation = false }
                 ) {
                     Text("Cancel")
                 }

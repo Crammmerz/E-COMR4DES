@@ -79,14 +79,3 @@ fun Inventory(
         )
     }
 }
-
-@Preview(
-    name = "Tablet Preview",
-    showBackground = true,
-    widthDp = 1280,
-    heightDp = 800
-)
-@Composable
-fun Try() {
-
-}

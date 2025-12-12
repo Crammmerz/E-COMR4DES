@@ -59,6 +59,14 @@ fun Home(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = hiltViewM
             ) {
                 // Expiry Dashboard Card
                 if (expiryItems.isEmpty() && stockItems.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+
+                } else {
                     Surface(
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(32.dp),
@@ -95,13 +103,6 @@ fun Home(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = hiltViewM
                                 itemModel = stockItems
                             )
                         }
-                    }
-                } else {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
                     }
                 }
             }

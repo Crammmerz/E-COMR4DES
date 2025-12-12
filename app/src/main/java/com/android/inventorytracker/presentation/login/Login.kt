@@ -22,8 +22,11 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.android.inventorytracker.data.model.LoginState
 import androidx.compose.ui.unit.sp
 import com.android.inventorytracker.data.model.UserRole
+import com.android.inventorytracker.presentation.login.viewmodel.LoginViewModel
 import com.android.inventorytracker.presentation.popup.login.LoginPopup
 import com.android.inventorytracker.R
 
@@ -44,11 +47,10 @@ private val GoogleSans = FontFamily(
 
 @Composable
 fun Login(
-    userRole: UserRole,
-    onSetUserRole: (UserRole) -> Unit,
-    onLogin: (username: String, password: String, userRole: String) -> Unit,
-    isRoleAuthEnabled: Boolean
+    loginViewModel: LoginViewModel = hiltViewModel()
 ) {
+    val userRole = loginViewModel.userRole
+    val isRoleAuthEnabled = loginViewModel.roleAuthEnabled
     val header = if (isRoleAuthEnabled) "Login Type" else "Login"
     var showDialog by remember { mutableStateOf(false) }
 
@@ -98,7 +100,7 @@ fun Login(
                 LoginButton(
                     label = "Admin Login",
                     onClick = {
-                        onSetUserRole(UserRole.ADMIN)
+                        loginViewModel.updateUserRole(UserRole.ADMIN)
                         showDialog = true
                     }
                 )
@@ -109,7 +111,7 @@ fun Login(
                     LoginButton(
                         label = "Staff Login",
                         onClick = {
-                            onSetUserRole(UserRole.STAFF)
+                            loginViewModel.updateUserRole(UserRole.STAFF)
                             showDialog = true
                         }
                     )
@@ -120,7 +122,7 @@ fun Login(
                 LoginPopup(
                     userRole = userRole,
                     onDismiss = { showDialog = false },
-                    onLogin = onLogin
+                    onLogin = loginViewModel::onLogin
                 )
             }
         }

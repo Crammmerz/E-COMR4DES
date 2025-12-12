@@ -1,5 +1,6 @@
 package com.android.inventorytracker.presentation.popup.batch_group_removal
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.data.model.RemoveBatch
@@ -42,9 +44,14 @@ fun BatchGroupRemovalPopup(
     batchViewModel: BatchViewModel = hiltViewModel(),
     onDismiss: () -> Unit
 ) {
+    val context = LocalContext.current
+
+    val filteredModel = model.filter { it.totalSubUnit() != 0 }
     val persistentItems by itemViewModel.persistentItems.collectAsState()
+
     var inputMap by remember { mutableStateOf<Map<Int, RemoveBatch>>(emptyMap()) }
     var validityMap by remember { mutableStateOf<Map<Int, Boolean>>(emptyMap()) }
+
     var showConfirmation by remember { mutableStateOf(false) }
 
     DialogHost(
@@ -74,7 +81,7 @@ fun BatchGroupRemovalPopup(
                     .padding(10.dp),
                 verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
-                items(model, key = { it.item.id }) { model ->
+                items(filteredModel, key = { it.item.id }) { model ->
                     val persistence = model.item.id in persistentItems
                     ItemRemovalRow (
                         model = model,
@@ -100,11 +107,17 @@ fun BatchGroupRemovalPopup(
                     Text("Close")
                 }
                 Button(onClick = {
-                    val validPersistentItems = model.filter { m ->
+                    val validPersistentItems = filteredModel.filter { m ->
                         m.item.id in persistentItems && (validityMap[m.item.id] == true)
                     }
                     if (validPersistentItems.isNotEmpty()) {
                         showConfirmation = true
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Oops! Looks like something’s missing — select an item or fill in the required fields.",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }) {
                     Text("Remove Batch")

@@ -2,6 +2,7 @@ package com.android.inventorytracker.presentation.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -23,18 +24,9 @@ private val iOSBackgroundLight = Color(0xFFF2F2F7)
 private val iOSCardWhite = Color(0xFFFFFFFF)
 
 @Composable
-fun Home(
-    modifier: Modifier = Modifier,
-    homeViewModel: HomeViewModel = hiltViewModel()
-) {
-    val itemModels by homeViewModel.itemModelList.collectAsState(initial = emptyList())
-
-    val expiryItems = itemModels
-        .filter { it.isExpiringSoon }
-        .sortedBy { it.nearestExpiryDate }
-    val stockItems = itemModels
-        .filter { it.isLowStock }
-        .sortedBy { (it.totalUnit().toFloat() / (it.item.unitThreshold * 0.20f)) }
+fun Home(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = hiltViewModel()) {
+    val expiryItems by homeViewModel.expiryItems.collectAsState(initial = emptyList())
+    val stockItems by homeViewModel.stockItems.collectAsState(initial = emptyList())
 
     Surface(
         modifier = modifier
@@ -66,7 +58,15 @@ fun Home(
                 verticalAlignment = Alignment.Top
             ) {
                 // Expiry Dashboard Card
-                if (expiryItems.isNotEmpty()) {
+                if (expiryItems.isEmpty() && stockItems.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+
+                } else {
                     Surface(
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(32.dp),
@@ -85,10 +85,7 @@ fun Home(
                             )
                         }
                     }
-                }
 
-                // Stock Dashboard Card
-                if (stockItems.isNotEmpty()) {
                     Surface(
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(32.dp),

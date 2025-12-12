@@ -19,14 +19,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.data.model.UserRole
-import com.android.inventorytracker.presentation.popup.user_change_password.ChangePasswordPopup
+import com.android.inventorytracker.presentation.popup.change_pass_admin.ChangePassAdmin
+import com.android.inventorytracker.presentation.popup.change_pass_staff.ChangePassStaff
 import com.android.inventorytracker.presentation.settings.viewmodel.SettingsViewModel
 
 @Composable
 fun Security(viewModel: SettingsViewModel = hiltViewModel()){
     val isAuthEnabled by viewModel.authEnabled.collectAsState()
     val isRoleAuthEnabled by viewModel.roleAuthEnabled.collectAsState()
-    var roleToChangePassword by remember { mutableStateOf<UserRole?>(null) }
+    var role by remember { mutableStateOf<UserRole?>(null) }
 
 
     Text(text = "User Account & Security", style = MaterialTheme.typography.titleLarge)
@@ -61,7 +62,7 @@ fun Security(viewModel: SettingsViewModel = hiltViewModel()){
             modifier = Modifier.weight(1f)
         )
         Button(
-            onClick = { roleToChangePassword = UserRole.ADMIN },
+            onClick = { role = UserRole.ADMIN },
             enabled = isAuthEnabled
         ) {
             Text(text = "Change Password")
@@ -77,7 +78,7 @@ fun Security(viewModel: SettingsViewModel = hiltViewModel()){
             modifier = Modifier.weight(1f)
         )
         Button(
-            onClick = { roleToChangePassword = UserRole.STAFF },
+            onClick = { role = UserRole.STAFF },
             enabled = isAuthEnabled && isRoleAuthEnabled
         ) {
             Text(text = "Change Password")
@@ -85,14 +86,17 @@ fun Security(viewModel: SettingsViewModel = hiltViewModel()){
     }
 
 
-    if (roleToChangePassword != null) {
-        ChangePasswordPopup(
-            role = roleToChangePassword!!,
-            onDismiss = { roleToChangePassword = null },
-            onConfirm = { user, password, role ->
-                viewModel.changePassword(user, password, role)
-                roleToChangePassword = null
-            }
-        )
+    when(role){
+        UserRole.ADMIN ->
+            ChangePassAdmin(
+                onDismiss = { role = null },
+                onSubmit = viewModel::updateUser
+            )
+        UserRole.STAFF ->
+            ChangePassStaff(
+                onDismiss = { role = null },
+                onSubmit = viewModel::updateUserStaff
+            )
+        else -> {}
     }
 }

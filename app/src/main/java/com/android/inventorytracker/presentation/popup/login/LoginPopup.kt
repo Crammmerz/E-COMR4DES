@@ -24,9 +24,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.unit.dp
+import com.android.inventorytracker.data.local.entities.UserEntity
+import com.android.inventorytracker.data.model.LoginState
 import com.android.inventorytracker.data.model.UserRole
 import com.android.inventorytracker.presentation.shared.component.input_fields.PasswordField
 import com.android.inventorytracker.presentation.shared.component.input_fields.StringField
+import kotlinx.coroutines.launch
 import com.android.inventorytracker.R
 
 // --- Pure White & Beige Palette (Uniform) ---
@@ -47,12 +51,19 @@ private val GoogleSans = FontFamily(
 fun LoginPopup(
     userRole: UserRole,
     onDismiss: () -> Unit,
-    onLogin: (username: String, password: String, userRole: String) -> Unit,
+    onLogin: suspend (user: UserEntity) -> Boolean,
 ) {
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
+
     var validUsername by rememberSaveable { mutableStateOf(false) }
     var validPassword by rememberSaveable { mutableStateOf(false) }
+
+    var loginSuccess by rememberSaveable { mutableStateOf<Boolean?>(null) }
+
+    val valid = validUsername && validPassword
+
+    val scope = rememberCoroutineScope()
 
     val focusUsername = remember { FocusRequester() }
     val focusPassword = remember { FocusRequester() }
@@ -62,6 +73,20 @@ fun LoginPopup(
         UserRole.STAFF -> "Staff Login"
     }
 
+    LaunchedEffect(Unit) {
+        focusUsername.requestFocus()
+    }
+
+    fun onSubmit(){
+        if(valid){
+            val user = UserEntity(username = username, passwordHash = password, role = userRole.name)
+            scope.launch {
+                val success = onLogin(user)
+                loginSuccess = success
+                if(success) onDismiss()
+            }
+        }
+    }
     Dialog(onDismissRequest = onDismiss) {
         Box(
             modifier = Modifier.wrapContentSize(),
@@ -125,12 +150,12 @@ fun LoginPopup(
                             .fillMaxWidth()
                             .focusRequester(focusPassword),
                         onValidityChange = { validPassword = it },
-                        onDone = {
-                            if (validUsername && validPassword) {
-                                onLogin(username, password, userRole.name)
-                            }
-                        }
+                        onDone = { onSubmit() }
                     )
+
+                    if(loginSuccess == false){
+                        Text("Invalid user credential") //TODO: UI DESIGN
+                    }
 
                     Spacer(modifier = Modifier.height(20.dp))
 
@@ -150,9 +175,7 @@ fun LoginPopup(
                         LoginTextAction(
                             enabled = validUsername && validPassword
                         ) {
-                            if (validUsername && validPassword) {
-                                onLogin(username, password, userRole.name)
-                            }
+                            onSubmit()
                         }
                     }
                 }
@@ -186,7 +209,7 @@ private fun LoginTextAction(
 
 @Composable
 private fun TextButtonSecondary(
-    label: String,
+    label: String = "Cancel",
     onClick: () -> Unit
 ) {
     Button(

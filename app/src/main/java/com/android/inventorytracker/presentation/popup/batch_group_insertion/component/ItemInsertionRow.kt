@@ -99,17 +99,6 @@ fun ItemInsertionRow(
                     Text(text = "Nearest Expiry: ${model.nearestExpiryFormatted}")
                 }
             }
-            Spacer(modifier = Modifier.weight(1f))
-            when(isPersistent){
-                true -> Icon(
-                    imageVector = Icons.Default.KeyboardArrowUp,
-                    contentDescription = "More options",
-                )
-                false -> Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = "More options",
-                )
-            }
         }
 
         if(isPersistent){

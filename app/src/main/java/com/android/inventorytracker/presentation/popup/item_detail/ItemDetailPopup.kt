@@ -58,40 +58,42 @@ fun ItemDetailPopup(
 
     val context = LocalContext.current
 
+    fun onUpdateItem() {
+        val updatedItem = itemModel.item.copy(
+            imageUri = imageUri,
+            name = name,
+            unitThreshold = unitThreshold,
+            subUnitThreshold = subUnitThreshold,
+            expiryThreshold = expiryThreshold,
+            description = description
+        )
+        if (allValid && itemModel.item != updatedItem) {
+            when (loginViewModel.userRole) {
+                UserRole.ADMIN -> {
+                    if (itemModel.item.subUnitThreshold != updatedItem.subUnitThreshold) {
+                        onUpdateBatch(
+                            itemModel.batch,
+                            itemModel.item.subUnitThreshold,
+                            updatedItem.subUnitThreshold
+                        )
+                    }
+                    onUpdateItem(updatedItem)
+                    Toast.makeText(context, "Item updated successfully", Toast.LENGTH_SHORT).show()
+                }
+                UserRole.STAFF -> {
+                    Toast.makeText(context, "You are not authorized to edit this item", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        onDismiss()
+    }
+
     DialogHost(
         modifier = Modifier
             .height(500.dp)
             .width(800.dp),
         useImePadding = true,
-        onDismissRequest = {
-            val updatedItem = itemModel.item.copy(
-                imageUri = imageUri,
-                name = name,
-                unitThreshold = unitThreshold,
-                subUnitThreshold = subUnitThreshold,
-                expiryThreshold = expiryThreshold,
-                description = description
-            )
-            if (allValid && itemModel.item != updatedItem) {
-                when (loginViewModel.userRole) {
-                    UserRole.ADMIN -> {
-                        if (itemModel.item.subUnitThreshold != updatedItem.subUnitThreshold) {
-                            onUpdateBatch(
-                                itemModel.batch,
-                                itemModel.item.subUnitThreshold,
-                                updatedItem.subUnitThreshold
-                            )
-                        }
-                        onUpdateItem(updatedItem)
-                        Toast.makeText(context, "Item updated successfully", Toast.LENGTH_SHORT).show()
-                    }
-                    UserRole.STAFF -> {
-                        Toast.makeText(context, "You are not authorized to edit this item", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-            onDismiss()
-        },
+        onDismissRequest = { onUpdateItem() },
     ) {
         Column(
             modifier = Modifier

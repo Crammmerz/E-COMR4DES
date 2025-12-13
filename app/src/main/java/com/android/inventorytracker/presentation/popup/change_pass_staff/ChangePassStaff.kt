@@ -67,7 +67,7 @@ fun ChangePassStaff(
         }
     }
 
-    DialogHost(modifier = Modifier.height(400.dp).width(300.dp), onDismissRequest = onDismiss) {
+    DialogHost(modifier = Modifier.height(300.dp).width(400.dp), onDismissRequest = onDismiss) {
         Column(
             modifier = Modifier.padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)

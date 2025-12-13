@@ -11,25 +11,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.android.inventorytracker.R // Ensure R is imported for font reference
 import com.android.inventorytracker.presentation.shared.viewmodel.TimeViewModel
-
-// --- Pure White & Beige Palette (Uniform with Login.kt) ---
-private val DarkBeigeText = Color(0xFF523F31)    // Dark text (Primary contrast)
-private val LightBeigeText = Color(0xFF796254)   // Lighter text (Subtle details)
-
-// --- Google Sans Font Family Definition ---
-private val GoogleSans = FontFamily(
-    Font(R.font.google_sans_regular, FontWeight.Normal),
-    Font(R.font.google_sans_medium, FontWeight.Medium),
-    Font(R.font.google_sans_semibold, FontWeight.SemiBold)
-)
+import com.android.inventorytracker.ui.theme.Palette
 
 @Composable
 fun Header(){
@@ -43,10 +30,9 @@ fun Header(){
             Text(
                 text = timeViewModel.getDayAndDate(),
                 style = TextStyle(
-                    fontFamily = GoogleSans,
                     fontWeight = FontWeight.Normal, // Regular
                     fontSize = 16.sp,
-                    color = LightBeigeText // Use light beige for subtlety
+                    color = Palette.LightBeigeText // Use light beige for subtlety
                 )
             )
         }
@@ -57,10 +43,9 @@ fun Header(){
         Text(
             text = "Inventory Dashboard",
             style = TextStyle(
-                fontFamily = GoogleSans,
                 fontWeight = FontWeight.SemiBold, // SemiBold for prominence
                 fontSize = 34.sp,
-                color = DarkBeigeText // Dark beige for prominence
+                color = Palette.DarkBeigeText // Dark beige for prominence
             )
         )
 
@@ -70,10 +55,9 @@ fun Header(){
         Text(
             text = "Quick Actions",
             style = TextStyle(
-                fontFamily = GoogleSans,
                 fontWeight = FontWeight.Medium, // Medium weight for section header
                 fontSize = 20.sp,
-                color = DarkBeigeText // Dark beige for contrast
+                color = Palette.DarkBeigeText // Dark beige for contrast
             )
         )
     }

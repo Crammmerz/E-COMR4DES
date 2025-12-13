@@ -21,6 +21,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.data.local.entities.UserEntity
 import com.android.inventorytracker.data.model.UserRole
@@ -77,6 +78,7 @@ fun ChangePassStaff(
             )
 
             PasswordField(
+                fieldModifier = Modifier.focusRequester(focusNewPass),
                 value = newPassword,
                 onValueChange = { newPassword = it },
                 header = "New Password",
@@ -85,6 +87,7 @@ fun ChangePassStaff(
             )
 
             PasswordField(
+                fieldModifier = Modifier.focusRequester(focusConfirmPass),
                 value = confirmPass,
                 onValueChange = { confirmPass = it },
                 header = "Confirm Password",

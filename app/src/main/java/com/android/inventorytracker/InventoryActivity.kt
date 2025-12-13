@@ -32,7 +32,6 @@ class InventoryActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
             val loginViewModel: LoginViewModel = hiltViewModel()
             val showNotificationRequest = rememberSaveable { mutableStateOf(true) }
             val loginState = loginViewModel.loginState != LoginState.LOGGED_IN

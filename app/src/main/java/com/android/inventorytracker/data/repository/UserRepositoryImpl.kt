@@ -30,13 +30,15 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateUser(user: UserEntity, newPass: String,): Boolean {
-        if (!authenticate(user)) return false
+        val existingUser = userDao.getUserCredential(user.username, hashPassword(user.passwordHash), user.role)
+        if (existingUser == null) return false
 
-        val updatedUser = user.copy(passwordHash = hashPassword(newPass))
+        val updatedUser = existingUser.copy(passwordHash = hashPassword(newPass))
         return try {
             userDao.update(updatedUser)
             true
         } catch (e: Exception) {
+            Log.e("UserRepository", "Failed to update user", e)
             false
         }
     }

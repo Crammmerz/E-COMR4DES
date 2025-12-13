@@ -35,8 +35,8 @@ fun IntField(
     fieldModifier: Modifier = Modifier,
     value: Int,
     onValueChange: (Int) -> Unit,
-    valueRange: IntRange = 1..9999,
     onValidityChange: (Boolean) -> Unit,
+    valueRange: IntRange = 1..9999,
     onDone: () -> Unit = {},
     label: String,
     placeholder: String,
@@ -46,13 +46,12 @@ fun IntField(
     var isFocused by remember { mutableStateOf(false) }
     var isError by remember { mutableStateOf(false) }
 
-    LaunchedEffect(value, isFocused) {
+
+    LaunchedEffect(value) {
         if (!isFocused) {
             textValue = value.toString()
         }
-    }
 
-    LaunchedEffect(value) {
         val valid = value in valueRange
 
         if (valid) {
@@ -109,6 +108,7 @@ fun IntField(
                         isFocused = focusState.isFocused
                         if (isFocused && doClear) {
                             textValue = ""
+                            onValueChange(0)
                             onValidityChange(false)
                         }
                     },

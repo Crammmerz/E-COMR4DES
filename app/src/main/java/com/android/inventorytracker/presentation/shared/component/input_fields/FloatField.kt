@@ -47,17 +47,19 @@ fun FloatField(
     var isFocused by remember { mutableStateOf(false) }
     var isError by remember { mutableStateOf(false) }
 
-    LaunchedEffect(value, isFocused) {
-        if (!isFocused) {
-            val valid = value > 0 && value in valueRange
 
-            if (valid) {
-                isError = false
-                onValidityChange(true)
-            } else {
-                isError = true
-                onValidityChange(false)
-            }
+    LaunchedEffect(value) {
+        if (!isFocused) {
+            textValue = df.format(value)
+        }
+        val valid = value > 0 && value in valueRange
+
+        if (valid) {
+            isError = false
+            onValidityChange(true)
+        } else {
+            isError = true
+            onValidityChange(false)
         }
     }
 
@@ -106,6 +108,7 @@ fun FloatField(
                         isFocused = focusState.isFocused
                         if (isFocused) {
                             textValue = ""
+                            onValueChange(0f)
                             onValidityChange(false)
                         }
                     },

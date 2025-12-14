@@ -26,7 +26,25 @@ fun Header(){
     Column(modifier = Modifier.fillMaxWidth()) {
 
         // 1. Date/Time (Subtle, Light Beige Color, Regular Font Weight)
+        Text(
+            text = "Inventory Dashboard",
+            style = TextStyle(
+                fontWeight = FontWeight.SemiBold, // SemiBold for prominence
+                fontSize = 34.sp,
+                color = Palette.DarkBeigeText // Dark beige for prominence
+            )
+        )
+        Spacer(modifier = Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "Quick Actions",
+                style = TextStyle(
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 20.sp,
+                    color = Palette.DarkBeigeText
+                )
+            )
+            Spacer(Modifier.weight(1f))
             Text(
                 text = timeViewModel.getDayAndDate(),
                 style = TextStyle(
@@ -36,29 +54,5 @@ fun Header(){
                 )
             )
         }
-
-        Spacer(modifier = Modifier.height(8.dp)) // Small separator
-
-        // 2. Primary Title ("Inventory Dashboard" - Large, SemiBold)
-        Text(
-            text = "Inventory Dashboard",
-            style = TextStyle(
-                fontWeight = FontWeight.SemiBold, // SemiBold for prominence
-                fontSize = 34.sp,
-                color = Palette.DarkBeigeText // Dark beige for prominence
-            )
-        )
-
-        Spacer(modifier = Modifier.height(16.dp)) // Spacer before the actual Quick Actions component starts
-
-        // 3. Secondary Title ("Quick Actions" - Medium size, Medium Weight)
-        Text(
-            text = "Quick Actions",
-            style = TextStyle(
-                fontWeight = FontWeight.Medium, // Medium weight for section header
-                fontSize = 20.sp,
-                color = Palette.DarkBeigeText // Dark beige for contrast
-            )
-        )
     }
 }

@@ -15,6 +15,7 @@ object AuthPreferences {
     fun setAuthEnabled(context: Context, enabled: Boolean) {
         getPrefs(context).edit { putBoolean(KEY_AUTH_ENABLED, enabled) }
     }
+
     fun isAuthEnabled(context: Context): Boolean {
         return getPrefs(context).getBoolean(KEY_AUTH_ENABLED, false)
     }
@@ -22,6 +23,7 @@ object AuthPreferences {
     fun setRoleAuthEnabled(context: Context, enabled: Boolean) {
         getPrefs(context).edit { putBoolean(KEY_ROLE_AUTH_ENABLED, enabled) }
     }
+
     fun isRoleAuthEnabled(context: Context): Boolean {
         return getPrefs(context).getBoolean(KEY_ROLE_AUTH_ENABLED, false)
     }

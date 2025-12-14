@@ -8,23 +8,29 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.presentation.main.viewmodel.MainViewModel
+import com.android.inventorytracker.ui.theme.Palette
 
 @Composable
 fun TopBar(
     mainViewModel: MainViewModel,
     modifier: Modifier = Modifier,
 ) {
+    val showNotif by mainViewModel.showNotif.collectAsState()
+
     Surface(
         color = Color.White,
         modifier = modifier
@@ -45,6 +51,9 @@ fun TopBar(
                 )
             }
             Spacer(Modifier.weight(1f))
+            IconButton(onClick = { mainViewModel.setNotif(!showNotif) }) {
+                Icon(imageVector = Icons.Default.Notifications, tint = Palette.ButtonBeigeBase, contentDescription = "Notifications")
+            }
             Text(
                 text = "Inventory Tracking 📦",
                 color = Color.Black,

@@ -36,10 +36,10 @@ import com.android.inventorytracker.presentation.shared.component.input_fields.S
 import com.android.inventorytracker.presentation.shared.component.input_fields.IntField
 import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
 import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
+import com.android.inventorytracker.ui.theme.Palette
 
 // Define Theme Colors
-val PopupSurface = Color(0xFFFFF9F5)
-val ButtonDarkBrown = Color(0xFF4A3B32)
+
 
 @Composable
 fun InsertItemPopup(
@@ -77,7 +77,7 @@ fun InsertItemPopup(
                 .fillMaxWidth(0.55f)
                 .fillMaxHeight(0.9f),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = PopupSurface),
+            colors = CardDefaults.cardColors(containerColor = Palette.PopupSurface),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             Box(
@@ -146,43 +146,50 @@ fun InsertItemPopup(
                     DescriptionField(
                         value = description,
                         onValueChange = { description = it },
-                        modifier = Modifier.weight(1f).fillMaxWidth(),
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
                         fieldModifier = Modifier.focusRequester(focusDescription)
                     )
-                }
 
-                // --- Buttons ---
-                Row(
-                    modifier = Modifier.align(Alignment.BottomEnd),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    CancelButton(onClick = onDismiss)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        CancelButton(onClick = onDismiss)
 
-                    // Calls the updated ConfirmButton with the theme color
-                    ConfirmButton("Add Item",
-                        containerColor = ButtonDarkBrown,
-                        onClick = {
-                            if (allValid) {
-                                val item = ItemEntity(
-                                    imageUri = null,
-                                    name = name.trim(),
-                                    unitThreshold = unitThreshold,
-                                    subUnitThreshold = subUnitThreshold,
-                                    expiryThreshold = expiryThreshold,
-                                    description = description.trim()
-                                )
-                                onInsert(item)
-                                onDismiss()
-                                Toast.makeText(context, "Item added!", Toast.LENGTH_SHORT).show()
-                            } else {
-                                Toast.makeText(context, "Please fill required fields", Toast.LENGTH_SHORT).show()
+                        // Calls the updated ConfirmButton with the theme color
+                        ConfirmButton(
+                            "Add Item",
+                            containerColor = Palette.ButtonDarkBrown,
+                            onClick = {
+                                if (allValid) {
+                                    val item = ItemEntity(
+                                        imageUri = null,
+                                        name = name.trim(),
+                                        unitThreshold = unitThreshold,
+                                        subUnitThreshold = subUnitThreshold,
+                                        expiryThreshold = expiryThreshold,
+                                        description = description.trim()
+                                    )
+                                    onInsert(item)
+                                    onDismiss()
+                                    Toast.makeText(context, "Item added!", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Please fill required fields",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
-                        })
+                        )
+                    }
                 }
             }
         }
     }
 }
+
 
 
 @Preview(
@@ -192,6 +199,7 @@ fun InsertItemPopup(
 )
 @Composable
 fun AddNewItemPopupPreview() {
+    // Simple no-op callbacks for preview. onAdd receives the created ItemEntity.
     InsertItemPopup(
         onDismiss = { /* no-op for preview */ },
         onInsert = { /* no-op for preview */ }

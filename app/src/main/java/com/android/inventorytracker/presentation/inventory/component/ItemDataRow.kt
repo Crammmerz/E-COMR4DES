@@ -2,13 +2,16 @@ package com.android.inventorytracker.presentation.inventory.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -16,10 +19,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -97,15 +100,6 @@ fun ItemDataRow(
                 modifier = Modifier.weight(1.2f)
             )
 
-            // 4. "Stock" / Unit (Weight 0.8f)
-            DataFieldBox(
-                text = "0",
-                backgroundColor = LightBeigeField,
-                textColor = Color.DarkGray,
-                modifier = Modifier.weight(0.8f),
-                centered = true
-            )
-
             // 5. "Current" (Highlight Brown Box) (Weight 0.8f)
             DataFieldBox(
                 text = model.totalUnitFormatted(),
@@ -123,13 +117,26 @@ fun ItemDataRow(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Minus Button
-                ActionButton(text = "-", onClick = { showDeleteBatch = true }, enabled = model.batch.isNotEmpty())
+                ActionButton(
+                    modifier = Modifier.weight(0.25f),
+                    icon = Icons.Default.Remove,
+                    onClick = { showDeleteBatch = true },
+                    enabled = model.batch.isNotEmpty()
+                )
 
                 // Plus Button
-                ActionButton(text = "+", onClick = { showInsertBatch = true }, enabled = true)
+                ActionButton(
+                    modifier = Modifier.weight(0.25f),
+                    icon = Icons.Default.Add,
+                    onClick = { showInsertBatch = true },
+                    enabled = true,
+                )
 
                 // View More Button
-                ViewMoreButton(onClick = { showItemDetail = true })
+                ViewMoreButton(
+                    modifier = Modifier.weight(0.5f),
+                    onClick = { showItemDetail = true }
+                )
             }
         }
     }
@@ -188,30 +195,19 @@ fun DataFieldBox(
 
 // Helper for the small circle +/- buttons
 @Composable
-fun ActionButton(text: String, onClick: () -> Unit, enabled: Boolean) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .size(32.dp)
-            .clip(CircleShape)
-            .border(1.dp, Color(0xFFD7CCC8), CircleShape)
-            .background(Color.White)
-            .clickable(enabled = enabled, onClick = onClick)
+fun ActionButton(icon: ImageVector, onClick: () -> Unit, enabled: Boolean, modifier: Modifier) {
+    IconButton(
+        modifier = modifier.background(Color.White),
+        onClick = onClick,
+        enabled = enabled
     ) {
-        Text(
-            text = text,
-            fontSize = 18.sp,
-            color = if(enabled) Color(0xFF5D4037) else Color.LightGray,
-            fontWeight = FontWeight.Medium
-        )
+        Icon(imageVector = icon, contentDescription = "")
     }
 }
-
-// Helper for the View More button
 @Composable
-fun ViewMoreButton(onClick: () -> Unit) {
+fun ViewMoreButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .height(32.dp)
             .clip(RoundedCornerShape(4.dp))
             .background(ActionBrown)

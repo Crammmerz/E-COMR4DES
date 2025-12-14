@@ -1,31 +1,27 @@
 package com.android.inventorytracker.presentation.popup.item_removal
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.android.inventorytracker.data.local.entities.ItemEntity
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.presentation.popup.item_removal.component.HeaderSection
 import com.android.inventorytracker.presentation.popup.item_removal.component.InventoryItem
-import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
-import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
+
+private val CoffeeBrown = Color(0xFF5D4037)
+private val PaperBackground = Color(0xFFFEF7ED)
+private val DividerColor = Color(0xFFE0D6CC)
+private val MutedText = Color(0xFF7A6A5F)
 
 @Composable
 fun DeleteItemPopup(
@@ -34,70 +30,95 @@ fun DeleteItemPopup(
     onDismiss: () -> Unit
 ) {
     val selectedIds = remember { mutableStateListOf<Int>() }
-    var showDialog by remember { mutableStateOf(false) }
+    var showConfirm by remember { mutableStateOf(false) }
 
-    if (!showDialog) {
-        DialogHost(
+    DialogHost(
+        modifier = Modifier
+            .fillMaxWidth(0.35f)
+            .fillMaxHeight(0.7f)
+            .background(PaperBackground, RoundedCornerShape(16.dp)),
+        onDismissRequest = onDismiss
+    ) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth(0.3f)
-                .fillMaxHeight(0.6f),
-            onDismissRequest = onDismiss,
-            useImePadding = true
+                .fillMaxSize()
+                .padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Column {
-                HeaderSection()
-                LazyColumn (Modifier.weight(1f)) {
-                    items(model, key = { it.item.id }) { itemModel ->
-                        val itemId = itemModel.item.id
-                        val isSelected = selectedIds.contains(itemId)
 
-                        InventoryItem(
-                            itemModel = itemModel,
-                            isChecked = isSelected,
-                            onCheckedChange = { checked ->
-                                if (checked) selectedIds.add(itemId)
-                                else selectedIds.remove(itemId)
-                            }
-                        )
-                    }
+            HeaderSection(onClose = onDismiss)
+
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(model, key = { it.item.id }) { itemModel ->
+                    val id = itemModel.item.id
+                    InventoryItem(
+                        itemModel = itemModel,
+                        isChecked = selectedIds.contains(id),
+                        onCheckedChange = {
+                            if (it) selectedIds.add(id) else selectedIds.remove(id)
+                        }
+                    )
+                }
+            }
+
+            Divider(color = DividerColor)
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "${selectedIds.size} items selected",
+                    color = MutedText,
+                    fontSize = 12.sp
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                TextButton(onClick = onDismiss) {
+                    Text("Cancel", color = CoffeeBrown)
                 }
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                Button(
+                    onClick = { showConfirm = true },
+                    enabled = selectedIds.isNotEmpty(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = CoffeeBrown,
+                        disabledContainerColor = CoffeeBrown.copy(alpha = 0.3f)
+                    ),
+                    shape = RoundedCornerShape(8.dp)
                 ) {
-                    CancelButton(onClick = onDismiss,)
-                    ConfirmButton("Delete Item",onClick = { showDialog = true && selectedIds.isNotEmpty() })
+                    Text("Remove Selected")
                 }
             }
         }
     }
 
-    // Confirmation Dialog
-    if (showDialog) {
+    if (showConfirm) {
         AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text("Confirm Deletion") },
-            text = { Text("Are you sure you want to delete ${selectedIds.size} item(s)?") },
+            onDismissRequest = { showConfirm = false },
+            title = { Text("Confirm Removal") },
+            text = { Text("Remove ${selectedIds.size} selected item(s)?") },
             confirmButton = {
                 TextButton(onClick = {
-                    model.forEach { itemModel ->
-                        if (selectedIds.contains(itemModel.item.id)) {
-                            onDelete(itemModel.item)
+                    model.forEach {
+                        if (selectedIds.contains(it.item.id)) {
+                            onDelete(it.item)
                         }
                     }
-                    selectedIds.clear()
-                    showDialog = false
+                    showConfirm = false
                     onDismiss()
                 }) {
-                    Text("Delete", color = Color.Red)
+                    Text("Remove", color = Color.Red)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showDialog = false }) {
+                TextButton(onClick = { showConfirm = false }) {
                     Text("Cancel")
                 }
             }
         )
     }
 }
-

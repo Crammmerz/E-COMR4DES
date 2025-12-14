@@ -1,224 +1,311 @@
 package com.android.inventorytracker.presentation.inventory.component
 
+
+
+import android.annotation.SuppressLint
+
 import androidx.compose.foundation.Image
+
 import androidx.compose.foundation.background
+
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+
+import androidx.compose.runtime.Composable
+
+import androidx.compose.runtime.LaunchedEffect
+
+import androidx.compose.runtime.getValue
+
+import androidx.compose.runtime.mutableStateOf
+
 import androidx.compose.runtime.saveable.rememberSaveable
+
+import androidx.compose.runtime.setValue
+
 import androidx.compose.ui.Alignment
+
 import androidx.compose.ui.Modifier
+
 import androidx.compose.ui.draw.clip
+
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+
 import androidx.compose.ui.res.painterResource
+
 import androidx.compose.ui.text.font.FontWeight
+
 import androidx.compose.ui.text.style.TextAlign
+
 import androidx.compose.ui.unit.dp
+
 import androidx.compose.ui.unit.sp
+
 import coil.compose.rememberAsyncImagePainter
+
 import com.android.inventorytracker.R
+
 import com.android.inventorytracker.data.model.ItemModel
+
 import com.android.inventorytracker.presentation.popup.batch_insertion.BatchInsertionPopup
+
 import com.android.inventorytracker.presentation.popup.batch_targeted_removal.BatchTargetedRemoval
+
 import com.android.inventorytracker.presentation.popup.item_detail.ItemDetailPopup
+
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
+
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 
-// Colors matching the new design reference (Lumi Cafe Theme)
-val SurfaceWhite = Color.White
-val LightBeigeField = Color(0xFFF2ECE6) // Background for Name/Expiry boxes
-val AccentBrown = Color(0xFFC19A6B)     // Background for "Current" box
-val ActionBrown = Color(0xFF8D6E63)     // Color for the View button
-val BorderColor = Color(0xFFE0E0E0)
+import com.android.inventorytracker.ui.theme.LightSand
+
+
+
+
+
+
 
 @Composable
+
 fun ItemDataRow(
+
     model: ItemModel,
+
     itemViewModel: ItemViewModel,
+
     batchViewModel: BatchViewModel,
+
     modifier: Modifier = Modifier
+
 ) {
+
     var showItemDetail by rememberSaveable { mutableStateOf(false) }
+
     var showInsertBatch by rememberSaveable { mutableStateOf(false) }
+
     var showDeleteBatch by rememberSaveable { mutableStateOf(false) }
 
-    Card(
+
+
+
+
+    Row(
+
         modifier = modifier
+
+            .height(60.dp)
+
             .fillMaxWidth()
-            .height(72.dp),
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
-        border = androidx.compose.foundation.BorderStroke(1.dp, BorderColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(15.dp)
-        ) {
-            // 1. Image
-            val painter = if(model.item.imageUri != null){
-                rememberAsyncImagePainter(model = model.item.imageUri)
-            } else {
-                painterResource(id = R.drawable.outline_add_photo_alternate_24)
-            }
-            Image(
-                painter = painter,
-                contentDescription = "Item Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.LightGray.copy(alpha = 0.2f))
-            )
 
-            // 2. Item Name (Weight 3.0f - INCREASED to fill space)
-            DataFieldBox(
-                text = model.item.name,
-                backgroundColor = LightBeigeField,
-                textColor = Color.Black,
-                modifier = Modifier.weight(3.0f)
-            )
-
-            // 3. Expiry (Weight 1.2f)
-            DataFieldBox(
-                text = if(model.nearestExpiryFormatted == "N/A") "No Date" else model.nearestExpiryFormatted,
-                backgroundColor = LightBeigeField,
-                textColor = Color.DarkGray,
-                modifier = Modifier.weight(1.2f)
-            )
-
-            // 4. "Stock" / Unit (Weight 0.8f)
-            DataFieldBox(
-                text = "0",
-                backgroundColor = LightBeigeField,
-                textColor = Color.DarkGray,
-                modifier = Modifier.weight(0.8f),
-                centered = true
-            )
-
-            // 5. "Current" (Highlight Brown Box) (Weight 0.8f)
-            DataFieldBox(
-                text = model.totalUnitFormatted(),
-                backgroundColor = AccentBrown,
-                textColor = Color.White,
-                modifier = Modifier.weight(0.8f),
-                centered = true,
-                isBold = true
-            )
-
-            // 6. Actions (+ / - / View) (Weight 1.5f)
-            Row(
-                modifier = Modifier.weight(1.5f),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Minus Button
-                ActionButton(text = "-", onClick = { showDeleteBatch = true }, enabled = model.batch.isNotEmpty())
-
-                // Plus Button
-                ActionButton(text = "+", onClick = { showInsertBatch = true }, enabled = true)
-
-                // View More Button
-                ViewMoreButton(onClick = { showItemDetail = true })
-            }
-        }
-    }
-
-    // Popups
-    if (showItemDetail) {
-        ItemDetailPopup(
-            itemModel = model,
-            onDismiss = { showItemDetail = false },
-            onUpdateItem = itemViewModel::updateItem,
-            onUpdateBatch = batchViewModel::onConvertBatch
-        )
-    }
-    if(showInsertBatch) {
-        BatchInsertionPopup(
-            itemModel = model,
-            onDismiss = { showInsertBatch = false },
-        )
-    }
-    if(showDeleteBatch) {
-        BatchTargetedRemoval(
-            threshold = model.item.subUnitThreshold,
-            batch = model.batch,
-            onDismiss = { showDeleteBatch = false },
-        )
-    }
-}
-
-// Helper for the colored data boxes
-@Composable
-fun DataFieldBox(
-    text: String,
-    backgroundColor: Color,
-    textColor: Color,
-    modifier: Modifier,
-    centered: Boolean = false,
-    isBold: Boolean = false
-) {
-    Box(
-        modifier = modifier
-            .height(40.dp)
-            .clip(RoundedCornerShape(4.dp))
-            .background(backgroundColor)
-            .padding(horizontal = 10.dp),
-        contentAlignment = if (centered) Alignment.Center else Alignment.CenterStart
-    ) {
-        Text(
-            text = text,
-            color = textColor,
-            fontSize = 13.sp,
-            fontWeight = if(isBold) FontWeight.Bold else FontWeight.Normal,
-            maxLines = 1
-        )
-    }
-}
-
-// Helper for the small circle +/- buttons
-@Composable
-fun ActionButton(text: String, onClick: () -> Unit, enabled: Boolean) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .size(32.dp)
-            .clip(CircleShape)
-            .border(1.dp, Color(0xFFD7CCC8), CircleShape)
             .background(Color.White)
-            .clickable(enabled = enabled, onClick = onClick)
-    ) {
-        Text(
-            text = text,
-            fontSize = 18.sp,
-            color = if(enabled) Color(0xFF5D4037) else Color.LightGray,
-            fontWeight = FontWeight.Medium
+
+            .clip(RoundedCornerShape(5.dp))
+
+            .border(1.dp, Color.DarkGray, RoundedCornerShape(5.dp))
+
+            .padding(horizontal = 5.dp, vertical = 5.dp),
+
+        verticalAlignment = Alignment.CenterVertically,
+
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+
+        ) {
+
+        if(model.item.imageUri != null){
+
+            Image(
+
+                painter = rememberAsyncImagePainter(
+
+                    model = model.item.imageUri,
+
+                    placeholder = painterResource(R.drawable.outline_add_photo_alternate_24),
+
+                    error = painterResource(R.drawable.outline_add_photo_alternate_24)
+
+                ),
+
+                contentDescription = "Selected image",
+
+                modifier = Modifier
+
+                    .clip(RoundedCornerShape(5.dp))
+
+                    .size(64.dp)
+
+                    .padding(horizontal = 10.dp),
+
+                )
+
+        } else {
+
+            Image(
+
+                painter = painterResource(id = R.drawable.outline_add_photo_alternate_24),
+
+                contentDescription = "Placeholder image",
+
+                modifier = Modifier
+
+                    .clip(RoundedCornerShape(5.dp))
+
+                    .size(64.dp)
+
+                    .padding(horizontal = 10.dp),
+
+                )
+
+        }
+
+        ItemText(text = model.item.name, modifier = Modifier.weight(0.75f))
+
+        ItemText(
+
+            text = model.nearestExpiryFormatted,
+
+            modifier = Modifier.weight(0.5f),
+
+            color = model.expiryColor
+
         )
+
+        ItemText(
+
+            text = model.totalUnitFormatted(),
+
+            modifier = Modifier
+
+                .weight(0.5f),
+
+            textAlign = TextAlign.Center,
+
+            color = model.stockColor,
+
+            )
+
+        ItemButton(
+
+            modifier = Modifier.weight(0.25f),
+
+            enabled = model.batch.isNotEmpty(),
+
+            onClick = { showDeleteBatch = true },
+
+            text = "-"
+
+        )
+
+        ItemButton (
+
+            modifier = Modifier.weight(0.25f),
+
+            onClick = { showInsertBatch = true },
+
+            text = "+"
+
+        )
+
+        ItemButton("View More", modifier = Modifier.weight(0.5f)) { showItemDetail = true }
+
     }
+
+
+
+    if (showItemDetail) {
+
+        ItemDetailPopup(
+
+            itemModel = model,
+
+            onDismiss = { showItemDetail = false },
+
+            onUpdateItem = itemViewModel::updateItem,
+
+            onUpdateBatch = batchViewModel::onConvertBatch
+
+        )
+
+    }
+
+
+
+    if(showInsertBatch){
+
+        BatchInsertionPopup(
+
+            itemModel = model,
+
+            onDismiss = { showInsertBatch = false },
+
+            )
+
+    }
+
+
+
+    if(showDeleteBatch){
+
+        BatchTargetedRemoval(
+
+            threshold = model.item.subUnitThreshold,
+
+            batch = model.batch,
+
+            onDismiss = { showDeleteBatch = false },
+
+            )
+
+    }
+
 }
 
-// Helper for the View More button
+
+
 @Composable
-fun ViewMoreButton(onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .height(32.dp)
-            .clip(RoundedCornerShape(4.dp))
-            .background(ActionBrown)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 8.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("View", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-    }
+
+fun ItemText(
+
+    text: String,
+
+    color: Color = Color.Gray,
+
+    modifier: Modifier,
+
+    textAlign: TextAlign = TextAlign.Start
+
+) {
+
+    Text(
+
+        text = text,
+
+        color = Color.Black,
+
+        fontWeight = FontWeight.SemiBold,
+
+        fontSize = 13.sp,
+
+        textAlign = textAlign,
+
+        maxLines = 1,
+
+        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+
+        modifier = modifier
+
+            .background(LightSand, shape = RoundedCornerShape(5.dp))
+
+            .clip(RoundedCornerShape(5.dp))
+
+            .border(if(color == Color.Gray)1.dp else 2.dp, color = color, RoundedCornerShape(5.dp))
+
+            .padding(horizontal = 5.dp, vertical = 7.dp)
+
+    )
+
 }

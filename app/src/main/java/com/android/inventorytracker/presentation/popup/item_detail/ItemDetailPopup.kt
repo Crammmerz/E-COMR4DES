@@ -117,7 +117,7 @@ fun ItemDetailPopup(
                         role = role,
                         onPickImage = { if(role == UserRole.ADMIN) imageUri = it }
                     )
-
+                    Text("ID: ${itemModel.item.id}")
                     StringField(
                         value = name,
                         onValueChange = { if(role == UserRole.ADMIN) name = it },

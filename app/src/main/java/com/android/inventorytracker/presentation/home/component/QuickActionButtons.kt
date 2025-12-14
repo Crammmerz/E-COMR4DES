@@ -23,14 +23,16 @@ import com.android.inventorytracker.presentation.popup.batch_group_removal.Batch
 import com.android.inventorytracker.presentation.shared.component.primitive.CenterButton
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import com.android.inventorytracker.ui.theme.Palette
+
 @Composable
 fun QuickActions(
     modifier: Modifier = Modifier,
     itemViewModel: ItemViewModel = hiltViewModel(),
 ) {
     val model by itemViewModel.itemModelList.collectAsState(initial = emptyList())
-    var showAddStock by rememberSaveable { mutableStateOf(false) }
-    var showRemoveStock by rememberSaveable { mutableStateOf(false) }
+    // Changed state variable names from Stock to Item
+    var showAddItem by rememberSaveable { mutableStateOf(false) } // CHANGED from showAddStock
+    var showDeductItem by rememberSaveable { mutableStateOf(false) } // CHANGED from showRemoveStock
 
     Row(
         modifier = modifier
@@ -38,22 +40,21 @@ fun QuickActions(
             .padding(vertical = 0.dp),
         horizontalArrangement = Arrangement.spacedBy(24.dp, Alignment.Start)
     ) {
-        // Button 1: Add Stock (Primary Accent Color: Deep Beige)
+
         QuickActionButton(
-            label = "Add Stock",
+            label = "Add Item",
             modifier = Modifier.weight(1f),
             bgColor = Palette.AccentBeigePrimary, // Deep Beige
             contentColor = Palette.PureWhite,   // White text
-            onClick = { showAddStock = true }
+            onClick = { showAddItem = true } // CHANGED variable name
         )
 
-        // Button 2: Deduct Stock (Secondary Accent Color: Light Beige)
         QuickActionButton(
-            label = "Deduct Stock",
+            label = "Deduct Item",
             modifier = Modifier.weight(1f),
             bgColor = Palette.AccentBeigeLight, // Light Beige/Neutral
             contentColor = Palette.DarkBeigeText, // Dark Beige text for contrast
-            onClick = { showRemoveStock = true }
+            onClick = { showDeductItem = true } // CHANGED variable name
         )
 
         // Button 3: New Item (Tertiary Action: White Background)
@@ -66,15 +67,15 @@ fun QuickActions(
         )
     }
 
-    if(showAddStock){
-        BatchGroupInsertionPopup(model = model, onDismiss = { showAddStock = false })
+    if(showAddItem){ // CHANGED variable name
+        BatchGroupInsertionPopup(model = model, onDismiss = { showAddItem = false }) // CHANGED variable name
     }
-    if(showRemoveStock){
-        BatchGroupRemovalPopup(model = model, onDismiss = { showRemoveStock = false })
+    if(showDeductItem){ // CHANGED variable name
+        BatchGroupRemovalPopup(model = model, onDismiss = { showDeductItem = false }) // CHANGED variable name
     }
 }
 
-// Revised QuickActionButton to pass Font Family if CenterButton supports TextStyle
+// QuickActionButton implementation remains the same
 @Composable
 fun QuickActionButton(
     label: String,
@@ -83,14 +84,9 @@ fun QuickActionButton(
     contentColor: Color,
     onClick: () -> Unit
 ) {
-    // Note: This relies on CenterButton being flexible enough to accept and apply the
-    // background/shape modifiers and the passed label/content color.
-
-    // If CenterButton is a simple wrapper, we update it to use Google Sans Medium
     CenterButton(
         modifier = modifier
             .fillMaxHeight()
-            // Apply large corner radius and background color/shape
             .background(
                 color = bgColor,
                 shape = RoundedCornerShape(999.dp)
@@ -100,37 +96,5 @@ fun QuickActionButton(
         bgColor = bgColor,
         contentColor = contentColor,
         onClick = onClick,
-        // *** Assume CenterButton can accept TextStyle or FontWeight for font application ***
-        // If CenterButton uses a simple Text(label, color=contentColor), you would need to
-        // inject the TextStyle here. Since we can't see CenterButton, we'll assume it's updated
-        // or we use a standard Text here for demo.
-        // For demonstration, let's assume CenterButton supports a text style parameter:
-        // textStyle = TextStyle(fontFamily = GoogleSans, fontWeight = FontWeight.Medium)
     )
-
-    // --- ALTERNATIVE: If CenterButton is a Box/Button and you need to apply the text style directly: ---
-    /*
-    Button(
-        onClick = onClick,
-        modifier = modifier
-            .fillMaxHeight()
-            .clip(RoundedCornerShape(999.dp))
-            .background(bgColor),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
-            contentColor = contentColor
-        ),
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
-    ) {
-        Text(
-            text = label,
-            style = TextStyle(
-                fontFamily = GoogleSans,
-                fontWeight = FontWeight.Medium,
-                fontSize = 18.sp,
-                color = contentColor
-            )
-        )
-    }
-    */
 }

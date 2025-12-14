@@ -28,7 +28,7 @@ fun AddNewItemButton(onClick: () -> Unit) {
         shape = RoundedCornerShape(8.dp),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
     ) {
-        Text("Add Stocks", color = Color.White, fontWeight = FontWeight.Bold)
+        Text("Add Items", color = Color.White, fontWeight = FontWeight.Bold)
     }
 }
 

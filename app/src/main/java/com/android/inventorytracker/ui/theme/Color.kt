@@ -10,12 +10,33 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 val Sand = Color(0xFFE1D9C5)
-val PaleSand = Color(0xFFF0E9D7)
 val LightSand = Color(0xFFF5F0E6)
-val SoftIvory = Color(0xFFF8F4EC)
-val Stone = Color(0xFFAE9372)
-val LightBrown = Color(0xFFE5D7BD)
-val Bistre = Color(0xFF3e2723)
 val Ochre = Color(0xFF7F4B30)
 val Orange = Color(0xFFFFA500) // Orange
 val DarkRed = Color(0xFF8B0000) // Dark Red
+
+
+// ColorPalette.kt
+
+object Palette {
+    val PureWhite = Color(0xFFFFFFFF)        // Strict white background
+    val DarkBeigeText = Color(0xFF523F31)    // Dark text (Primary contrast)
+    val LightBeigeText = Color(0xFF796254)   // Lighter text (Secondary contrast)
+    val ButtonBeigeBase = Color(0xFFD3B386)  // Main beige for buttons (Lighter shade)
+    val ButtonBeigeEnd = Color(0xFFB08959)   // Deeper beige for gradient end
+    val ButtonBeigeHover = Color(0xFFE7D0AC)
+    val iOSBackgroundLight = Color(0xFFF2F2F7)
+    val iOSCardWhite = Color(0xFFFFFFFF)
+
+    val InnerTileBackground = Color(0xFFFFFFFF)
+
+    val AccentBeigePrimary = Color(0xFFB08959)  // Deep beige for primary action button background
+
+    val AccentBeigeLight = Color(0xFFE7D0AC)
+
+    val BeigeProgressTrack = Color(0xFFEEEAE5)
+
+//TODO: Define the Color Here
+
+}
+

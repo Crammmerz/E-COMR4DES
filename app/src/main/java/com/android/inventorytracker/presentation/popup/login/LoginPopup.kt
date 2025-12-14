@@ -40,13 +40,6 @@ private val DarkBeigeText = Color(0xFF523F31)        // Dark text (Headers, prim
 private val LightBeigeText = Color(0xFF796254)       // Medium text color (Secondary actions)
 private val AccentBeigePrimary = Color(0xFFB08959)   // Primary action color (Deep Beige)
 
-// Google Sans
-private val GoogleSans = FontFamily(
-    Font(R.font.google_sans_regular, FontWeight.Normal),
-    Font(R.font.google_sans_medium, FontWeight.Medium),
-    Font(R.font.google_sans_semibold, FontWeight.SemiBold)
-)
-
 @Composable
 fun LoginPopup(
     userRole: UserRole,
@@ -113,7 +106,6 @@ fun LoginPopup(
                     Text(
                         text = header,
                         style = TextStyle(
-                            fontFamily = GoogleSans,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 22.sp,
                             color = DarkBeigeText // Use Dark Beige Text
@@ -198,7 +190,6 @@ private fun LoginTextAction(
             .padding(vertical = 8.dp)
             .clickable(enabled = enabled, onClick = onClick),
         style = TextStyle(
-            fontFamily = GoogleSans,
             fontWeight = FontWeight.Medium,
             fontSize = 15.sp,
             // Use AccentBeigePrimary for primary action, dimmed when disabled
@@ -226,7 +217,6 @@ private fun TextButtonSecondary(
         Text(
             text = label,
             style = TextStyle(
-                fontFamily = GoogleSans,
                 fontWeight = FontWeight.Medium,
                 fontSize = 15.sp
             )

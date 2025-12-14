@@ -43,12 +43,13 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun PasswordField(
+    modifier: Modifier = Modifier,
+    fieldModifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
     onValidityChange: (Boolean) -> Unit,
     onDone: () -> Unit,
     header: String,
-    modifier: Modifier = Modifier,
     minLength: Int = 3,
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
@@ -88,7 +89,7 @@ fun PasswordField(
             BasicTextField(
                 value = value,
                 onValueChange = onValueChange,
-                modifier = Modifier
+                modifier = fieldModifier
                     .weight(1f)
                     .fillMaxHeight(),
                 textStyle = TextStyle(fontSize = 15.sp),

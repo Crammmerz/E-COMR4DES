@@ -7,37 +7,22 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp // Import needed for explicit Text Style definition
+import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.android.inventorytracker.R
 import com.android.inventorytracker.data.model.ItemModel
+import com.android.inventorytracker.ui.theme.Palette
 
-// --- Pure White & Beige Palette (Uniform with Login.kt) ---
-private val PureWhite = Color(0xFFFFFFFF)
-private val DarkBeigeText = Color(0xFF523F31)
-private val LightBeigeText = Color(0xFF796254)
-private val InnerTileBackground = Color(0xFFFFFFFF)
-
-// --- Google Sans Font Family Definition ---
-private val GoogleSans = FontFamily(
-    Font(R.font.google_sans_regular, FontWeight.Normal),
-    Font(R.font.google_sans_medium, FontWeight.Medium),
-    Font(R.font.google_sans_semibold, FontWeight.SemiBold)
-)
 
 @Composable
 fun ExpiryLevels(
@@ -47,7 +32,7 @@ fun ExpiryLevels(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(PureWhite)
+            .background(Palette.PureWhite)
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -55,10 +40,9 @@ fun ExpiryLevels(
             text = "Expiry",
             // Apply Google Sans SemiBold for the title
             style = TextStyle(
-                fontFamily = GoogleSans,
                 fontWeight = FontWeight.SemiBold, // Use SemiBold for the main header
                 fontSize = 24.sp, // Approximate size for titleLarge
-                color = DarkBeigeText
+                color = Palette.DarkBeigeText
             )
         )
 
@@ -82,7 +66,7 @@ fun ExpiryLevels(
                         modifier = Modifier
                             .height(cellHeight)
                             .clip(RoundedCornerShape(16.dp))
-                            .background(InnerTileBackground)
+                            .background(Palette.InnerTileBackground)
                             .padding(12.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -113,10 +97,9 @@ fun ExpiryLevels(
                             modifier = Modifier.fillMaxWidth(),
                             // Apply Google Sans Medium for item name
                             style = TextStyle(
-                                fontFamily = GoogleSans,
                                 fontWeight = FontWeight.Medium, // Use Medium for item name
                                 fontSize = 16.sp, // Approximate size for bodyMedium
-                                color = DarkBeigeText
+                                color = Palette.DarkBeigeText
                             )
                         )
 
@@ -129,10 +112,9 @@ fun ExpiryLevels(
                                 text = "Expires in",
                                 // Apply Google Sans Regular for detail text
                                 style = TextStyle(
-                                    fontFamily = GoogleSans,
                                     fontWeight = FontWeight.Normal, // Use Regular for label text
                                     fontSize = 12.sp, // Approximate size for bodySmall
-                                    color = DarkBeigeText
+                                    color = Palette.DarkBeigeText
                                 )
                             )
                             Text(
@@ -141,11 +123,9 @@ fun ExpiryLevels(
                                     .clip(RoundedCornerShape(999.dp))
                                     .background(model.expiryColor.copy(alpha = 0.12f))
                                     .padding(horizontal = 8.dp, vertical = 4.dp),
-                                // Apply Google Sans Regular for detail text
                                 style = TextStyle(
-                                    fontFamily = GoogleSans,
-                                    fontWeight = FontWeight.Normal, // Use Regular
-                                    fontSize = 12.sp, // Approximate size for bodySmall
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 12.sp,
                                     color = model.expiryColor
                                 )
                             )

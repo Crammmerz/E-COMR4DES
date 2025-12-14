@@ -1,6 +1,5 @@
 package com.android.inventorytracker.presentation.popup.item_detail
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,15 +8,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
@@ -40,6 +44,8 @@ fun ItemDetailPopup(
     onUpdateItem: (ItemEntity) -> Unit,
     onUpdateBatch: (List<ItemBatchEntity>, Int, Int) -> Unit
 ) {
+    val role = loginViewModel.userRole
+
     var imageUri by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.imageUri) }
     var name by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.name) }
     var unitThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.unitThreshold) }
@@ -47,24 +53,7 @@ fun ItemDetailPopup(
     var expiryThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.expiryThreshold) }
     var description by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.description) }
 
-    var nameValid by rememberSaveable { mutableStateOf(true) }
-    var isStockThresholdValid by rememberSaveable { mutableStateOf(true) }
-    var expiryThresholdValid by rememberSaveable { mutableStateOf(true) }
-    var subUnitThresholdValid by rememberSaveable { mutableStateOf(true) }
-
-    val allValid = nameValid && isStockThresholdValid && expiryThresholdValid && subUnitThresholdValid
-
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    val context = LocalContext.current
-
-    DialogHost(
-        modifier = Modifier
-            .height(500.dp)
-            .width(800.dp),
-        useImePadding = true,
-        onDismissRequest = {
-            val updatedItem = itemModel.item.copy(
+    val updatedItem = itemModel.item.copy(
                 imageUri = imageUri,
                 name = name,
                 unitThreshold = unitThreshold,
@@ -72,26 +61,42 @@ fun ItemDetailPopup(
                 expiryThreshold = expiryThreshold,
                 description = description
             )
-            if (allValid && itemModel.item != updatedItem) {
-                when (loginViewModel.userRole) {
-                    UserRole.ADMIN -> {
-                        if (itemModel.item.subUnitThreshold != updatedItem.subUnitThreshold) {
-                            onUpdateBatch(
-                                itemModel.batch,
-                                itemModel.item.subUnitThreshold,
-                                updatedItem.subUnitThreshold
-                            )
-                        }
-                        onUpdateItem(updatedItem)
-                        Toast.makeText(context, "Item updated successfully", Toast.LENGTH_SHORT).show()
-                    }
-                    UserRole.STAFF -> {
-                        Toast.makeText(context, "You are not authorized to edit this item", Toast.LENGTH_SHORT).show()
-                    }
-                }
+
+    var nameValid by remember { mutableStateOf(true) }
+    var isStockThresholdValid by remember { mutableStateOf(true) }
+    var expiryThresholdValid by remember { mutableStateOf(true) }
+    var subUnitThresholdValid by remember { mutableStateOf(true) }
+
+    var showAlert by remember { mutableStateOf(false) }
+    var riskyFieldChanged by rememberSaveable { mutableStateOf(false) }
+    val doUpdate = itemModel.item != updatedItem
+    val allValid = nameValid && isStockThresholdValid && expiryThresholdValid && subUnitThresholdValid
+
+    fun checkRiskyChanges(): Boolean {
+        return itemModel.item.unitThreshold != updatedItem.unitThreshold ||
+                itemModel.item.subUnitThreshold != updatedItem.subUnitThreshold ||
+                itemModel.item.expiryThreshold != updatedItem.expiryThreshold
+    }
+
+    fun onUpdateItem() {
+        if (allValid && doUpdate) {
+            if (itemModel.item.subUnitThreshold != updatedItem.subUnitThreshold) {
+                onUpdateBatch(
+                    itemModel.batch,
+                    itemModel.item.subUnitThreshold,
+                    updatedItem.subUnitThreshold
+                )
             }
-            onDismiss()
-        },
+            onUpdateItem(updatedItem)
+        }
+    }
+
+    DialogHost(
+        modifier = Modifier
+            .height(500.dp)
+            .width(800.dp),
+        useImePadding = true,
+        onDismissRequest = { onDismiss() },
     ) {
         Column(
             modifier = Modifier
@@ -105,28 +110,28 @@ fun ItemDetailPopup(
                 Column(Modifier.weight(0.40f)) {
                     PhotoSelection(
                         image = imageUri,
-                        onPickImage = { imageUri = it })
-
+                        role = role,
+                        onPickImage = { if(role == UserRole.ADMIN) imageUri = it }
+                    )
+                    Text("ID: ${itemModel.item.id}")
                     StringField(
                         value = name,
-                        onValueChange = { name = it },
+                        onValueChange = { if(role == UserRole.ADMIN) name = it },
                         header = "Item Name",
                         placeholder = "Enter item name",
                         onValidationChange = { valid -> nameValid = valid },
-                        onDone = { keyboardController?.hide() }
+                        onDone = {  }
                     )
 
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         Column(Modifier.weight(1f)) {
                             IntField(
                                 value = unitThreshold,
-                                onValueChange = {
-                                    unitThreshold = it
-                                },
+                                onValueChange = { if(role == UserRole.ADMIN) unitThreshold = it },
                                 label = "Low Stock Threshold",
                                 placeholder = "Enter threshold",
                                 onValidityChange = { isStockThresholdValid = it },
-                                onDone = { keyboardController?.hide() }
+                                onDone = {  }
                             )
                         }
                         Column(Modifier.weight(1f)) {
@@ -137,8 +142,8 @@ fun ItemDetailPopup(
                                 },
                                 label = "Expiry Threshold",
                                 placeholder = "Enter threshold",
-                                onValidityChange = { expiryThresholdValid = it },
-                                onDone = { keyboardController?.hide() }
+                                onValidityChange = { if(role == UserRole.ADMIN) expiryThresholdValid = it },
+                                onDone = {  }
                             )
                         }
                     }
@@ -149,15 +154,36 @@ fun ItemDetailPopup(
                         },
                         label = "Sub Unit",
                         placeholder = "Enter threshold",
-                        onValidityChange = { subUnitThresholdValid = it },
-                        onDone = { keyboardController?.hide() }
+                        onValidityChange = { if(role == UserRole.ADMIN) subUnitThresholdValid = it },
+                        onDone = { }
                     )
+                    if(itemModel.item.subUnitThreshold > subUnitThreshold){
+                        Text(
+                            text = "⚠️ Lowering this value reduces precision. Existing stock will be converted to larger units.",
+                            color = Color.Red,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    Spacer(Modifier.weight(1f))
+                    Button(onClick = {
+                        riskyFieldChanged = checkRiskyChanges()
+                        if (riskyFieldChanged) {
+                            showAlert = true
+                        } else {
+                            onUpdateItem()
+                            onDismiss()
+                        }
+                    },
+                        enabled = allValid && doUpdate
+                    ) {
+                        Text("Update Item")
+                    }
                 }
 
                 Column(Modifier.weight(0.60f)) {
                     DescriptionField(
                         value = description,
-                        onValueChange = { description = it },
+                        onValueChange = { if(role == UserRole.ADMIN) description = it },
                         modifier = Modifier.weight(0.45f)
                     )
 
@@ -170,5 +196,22 @@ fun ItemDetailPopup(
                 }
             }
         }
+    }
+    if (showAlert) {
+        AlertDialog(
+            onDismissRequest = { showAlert = false },
+            title = { Text("Confirm Risky Update") },
+            text = { Text("⚠️ Updating thresholds or expiry may affect stock alerts and batch logic. Proceed?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    onUpdateItem()
+                    showAlert = false
+                    onDismiss()
+                }) { Text("Yes, Update") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showAlert = false }) { Text("Cancel") }
+            }
+        )
     }
 }

@@ -10,7 +10,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.presentation.home.component.ExpiryLevels
@@ -18,10 +17,7 @@ import com.android.inventorytracker.presentation.home.component.Header
 import com.android.inventorytracker.presentation.home.component.StockLevels
 import com.android.inventorytracker.presentation.home.component.QuickActions
 import com.android.inventorytracker.presentation.home.viewmodel.HomeViewModel
-
-// --- iOS-Inspired White/Beige Palette ---
-private val iOSBackgroundLight = Color(0xFFF2F2F7)
-private val iOSCardWhite = Color(0xFFFFFFFF)
+import com.android.inventorytracker.ui.theme.Palette
 
 @Composable
 fun Home(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = hiltViewModel()) {
@@ -31,8 +27,8 @@ fun Home(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = hiltViewM
     Surface(
         modifier = modifier
             .fillMaxSize()
-            .background(iOSBackgroundLight),
-        color = iOSBackgroundLight
+            .background(Palette.iOSBackgroundLight),
+        color = Palette.iOSBackgroundLight
     ) {
         Column(
             modifier = Modifier
@@ -43,8 +39,7 @@ fun Home(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = hiltViewM
             // 1. Header
             Header()
 
-            // 2. Quick Actions - FIX: WRAPPING IN BOX TO APPLY MODIFIER
-            // This ensures QuickActions still fills the width even if it doesn't take a Modifier param.
+
             Box(modifier = Modifier.fillMaxWidth()) {
                 QuickActions()
             }
@@ -72,7 +67,7 @@ fun Home(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = hiltViewM
                         shape = RoundedCornerShape(32.dp),
                         tonalElevation = 0.dp,
                         shadowElevation = 8.dp,
-                        color = iOSCardWhite
+                        color = Palette.iOSCardWhite
                     ) {
                         Box(
                             modifier = Modifier
@@ -91,7 +86,7 @@ fun Home(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = hiltViewM
                         shape = RoundedCornerShape(32.dp),
                         tonalElevation = 0.dp,
                         shadowElevation = 8.dp,
-                        color = iOSCardWhite
+                        color = Palette.iOSCardWhite
                     ) {
                         Box(
                             modifier = Modifier

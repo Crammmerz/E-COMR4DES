@@ -17,45 +17,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.unit.sp
-import com.android.inventorytracker.R // Ensure R is imported for font reference
 import com.android.inventorytracker.data.model.ItemModel
-
-// --- Pure White & Beige Palette (Uniform with Login.kt) ---
-private val PureWhite = Color(0xFFFFFFFF)        // Card background
-private val DarkBeigeText = Color(0xFF523F31)    // Dark text (Primary contrast)
-private val LightBeigeText = Color(0xFF796254)   // Lighter text (Subtle details)
-private val BeigeProgressTrack = Color(0xFFEEEAE5) // Very light beige/off-white for progress bar track
+import com.android.inventorytracker.ui.theme.Palette
 
 // --- Google Sans Font Family Definition ---
-private val GoogleSans = FontFamily(
-    Font(R.font.google_sans_regular, FontWeight.Normal),
-    Font(R.font.google_sans_medium, FontWeight.Medium),
-    Font(R.font.google_sans_semibold, FontWeight.SemiBold)
-)
 
 @Composable
 fun StockLevels(modifier: Modifier, itemModel: List<ItemModel>){
 
     Column(modifier = modifier
-        .background(PureWhite)
+        .background(Palette.PureWhite)
         .padding(24.dp)
     ){
         // Header Text
         Text(
             text = "Stocks",
             style = TextStyle(
-                fontFamily = GoogleSans,
                 fontWeight = FontWeight.SemiBold, // SemiBold for header
                 fontSize = 24.sp,
-                color = DarkBeigeText
+                color = Palette.DarkBeigeText
             )
         )
 
@@ -74,10 +60,9 @@ fun StockLevels(modifier: Modifier, itemModel: List<ItemModel>){
                     Text(
                         model.item.name,
                         style = TextStyle(
-                            fontFamily = GoogleSans,
                             fontWeight = FontWeight.Medium, // Medium for item name
                             fontSize = 16.sp,
-                            color = DarkBeigeText
+                            color = Palette.DarkBeigeText
                         )
                     )
 
@@ -94,7 +79,7 @@ fun StockLevels(modifier: Modifier, itemModel: List<ItemModel>){
                                 .clip(RoundedCornerShape(8.dp))
                                 .height(8.dp),
                             color = model.stockColor, // Retain model's color for visual alert
-                            trackColor = BeigeProgressTrack // Use light beige track color
+                            trackColor = Palette.BeigeProgressTrack // Use light beige track color
                         )
 
                         // Count Text
@@ -103,10 +88,9 @@ fun StockLevels(modifier: Modifier, itemModel: List<ItemModel>){
                             modifier = Modifier.width(100.dp),
                             textAlign = TextAlign.End,
                             style = TextStyle(
-                                fontFamily = GoogleSans,
                                 fontWeight = FontWeight.Normal, // Regular for detail count
                                 fontSize = 14.sp,
-                                color = LightBeigeText // Use light beige for subtle count text
+                                color = Palette.LightBeigeText // Use light beige for subtle count text
                             )
                         )
                     }

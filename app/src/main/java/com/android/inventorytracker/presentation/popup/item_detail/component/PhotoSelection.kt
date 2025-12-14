@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -23,11 +21,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import coil.compose.rememberAsyncImagePainter
 import com.android.inventorytracker.R
+import com.android.inventorytracker.data.model.UserRole
 
 @Composable
 fun PhotoSelection(
     modifier: Modifier = Modifier,
     image: String?,
+    role: UserRole,
     onPickImage: (String?) -> Unit
 ) {
     val context = LocalContext.current
@@ -57,7 +57,7 @@ fun PhotoSelection(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         TextButton(
-            onClick = { launcher.launch(arrayOf("image/*")) }, // OpenDocument expects MIME types array
+            onClick = { if(role == UserRole.ADMIN) launcher.launch(arrayOf("image/*")) }, // OpenDocument expects MIME types array
             modifier = Modifier.fillMaxSize().background(Color.Transparent)
         ) {
             if (imageUri != null) {

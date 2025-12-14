@@ -63,7 +63,7 @@ fun Inventory(
         LazyColumn(
             modifier = Modifier
                 .weight(1f)
-                .padding(horizontal = 16.dp), // 👈 ADD THIS
+                .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
         items(itemModels, key = { it.item.id }) {

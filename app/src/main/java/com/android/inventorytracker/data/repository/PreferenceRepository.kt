@@ -5,5 +5,8 @@ interface PreferencesRepository {
     fun isAuthEnabled(): Boolean
     fun setRoleAuthEnabled(enabled: Boolean)
     fun isRoleAuthEnabled(): Boolean
+
+    fun setCsvConfirmation(show: Boolean)
+    fun shouldShowConfirmation(): Boolean
 }
 

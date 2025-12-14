@@ -36,15 +36,12 @@ fun Home(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = hiltViewM
                 .padding(horizontal = 40.dp, vertical = 32.dp),
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
-            // 1. Header
             Header()
-
 
             Box(modifier = Modifier.fillMaxWidth()) {
                 QuickActions()
             }
 
-            // 3. Main Dashboard Cards Row (Expiry and Stock)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -52,7 +49,6 @@ fun Home(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = hiltViewM
                 horizontalArrangement = Arrangement.spacedBy(32.dp),
                 verticalAlignment = Alignment.Top
             ) {
-                // Expiry Dashboard Card
                 if (expiryItems.isEmpty() && stockItems.isEmpty()) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -60,7 +56,6 @@ fun Home(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = hiltViewM
                     ) {
                         CircularProgressIndicator()
                     }
-
                 } else {
                     Surface(
                         modifier = Modifier.weight(1f),

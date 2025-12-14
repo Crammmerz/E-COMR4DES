@@ -24,8 +24,6 @@ fun ConfirmButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    // The previous error "No parameter with name 'containerColor' found." is fixed here
-    // by having this parameter defined.
     containerColor: Color = MaterialTheme.colorScheme.primary,
     enabled: Boolean = true
 ) {
@@ -43,9 +41,6 @@ fun ConfirmButton(
         Text(text)
     }
 }
-// --- STYLING THE CANCEL BUTTON ---
-// To match the cozy/professional theme, let's style the Cancel Button as a secondary,
-// transparent/outlined button, which is standard practice.
 val SecondaryButtonTextColor = Color(0xFF4A3B32) // Dark Brown
 
 @Composable
@@ -63,7 +58,6 @@ fun CancelButton(text: String = "Cancel",onClick: () -> Unit){
     }
 }
 
-// LeftButton, RightButton, and CenterButton remain unchanged as they were not the focus.
 @Composable
 fun LeftButton(
     label: String,
@@ -121,30 +115,5 @@ fun RightButton(
         ) {
             Text(modifier = Modifier.padding(horizontal = 10.dp), text = label)
         }
-    }
-}
-
-@Composable
-fun CenterButton(
-    label: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    bgColor: Color = Color.Gray,
-    contentColor: Color = Color.White,
-    enabled: Boolean = true,
-) {
-    Button(
-        onClick = onClick,
-        enabled = enabled,
-        shape = RoundedCornerShape(5.dp),
-        contentPadding = PaddingValues(0.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = bgColor,
-            contentColor = contentColor
-        ),
-        modifier = modifier
-            .height(30.dp),
-    ) {
-        Text(text = label)
     }
 }

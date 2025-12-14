@@ -2,6 +2,7 @@ package com.android.inventorytracker.data.repository
 
 import android.content.Context
 import com.android.inventorytracker.data.preferences.AuthPreferences
+import com.android.inventorytracker.data.preferences.CsvPreference
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -13,9 +14,13 @@ class PreferencesRepositoryImpl @Inject constructor(
         AuthPreferences.setAuthEnabled(context, enabled)
     override fun isAuthEnabled(): Boolean =
         AuthPreferences.isAuthEnabled(context)
-
     override fun setRoleAuthEnabled(enabled: Boolean) =
         AuthPreferences.setRoleAuthEnabled(context, enabled)
     override fun isRoleAuthEnabled(): Boolean =
         AuthPreferences.isRoleAuthEnabled(context)
+
+    override fun setCsvConfirmation(show: Boolean) =
+        CsvPreference.setShowConfirmation(context, show)
+    override fun shouldShowConfirmation(): Boolean =
+        CsvPreference.shouldShowConfirmation(context)
 }

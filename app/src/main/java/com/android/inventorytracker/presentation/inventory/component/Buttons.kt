@@ -36,7 +36,6 @@ fun AddNewItemButton(onClick: () -> Unit) {
         Text("Add new Item")
     }
 }
-
 @Composable
 fun DeleteItemButton(
     onClick: () -> Unit,
@@ -73,7 +72,6 @@ fun DeleteItemButton(
         )
     }
 }
-
 
 @Composable
 fun ItemButton(

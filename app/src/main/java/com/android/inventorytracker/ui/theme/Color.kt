@@ -43,5 +43,7 @@ object Palette {
     val LightBeigeField = Color(0xFFF2ECE6) // For the read-only text fields
     val AlertRed = Color(0xFFD32F2F)       // For "Remove" button
 
+    val PopupSurface = Color(0xFFFFF9F5)
+    val ButtonDarkBrown = Color(0xFF4A3B32)
 }
 

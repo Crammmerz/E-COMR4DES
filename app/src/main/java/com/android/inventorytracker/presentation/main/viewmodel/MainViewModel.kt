@@ -18,4 +18,9 @@ class MainViewModel @Inject constructor(): ViewModel() {
     private val _showNavBar = MutableStateFlow(false)
     val showNavBar: StateFlow<Boolean> = _showNavBar
     fun setNavBar(b: Boolean) { _showNavBar.value = b }
+
+    private val _showNotif = MutableStateFlow(false)
+    val showNotif: StateFlow<Boolean> = _showNotif
+
+    fun setNotif(b: Boolean) { _showNotif.value = b }
 }

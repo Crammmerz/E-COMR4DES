@@ -43,8 +43,9 @@ data class ItemModel(
     val isExpiringSoon: Boolean = nearestExpiryDate?.isBefore(
         LocalDate.now().plusDays(item.expiryThreshold.toLong())
     ) == true
-
+    val hasExpired: Boolean = nearestExpiryDate?.isBefore(LocalDate.now()) == true
     val isLowStock: Boolean = totalUnit() <= item.unitThreshold * 0.20
+    val hasNoStock: Boolean = totalUnit() <= 0.0
 
     val expiryMessage: String = when {
         daysLeft == null -> "N/A"

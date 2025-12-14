@@ -11,19 +11,19 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val preferencesRepository: PreferencesRepository,
+    private val preferenceRepo: PreferencesRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
-    private val _authEnabled = MutableStateFlow(preferencesRepository.isAuthEnabled())
+    private val _authEnabled = MutableStateFlow(preferenceRepo.isAuthEnabled())
     val authEnabled: StateFlow<Boolean> = _authEnabled
-    private val _roleAuthEnabled = MutableStateFlow(preferencesRepository.isRoleAuthEnabled())
+    private val _roleAuthEnabled = MutableStateFlow(preferenceRepo.isRoleAuthEnabled())
     val roleAuthEnabled: StateFlow<Boolean> = _roleAuthEnabled
     fun toggleAuth(enabled: Boolean) {
-        preferencesRepository.setAuthEnabled(enabled)
+        preferenceRepo.setAuthEnabled(enabled)
         _authEnabled.value = enabled
     }
     fun toggleRoleAuth(enabled: Boolean) {
-        preferencesRepository.setRoleAuthEnabled(enabled)
+        preferenceRepo.setRoleAuthEnabled(enabled)
         _roleAuthEnabled.value = enabled
     }
     suspend fun updateUser(user: UserEntity, newPass: String): Boolean {

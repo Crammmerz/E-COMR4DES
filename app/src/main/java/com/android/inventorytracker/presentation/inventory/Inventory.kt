@@ -27,7 +27,6 @@ fun Inventory(
     batchViewModel: BatchViewModel = hiltViewModel(),
     loginViewModel: LoginViewModel = hiltViewModel()
 ) {
-    // ✅ UPDATED BACKGROUND COLOR
     val BackgroundColor = Color(0xFFFEF7ED)
 
     val itemModels by itemViewModel.itemModelList.collectAsState()
@@ -38,9 +37,14 @@ fun Inventory(
         modifier = Modifier
             .fillMaxSize()
             .background(BackgroundColor)
-            .padding(5.dp)
+            .padding(vertical = 8.dp)
     ) {
+
+        /* 🔹 HEADER ROW (ALIGNED WITH LIST ITEMS) */
         Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp), // ✅ MATCH ITEM ROW PADDING
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -54,19 +58,23 @@ fun Inventory(
 
             Spacer(Modifier.weight(1f))
 
-            SearchField(Modifier.width(275.dp))
+            SearchField(Modifier.width(260.dp))
             SortDropdownMenu()
         }
 
-        HeaderSection()
+        Spacer(modifier = Modifier.height(8.dp))
+
+        HeaderSection(
+            modifier = Modifier.padding(horizontal = 16.dp) // ✅ align headers too
+        )
 
         LazyColumn(
             modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 16.dp),
+                .fillMaxSize()
+                .padding(horizontal = 16.dp), // ✅ SAME AS HEADER
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-        items(itemModels, key = { it.item.id }) {
+            items(itemModels, key = { it.item.id }) {
                 ItemDataRow(
                     model = it,
                     itemViewModel = itemViewModel,

@@ -117,6 +117,8 @@ fun ItemDataRow(
         }
     }
 
+    /* ---------------- POPUPS (UNCHANGED SIGNATURES) ---------------- */
+
     if (showItemDetail) {
         ItemDetailPopup(
             itemModel = model,
@@ -141,6 +143,8 @@ fun ItemDataRow(
         )
     }
 }
+
+/* ---------------- ITEM TEXT (UPDATED VISUALS ONLY) ---------------- */
 
 @Composable
 fun ItemText(

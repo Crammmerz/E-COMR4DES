@@ -15,7 +15,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.layout.size
-
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.PaddingValues
 
 private val AccentColor = Color(0xFF5D4037)
 
@@ -75,22 +76,30 @@ fun DeleteItemButton(
 fun ItemButton(
     text: String,
     enabled: Boolean = true,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Button(
         onClick = onClick,
         enabled = enabled,
-        modifier = modifier.shadow(4.dp, RoundedCornerShape(8.dp)),
-        shape = RoundedCornerShape(8.dp),
+        modifier = modifier
+            .height(40.dp), // ✅ MATCH ItemText height
+        shape = RoundedCornerShape(6.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = AccentColor,
+            containerColor = Color(0xFF5D4037),
             contentColor = Color.White,
-            disabledContainerColor = AccentColor,   // 👈 keep brown
-            disabledContentColor = Color.White      // 👈 keep white
-        )
+            disabledContainerColor = Color(0xFF5D4037),
+            disabledContentColor = Color.White
+        ),
+        contentPadding = PaddingValues(horizontal = 12.dp)
     ) {
-        Text(text, fontSize = 12.sp)
+        Text(
+            text = text,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1
+        )
     }
 }
+
 

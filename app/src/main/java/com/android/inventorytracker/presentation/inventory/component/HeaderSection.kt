@@ -1,56 +1,57 @@
 package com.android.inventorytracker.presentation.inventory.component
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun HeaderSection() {
-    val headerColor = Color(0xFF463D35)
-
+fun HeaderSection(
+    modifier: Modifier = Modifier
+) {
     Row(
-        modifier = Modifier.padding(horizontal = 5.dp),
-        horizontalArrangement = Arrangement.spacedBy(5.dp)
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp)
     ) {
+
         Text(
             text = "Image",
-            color = headerColor,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 13.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.width(64.dp)
+            modifier = Modifier.weight(1f),
+            fontSize = 12.sp,
+            textAlign = TextAlign.Center
         )
 
         Text(
             text = "Item Name",
-            color = headerColor,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 13.sp,
-            modifier = Modifier.weight(0.75f)
+            modifier = Modifier.weight(3f),
+            fontSize = 12.sp,
+            textAlign = TextAlign.Center
         )
 
         Text(
             text = "Expiry",
-            color = headerColor,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 13.sp,
-            modifier = Modifier.weight(0.5f)
+            modifier = Modifier.weight(2f),
+            fontSize = 12.sp,
+            textAlign = TextAlign.Center
         )
 
         Text(
             text = "Unit",
-            color = headerColor,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 13.sp,
-            modifier = Modifier.weight(0.5f)
+            modifier = Modifier.weight(1f),
+            fontSize = 12.sp,
+            textAlign = TextAlign.Center
         )
 
-        Spacer(Modifier.weight(1f))
+        // Actions column ( + / - / View More )
+        Text(
+            text = "",
+            modifier = Modifier.weight(3f)
+        )
     }
 }

@@ -6,6 +6,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -53,32 +55,34 @@ fun PhotoSelection(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.4f),
+            .fillMaxHeight(0.4f)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                enabled = role == UserRole.ADMIN
+            ) {
+                launcher.launch(arrayOf("image/*"))
+            },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        TextButton(
-            onClick = { if(role == UserRole.ADMIN) launcher.launch(arrayOf("image/*")) }, // OpenDocument expects MIME types array
-            modifier = Modifier.fillMaxSize().background(Color.Transparent)
-        ) {
-            if (imageUri != null) {
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        model = imageUri,
-                        placeholder = painterResource(R.drawable.outline_add_photo_alternate_24),
-                        error = painterResource(R.drawable.outline_add_photo_alternate_24)
-                    ),
-                    contentDescription = "Selected image",
-                    modifier = Modifier.fillMaxHeight(),
-                    contentScale = ContentScale.Crop ,
-                )
-            } else {
-                Image(
-                    painter = painterResource(R.drawable.outline_add_photo_alternate_24),
-                    contentDescription = "Placeholder image",
-                    modifier = Modifier.fillMaxHeight(),
-                    contentScale = ContentScale.Crop
-                )
-            }
+        if (imageUri != null) {
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = imageUri,
+                    placeholder = painterResource(R.drawable.outline_add_photo_alternate_24),
+                    error = painterResource(R.drawable.outline_add_photo_alternate_24)
+                ),
+                contentDescription = "Selected image",
+                modifier = Modifier.fillMaxHeight(),
+                contentScale = ContentScale.Crop,
+            )
+        } else {
+            Image(
+                painter = painterResource(R.drawable.outline_add_photo_alternate_24),
+                contentDescription = "Placeholder image",
+                modifier = Modifier.fillMaxHeight(),
+                contentScale = ContentScale.Crop
+            )
         }
     }
 }

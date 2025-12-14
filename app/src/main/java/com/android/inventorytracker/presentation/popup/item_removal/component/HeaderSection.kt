@@ -12,7 +12,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.Modifier
 
 private val CoffeeBrown = Color(0xFF5D4037)
 private val MutedText = Color(0xFF7A6A5F)

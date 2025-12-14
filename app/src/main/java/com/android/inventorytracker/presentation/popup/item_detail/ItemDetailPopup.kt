@@ -1,25 +1,11 @@
 package com.android.inventorytracker.presentation.popup.item_detail
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -29,11 +15,8 @@ import com.android.inventorytracker.data.local.entities.ItemEntity
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.data.model.UserRole
 import com.android.inventorytracker.presentation.login.viewmodel.LoginViewModel
-import com.android.inventorytracker.presentation.popup.item_detail.component.BatchExpirySection
-import com.android.inventorytracker.presentation.popup.item_detail.component.PhotoSelection
-import com.android.inventorytracker.presentation.shared.component.input_fields.DescriptionField
-import com.android.inventorytracker.presentation.shared.component.input_fields.IntField
-import com.android.inventorytracker.presentation.shared.component.input_fields.StringField
+import com.android.inventorytracker.presentation.popup.item_detail.component.*
+import com.android.inventorytracker.presentation.shared.component.input_fields.*
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
 
 @Composable
@@ -46,168 +29,159 @@ fun ItemDetailPopup(
 ) {
     val role = loginViewModel.userRole
 
-    var imageUri by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.imageUri) }
-    var name by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.name) }
-    var unitThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.unitThreshold) }
-    var subUnitThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.subUnitThreshold) }
-    var expiryThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.expiryThreshold) }
-    var description by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.description) }
+    var imageUri by rememberSaveable { mutableStateOf(itemModel.item.imageUri) }
+    var name by rememberSaveable { mutableStateOf(itemModel.item.name) }
+    var unitThreshold by rememberSaveable { mutableIntStateOf(itemModel.item.unitThreshold) }
+    var subUnitThreshold by rememberSaveable { mutableIntStateOf(itemModel.item.subUnitThreshold) }
+    var expiryThreshold by rememberSaveable { mutableIntStateOf(itemModel.item.expiryThreshold) }
+    var description by rememberSaveable { mutableStateOf(itemModel.item.description) }
 
     val updatedItem = itemModel.item.copy(
-                imageUri = imageUri,
-                name = name,
-                unitThreshold = unitThreshold,
-                subUnitThreshold = subUnitThreshold,
-                expiryThreshold = expiryThreshold,
-                description = description
-            )
-
-    var nameValid by remember { mutableStateOf(true) }
-    var isStockThresholdValid by remember { mutableStateOf(true) }
-    var expiryThresholdValid by remember { mutableStateOf(true) }
-    var subUnitThresholdValid by remember { mutableStateOf(true) }
+        imageUri = imageUri,
+        name = name,
+        unitThreshold = unitThreshold,
+        subUnitThreshold = subUnitThreshold,
+        expiryThreshold = expiryThreshold,
+        description = description
+    )
 
     var showAlert by remember { mutableStateOf(false) }
-    var riskyFieldChanged by rememberSaveable { mutableStateOf(false) }
     val doUpdate = itemModel.item != updatedItem
-    val allValid = nameValid && isStockThresholdValid && expiryThresholdValid && subUnitThresholdValid
-
-    fun checkRiskyChanges(): Boolean {
-        return itemModel.item.unitThreshold != updatedItem.unitThreshold ||
-                itemModel.item.subUnitThreshold != updatedItem.subUnitThreshold ||
-                itemModel.item.expiryThreshold != updatedItem.expiryThreshold
-    }
-
-    fun onUpdateItem() {
-        if (allValid && doUpdate) {
-            if (itemModel.item.subUnitThreshold != updatedItem.subUnitThreshold) {
-                onUpdateBatch(
-                    itemModel.batch,
-                    itemModel.item.subUnitThreshold,
-                    updatedItem.subUnitThreshold
-                )
-            }
-            onUpdateItem(updatedItem)
-        }
-    }
 
     DialogHost(
         modifier = Modifier
-            .height(500.dp)
-            .width(800.dp),
-        useImePadding = true,
-        onDismissRequest = { onDismiss() },
+            .width(850.dp)
+            .height(520.dp)
+            .background(Color(0xFFFEF7ED), RoundedCornerShape(14.dp)),
+        onDismissRequest = onDismiss,
+        useImePadding = true
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(10.dp)
-        ) {
+        Column(Modifier.fillMaxSize().padding(16.dp)) {
+
+            HeaderSection(itemModel)
+
+            Spacer(Modifier.height(12.dp))
+            HorizontalDivider(color = Color(0xFFE0E0E0))
+            Spacer(Modifier.height(16.dp))
+
             Row(
-                Modifier.weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Column(Modifier.weight(0.40f)) {
+
+                /* LEFT CARD */
+                Column(
+                    modifier = Modifier
+                        .weight(0.4f)
+                        .background(Color.White, RoundedCornerShape(12.dp))
+                        .padding(16.dp)
+                ) {
                     PhotoSelection(
                         image = imageUri,
                         role = role,
-                        onPickImage = { if(role == UserRole.ADMIN) imageUri = it }
-                    )
-                    Text("ID: ${itemModel.item.id}")
-                    StringField(
-                        value = name,
-                        onValueChange = { if(role == UserRole.ADMIN) name = it },
-                        header = "Item Name",
-                        placeholder = "Enter item name",
-                        onValidationChange = { valid -> nameValid = valid },
-                        onDone = {  }
+                        onPickImage = { if (role == UserRole.ADMIN) imageUri = it }
                     )
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Column(Modifier.weight(1f)) {
-                            IntField(
-                                value = unitThreshold,
-                                onValueChange = { if(role == UserRole.ADMIN) unitThreshold = it },
-                                label = "Low Stock Threshold",
-                                placeholder = "Enter threshold",
-                                onValidityChange = { isStockThresholdValid = it },
-                                onDone = {  }
-                            )
-                        }
-                        Column(Modifier.weight(1f)) {
-                            IntField(
-                                value = expiryThreshold,
-                                onValueChange = {
-                                    expiryThreshold = it
-                                },
-                                label = "Expiry Threshold",
-                                placeholder = "Enter threshold",
-                                onValidityChange = { if(role == UserRole.ADMIN) expiryThresholdValid = it },
-                                onDone = {  }
-                            )
-                        }
-                    }
-                    IntField(
-                        value = subUnitThreshold,
-                        onValueChange = {
-                            subUnitThreshold = it
-                        },
-                        label = "Sub Unit",
-                        placeholder = "Enter threshold",
-                        onValidityChange = { if(role == UserRole.ADMIN) subUnitThresholdValid = it },
-                        onDone = { }
+                    Spacer(Modifier.height(8.dp))
+                    Text("ID: ${itemModel.item.id}", style = MaterialTheme.typography.labelSmall)
+
+                    StringField(
+                        value = name,
+                        onValueChange = { if (role == UserRole.ADMIN) name = it },
+                        header = "Item Name",
+                        placeholder = "Enter item name",
+                        onValidationChange = {},
+                        onDone = {}
                     )
-                    if(itemModel.item.subUnitThreshold > subUnitThreshold){
-                        Text(
-                            text = "⚠️ Lowering this value reduces precision. Existing stock will be converted to larger units.",
-                            color = Color.Red,
-                            style = MaterialTheme.typography.bodySmall
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        IntField(
+                            value = unitThreshold,
+                            onValueChange = { if (role == UserRole.ADMIN) unitThreshold = it },
+                            label = "Low Stock Threshold",
+                            placeholder = "Threshold",
+                            onValidityChange = {},
+                            onDone = {}
+                        )
+                        IntField(
+                            value = expiryThreshold,
+                            onValueChange = { if (role == UserRole.ADMIN) expiryThreshold = it },
+                            label = "Expiry Threshold",
+                            placeholder = "Threshold",
+                            onValidityChange = {},
+                            onDone = {}
                         )
                     }
+
+                    IntField(
+                        value = subUnitThreshold,
+                        onValueChange = { if (role == UserRole.ADMIN) subUnitThreshold = it },
+                        label = "Sub Unit",
+                        placeholder = "Enter value",
+                        onValidityChange = {},
+                        onDone = {}
+                    )
+
+                    if (itemModel.item.subUnitThreshold > subUnitThreshold) {
+                        Text(
+                            "⚠ Lowering this may convert existing stock.",
+                            color = Color(0xFF8B0000),
+                            fontSize = MaterialTheme.typography.bodySmall.fontSize
+                        )
+                    }
+
                     Spacer(Modifier.weight(1f))
-                    Button(onClick = {
-                        riskyFieldChanged = checkRiskyChanges()
-                        if (riskyFieldChanged) {
+
+                    Button(
+                        onClick = {
                             showAlert = true
-                        } else {
-                            onUpdateItem()
-                            onDismiss()
-                        }
-                    },
-                        enabled = allValid && doUpdate
+                        },
+                        enabled = doUpdate,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF5D4037),
+                            contentColor = Color.White
+                        )
                     ) {
                         Text("Update Item")
                     }
                 }
 
-                Column(Modifier.weight(0.60f)) {
+                /* RIGHT CARD */
+                Column(
+                    modifier = Modifier
+                        .weight(0.6f)
+                        .background(Color.White, RoundedCornerShape(12.dp))
+                        .padding(16.dp)
+                ) {
                     DescriptionField(
                         value = description,
-                        onValueChange = { if(role == UserRole.ADMIN) description = it },
-                        modifier = Modifier.weight(0.45f)
+                        onValueChange = { if (role == UserRole.ADMIN) description = it },
+                        modifier = Modifier.weight(0.4f)
                     )
 
-                    Spacer(Modifier.height(10.dp))
+                    Spacer(Modifier.height(12.dp))
 
                     BatchExpirySection(
                         model = itemModel,
-                        modifier = Modifier.weight(0.55f)
+                        modifier = Modifier.weight(0.6f)
                     )
                 }
             }
         }
     }
+
     if (showAlert) {
         AlertDialog(
             onDismissRequest = { showAlert = false },
-            title = { Text("Confirm Risky Update") },
-            text = { Text("⚠️ Updating thresholds or expiry may affect stock alerts and batch logic. Proceed?") },
+            title = { Text("Confirm Update") },
+            text = { Text("This change may affect existing stock. Proceed?") },
             confirmButton = {
                 TextButton(onClick = {
-                    onUpdateItem()
+                    onUpdateItem(updatedItem)
                     showAlert = false
                     onDismiss()
-                }) { Text("Yes, Update") }
+                }) { Text("Confirm") }
             },
             dismissButton = {
                 TextButton(onClick = { showAlert = false }) { Text("Cancel") }

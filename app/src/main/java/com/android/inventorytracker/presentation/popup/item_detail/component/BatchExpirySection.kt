@@ -13,70 +13,41 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.inventorytracker.data.model.ItemModel
+import androidx.compose.foundation.layout.fillMaxSize
 
 @Composable
-fun BatchExpirySection(
-    model: ItemModel,
-    modifier: Modifier
-){
-    Column (modifier = modifier.fillMaxWidth()) {
+fun BatchExpirySection(model: ItemModel, modifier: Modifier) {
+    Column(modifier = modifier.fillMaxWidth()) {
         Text(
-            text = "Batch Expiry Information",
-            color = Color.DarkGray,
+            "Batch Expiry Information",
             fontWeight = FontWeight.SemiBold,
             fontSize = 15.sp,
-            modifier = Modifier.padding(horizontal= 5.dp)
+            modifier = Modifier.padding(bottom = 8.dp)
         )
-        Column (
+
+        Column(
             modifier = Modifier
-                .weight(1f)
-                .background(Color.White)
-                .clip(RoundedCornerShape(10.dp))
-                .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
+                .fillMaxSize()
+                .background(Color(0xFFF8F8F8), RoundedCornerShape(10.dp))
+                .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(10.dp))
         ) {
-            Row (Modifier.padding(horizontal = 10.dp, vertical = 5.dp)) {
-                Text(
-                    text = "Expiry Date",
-                    color = Color.Black,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 14.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(0.5f)
-                )
-                Text(
-                    text = "Unit",
-                    color = Color.Black,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.weight(0.25f)
-                )
-                Text(
-                    text = "Sub Unit",
-                    color = Color.Black,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 14.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.weight(0.25f)
-                )
+            Row(Modifier.padding(10.dp)) {
+                Text("Expiry Date", Modifier.weight(0.5f))
+                Text("Unit", Modifier.weight(0.25f), textAlign = TextAlign.Center)
+                Text("Sub Unit", Modifier.weight(0.25f), textAlign = TextAlign.Center)
             }
-            HorizontalDivider(color = Color.Black, thickness = 1.dp)
-            if(model.batch.isNotEmpty()){
-                LazyColumn(Modifier.padding(horizontal = 5.dp)) {
-                    items(items = model.batch, key = {it.id}){ batch ->
-                        BatchDataRow(model.item.subUnitThreshold,batch)
-                    }
+
+            HorizontalDivider(color = Color(0xFFE0E0E0))
+
+            LazyColumn {
+                items(model.batch, key = { it.id }) {
+                    BatchDataRow(model.item.subUnitThreshold, it)
                 }
             }
         }

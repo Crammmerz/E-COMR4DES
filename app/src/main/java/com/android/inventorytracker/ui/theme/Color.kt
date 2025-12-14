@@ -36,7 +36,12 @@ object Palette {
 
     val BeigeProgressTrack = Color(0xFFEEEAE5)
 
-//TODO: Define the Color Here
+    val MainBackground = Color(0xFFFFF9F5) // Very light cream
+    val SurfaceWhite = Color(0xFFFFFFFF)
+    val DarkBrown = Color(0xFF4A3B32)      // For "Add Stocks" button and Text
+    val AccentBrown = Color(0xFFCca57d)    // For the "Current" stock highlight
+    val LightBeigeField = Color(0xFFF2ECE6) // For the read-only text fields
+    val AlertRed = Color(0xFFD32F2F)       // For "Remove" button
 
 }
 

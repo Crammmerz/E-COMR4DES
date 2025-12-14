@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+// ADD THIS IMPORT TO RESOLVE 'MaterialTheme'
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,17 +20,50 @@ import androidx.compose.ui.unit.dp
 
 //TODO: Button Design
 @Composable
-fun ConfirmButton(text: String = "Confirm", onClick: () -> Unit){
-    Button(onClick = onClick) {
+fun ConfirmButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    // The previous error "No parameter with name 'containerColor' found." is fixed here
+    // by having this parameter defined.
+    containerColor: Color = MaterialTheme.colorScheme.primary,
+    enabled: Boolean = true
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        shape = RoundedCornerShape(8.dp), // Using rounded corners consistent with theme
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor, // Using the custom color
+            contentColor = Color.White // Ensures white text for dark backgrounds
+        ),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
+    ) {
         Text(text)
     }
 }
+// --- STYLING THE CANCEL BUTTON ---
+// To match the cozy/professional theme, let's style the Cancel Button as a secondary,
+// transparent/outlined button, which is standard practice.
+val SecondaryButtonTextColor = Color(0xFF4A3B32) // Dark Brown
+
 @Composable
 fun CancelButton(text: String = "Cancel",onClick: () -> Unit){
-    Button(onClick = onClick) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Transparent, // Transparent background
+            contentColor = SecondaryButtonTextColor // Dark Brown text
+        ),
+        shape = RoundedCornerShape(8.dp),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp) // Flat look
+    ) {
         Text(text)
     }
 }
+
+// LeftButton, RightButton, and CenterButton remain unchanged as they were not the focus.
 @Composable
 fun LeftButton(
     label: String,
@@ -113,5 +148,3 @@ fun CenterButton(
         Text(text = label)
     }
 }
-
-

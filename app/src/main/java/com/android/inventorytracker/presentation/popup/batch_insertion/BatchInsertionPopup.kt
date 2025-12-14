@@ -14,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -32,6 +33,9 @@ import com.android.inventorytracker.util.onUnitChange
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+
+// Define the Dark Brown color for the button (copied from InsertItemPopup.kt)
+val ButtonDarkBrown = Color(0xFF4A3B32)
 
 @Composable
 fun BatchInsertionPopup(
@@ -124,15 +128,21 @@ fun BatchInsertionPopup(
 
             Row {
                 CancelButton(onClick = { onDismiss() })
-                ConfirmButton("Add Stock") {
-                    when {
-                        !validDate ->
-                            Toast.makeText(context, "Please enter a valid date", Toast.LENGTH_SHORT).show()
-                        !validUnit ->
-                            Toast.makeText(context, "Please enter valid unit/subunit", Toast.LENGTH_SHORT).show()
-                        valid -> onSubmit = true
+
+                // FIX APPLIED: Explicitly define the onClick parameter and apply the theme color
+                ConfirmButton(
+                    text = "Add Stock",
+                    containerColor = ButtonDarkBrown, // Apply theme color
+                    onClick = {
+                        when {
+                            !validDate ->
+                                Toast.makeText(context, "Please enter a valid date", Toast.LENGTH_SHORT).show()
+                            !validUnit ->
+                                Toast.makeText(context, "Please enter valid unit/subunit", Toast.LENGTH_SHORT).show()
+                            valid -> onSubmit = true
+                        }
                     }
-                }
+                )
             }
         }
     }

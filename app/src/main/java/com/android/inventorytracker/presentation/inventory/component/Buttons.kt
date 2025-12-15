@@ -1,87 +1,105 @@
 package com.android.inventorytracker.presentation.inventory.component
 
-
-
-import androidx.compose.foundation.layout.Arrangement
-
-import androidx.compose.foundation.layout.Column
-
-import androidx.compose.foundation.layout.fillMaxSize
-
-import androidx.compose.foundation.layout.fillMaxWidth
-
-import androidx.compose.foundation.layout.padding
-
-import androidx.compose.material3.Button
-
-import androidx.compose.material3.Text
-
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-
 import androidx.compose.ui.Modifier
-
-import androidx.compose.ui.tooling.preview.Preview
-
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.PaddingValues
 
+private val AccentColor = Color(0xFF5D4037)
 
 
 @Composable
-
 fun AddNewItemButton(onClick: () -> Unit) {
-
     Button(
-
-        onClick = onClick //TODO: Design The Button
-
+        onClick = onClick,
+        modifier = Modifier.shadow(4.dp, RoundedCornerShape(8.dp)),
+        shape = RoundedCornerShape(8.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = AccentColor,
+            contentColor = Color.White
+        )
     ) {
-
         Text("Add new Item")
-
     }
-
 }
-
-
-
 @Composable
+fun DeleteItemButton(
+    onClick: () -> Unit,
+    enabled: Boolean
+) {
+    val dangerRed = Color(0xFF5D4037) // clean red (Material danger-like)
 
-fun DeleteItemButton(onClick: () -> Unit, enabled: Boolean){
-
-    Button(
-
-        onClick = onClick, //TODO: Design The Button
-
-        enabled = enabled
-
-    ) {
-
-        Text("Remove Item")
-
-    }
-
-}
-
-
-
-@Composable
-
-fun ItemButton(text: String, enabled: Boolean = true, modifier: Modifier, onClick: () -> Unit) {
-
-    Button(
-
-        modifier = modifier,
-
+    OutlinedButton(
+        onClick = onClick,
         enabled = enabled,
-
-        onClick = onClick, //TODO: Design The Button
-
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, dangerRed),
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = dangerRed,
+            disabledContentColor = dangerRed,
+            containerColor = Color.White,
+            disabledContainerColor = Color.White
+        )
     ) {
+        Icon(
+            imageVector = Icons.Outlined.Delete,
+            contentDescription = "Remove",
+            tint = dangerRed,
+            modifier = Modifier.size(18.dp)
+        )
 
-        Text(text, fontSize = 12.sp,)
+        Spacer(modifier = Modifier.width(6.dp))
 
+        Text(
+            text = "Remove Items",
+            color = dangerRed,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold
+        )
     }
-
 }
+
+@Composable
+fun ItemButton(
+    text: String,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = modifier
+            .height(40.dp), // ✅ MATCH ItemText height
+        shape = RoundedCornerShape(6.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFF5D4037),
+            contentColor = Color.White,
+            disabledContainerColor = Color(0xFF5D4037),
+            disabledContentColor = Color.White
+        ),
+        contentPadding = PaddingValues(horizontal = 12.dp)
+    ) {
+        Text(
+            text = text,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1
+        )
+    }
+}
+
+

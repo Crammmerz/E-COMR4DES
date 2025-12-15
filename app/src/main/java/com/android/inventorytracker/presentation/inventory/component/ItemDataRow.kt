@@ -153,7 +153,7 @@ fun ItemDataRow(
     if(showInsertBatch) {
         BatchInsertionPopup(
             itemModel = model,
-            onDismiss = { showInsertBatch = false },
+            onDismiss = { showInsertBatch = false }
         )
     }
     if(showDeleteBatch) {
@@ -193,6 +193,7 @@ fun DataFieldBox(
     }
 }
 
+// Helper for the small circle +/- buttons
 @Composable
 fun ActionButton(icon: ImageVector, onClick: () -> Unit, enabled: Boolean, modifier: Modifier) {
     IconButton(
@@ -203,7 +204,6 @@ fun ActionButton(icon: ImageVector, onClick: () -> Unit, enabled: Boolean, modif
         Icon(imageVector = icon, contentDescription = "")
     }
 }
-
 @Composable
 fun ViewMoreButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
     Box(

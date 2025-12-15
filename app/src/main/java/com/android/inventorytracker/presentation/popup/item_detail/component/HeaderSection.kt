@@ -1,8 +1,6 @@
 package com.android.inventorytracker.presentation.popup.item_detail.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,45 +18,25 @@ import com.android.inventorytracker.data.model.ItemModel
 
 
 @Composable
-fun HeaderSection(itemModel: ItemModel){
-    val totalUnit = itemModel.totalUnit()
-    val threshold = itemModel.item.unitThreshold
-    val darkRed = Color(0xFF8B0000)
-
-    val stockColor = when {//TODO: Adjust Colors
-        totalUnit == 0.0 -> Color.DarkGray
-        totalUnit <= threshold * 0.2 -> darkRed
-        else -> Color.White
-    }
-
+fun HeaderSection(itemModel: ItemModel) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        // TODO: Image or Icon Display
         Text(
-            text = "Item Details",
-            color = Color.Black,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 16.sp
+            "Item Details",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
         )
-        Spacer(modifier = Modifier.weight(1f))
-        Column (
+        Spacer(Modifier.weight(1f))
+        Column(
             modifier = Modifier
-                .border(1.dp, Color.Black, shape = RoundedCornerShape(10.dp))
-                .background(stockColor, shape = RoundedCornerShape(10.dp))
-                .padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .background(Color(0xFF5D4037), RoundedCornerShape(10.dp))
+                .padding(horizontal = 16.dp, vertical = 6.dp)
         ) {
+            Text("Current Stock", color = Color.White, fontSize = 10.sp)
             Text(
-                text = "Current Stocks",
-                color = Color.Black,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 10.sp
-            )
-            Text(
-                text = "${itemModel.totalUnitFormatted()} units",
-                color = Color.Black,
+                "${itemModel.totalUnitFormatted()} units",
+                color = Color.White,
                 fontWeight = FontWeight.Bold,
-                fontSize = 10.sp
+                fontSize = 12.sp
             )
         }
     }

@@ -29,7 +29,7 @@ import com.android.inventorytracker.data.model.UserRole
 fun PhotoSelection(
     modifier: Modifier = Modifier,
     image: String?,
-    role: UserRole,
+    enabled: Boolean,
     onPickImage: (String?) -> Unit
 ) {
     val context = LocalContext.current
@@ -59,7 +59,7 @@ fun PhotoSelection(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
-                enabled = role == UserRole.ADMIN
+                enabled = enabled
             ) {
                 launcher.launch(arrayOf("image/*"))
             },

@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -30,13 +32,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.android.inventorytracker.data.local.entities.ItemEntity
+import com.android.inventorytracker.presentation.popup.item_detail.component.PhotoSelection
 import com.android.inventorytracker.presentation.popup.item_insertion.component.HeaderSection
+import com.android.inventorytracker.presentation.popup.item_insertion.component.PhotoSelectionButton
 import com.android.inventorytracker.presentation.shared.component.input_fields.DescriptionField
 import com.android.inventorytracker.presentation.shared.component.input_fields.StringField
 import com.android.inventorytracker.presentation.shared.component.input_fields.IntField
 import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
 import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.ui.theme.Palette
+import com.android.inventorytracker.util.convertDaysToString
 
 // Define Theme Colors
 
@@ -48,6 +53,7 @@ fun InsertItemPopup(
 ) {
     val context = LocalContext.current
 
+    var imageUri by rememberSaveable { mutableStateOf<String?>(null) }
     var name by rememberSaveable { mutableStateOf("") }
     var unitThreshold by rememberSaveable { mutableIntStateOf(1) }
     var subUnitThreshold by rememberSaveable { mutableIntStateOf(1) }
@@ -67,15 +73,46 @@ fun InsertItemPopup(
     val focusExpiry = remember { FocusRequester() }
     val focusDescription = remember { FocusRequester() }
 
+    var annotation by remember{ mutableStateOf("") }
+
     LaunchedEffect(Unit) {
         focusName.requestFocus()
+    }
+    LaunchedEffect(expiryThreshold) {
+        annotation = if (expiryThresholdValid) {
+            convertDaysToString(expiryThreshold)
+        } else {
+            ""
+        }
+    }
+
+    fun doInsert(){
+        if (allValid) {
+            val item = ItemEntity(
+                imageUri = imageUri,
+                name = name.trim(),
+                unitThreshold = unitThreshold,
+                subUnitThreshold = subUnitThreshold,
+                expiryThreshold = expiryThreshold,
+                description = description.trim()
+            )
+            onInsert(item)
+            onDismiss()
+            Toast.makeText(context, "Item added!", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(
+                context,
+                "Please fill required fields",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
-                .fillMaxWidth(0.55f)
-                .fillMaxHeight(0.9f),
+                .width(300.dp)
+                .height(600.dp),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Palette.PopupSurface),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
@@ -90,9 +127,11 @@ fun InsertItemPopup(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     HeaderSection()
-
-                    // --- Input Fields ---
-
+                    PhotoSelectionButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        image = imageUri,
+                        onPickImage = { imageUri = it }
+                    )
                     StringField(
                         value = name,
                         onValueChange = { name = it },
@@ -124,7 +163,8 @@ fun InsertItemPopup(
                             value = expiryThreshold,
                             onValueChange = { expiryThreshold = it },
                             label = "Expiry Threshold",
-                            placeholder = "1",
+                            placeholder = "Enter threshold (Days)",
+                            annotation = annotation,
                             fieldModifier = Modifier.focusRequester(focusExpiry),
                             onValidityChange = { expiryThresholdValid = it },
                             onDone = { focusSubUnit.requestFocus() },
@@ -147,8 +187,8 @@ fun InsertItemPopup(
                         value = description,
                         onValueChange = { description = it },
                         modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .weight(1f),
                         fieldModifier = Modifier.focusRequester(focusDescription)
                     )
 
@@ -157,31 +197,10 @@ fun InsertItemPopup(
                     ) {
                         CancelButton(onClick = onDismiss)
 
-                        // Calls the updated ConfirmButton with the theme color
                         ConfirmButton(
                             "Add Item",
                             containerColor = Palette.ButtonDarkBrown,
-                            onClick = {
-                                if (allValid) {
-                                    val item = ItemEntity(
-                                        imageUri = null,
-                                        name = name.trim(),
-                                        unitThreshold = unitThreshold,
-                                        subUnitThreshold = subUnitThreshold,
-                                        expiryThreshold = expiryThreshold,
-                                        description = description.trim()
-                                    )
-                                    onInsert(item)
-                                    onDismiss()
-                                    Toast.makeText(context, "Item added!", Toast.LENGTH_SHORT).show()
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        "Please fill required fields",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
+                            onClick = { doInsert() },
                         )
                     }
                 }

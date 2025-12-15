@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -35,6 +36,7 @@ import com.android.inventorytracker.presentation.shared.component.input_fields.D
 import com.android.inventorytracker.presentation.shared.component.input_fields.IntField
 import com.android.inventorytracker.presentation.shared.component.input_fields.StringField
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
+import com.android.inventorytracker.util.convertDaysToString
 
 @Composable
 fun ItemDetailPopup(
@@ -52,6 +54,8 @@ fun ItemDetailPopup(
     var subUnitThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.subUnitThreshold) }
     var expiryThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.expiryThreshold) }
     var description by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.description) }
+
+    var annotation by remember{ mutableStateOf("") }
 
     val updatedItem = itemModel.item.copy(
                 imageUri = imageUri,
@@ -72,6 +76,13 @@ fun ItemDetailPopup(
     val doUpdate = itemModel.item != updatedItem
     val allValid = nameValid && isStockThresholdValid && expiryThresholdValid && subUnitThresholdValid
 
+    LaunchedEffect(expiryThreshold) {
+        annotation = if (expiryThresholdValid) {
+            convertDaysToString(expiryThreshold)
+        } else {
+            ""
+        }
+    }
     fun checkRiskyChanges(): Boolean {
         return itemModel.item.unitThreshold != updatedItem.unitThreshold ||
                 itemModel.item.subUnitThreshold != updatedItem.subUnitThreshold ||
@@ -110,7 +121,7 @@ fun ItemDetailPopup(
                 Column(Modifier.weight(0.40f)) {
                     PhotoSelection(
                         image = imageUri,
-                        role = role,
+                        enabled = role == UserRole.ADMIN,
                         onPickImage = { if(role == UserRole.ADMIN) imageUri = it }
                     )
                     Text("ID: ${itemModel.item.id}")
@@ -119,7 +130,7 @@ fun ItemDetailPopup(
                         onValueChange = { if(role == UserRole.ADMIN) name = it },
                         header = "Item Name",
                         placeholder = "Enter item name",
-                        onValidationChange = { valid -> nameValid = valid },
+                        onValidationChange = { nameValid = it },
                         onDone = {  }
                     )
 
@@ -137,24 +148,21 @@ fun ItemDetailPopup(
                         Column(Modifier.weight(1f)) {
                             IntField(
                                 value = expiryThreshold,
-                                onValueChange = {
-                                    expiryThreshold = it
-                                },
+                                onValueChange = { if(role == UserRole.ADMIN) expiryThreshold = it },
                                 label = "Expiry Threshold",
-                                placeholder = "Enter threshold",
-                                onValidityChange = { if(role == UserRole.ADMIN) expiryThresholdValid = it },
+                                placeholder = "Enter threshold (Days)",
+                                annotation = annotation,
+                                onValidityChange = {  expiryThresholdValid = it },
                                 onDone = {  }
                             )
                         }
                     }
                     IntField(
                         value = subUnitThreshold,
-                        onValueChange = {
-                            subUnitThreshold = it
-                        },
+                        onValueChange = { if(role == UserRole.ADMIN) subUnitThreshold = it },
                         label = "Sub Unit",
                         placeholder = "Enter threshold",
-                        onValidityChange = { if(role == UserRole.ADMIN) subUnitThresholdValid = it },
+                        onValidityChange = { subUnitThresholdValid = it },
                         onDone = { }
                     )
                     if(itemModel.item.subUnitThreshold > subUnitThreshold){

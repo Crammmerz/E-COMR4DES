@@ -1,5 +1,9 @@
 package com.android.inventorytracker.presentation.home.component
 
+import android.net.Uri
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -42,6 +46,19 @@ fun QuickActions(
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val model by itemViewModel.itemModelList.collectAsState(initial = emptyList())
+    var csvUri: String? by remember { mutableStateOf(null) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        val isCsv = uri?.toString()?.endsWith(".csv") ?: false
+        csvUri = if (isCsv) {
+            uri.toString()
+        } else {
+            null
+        }
+        Log.d("QuickActions", "CSV URI: $csvUri")
+    }
 
     var showAddStock by rememberSaveable { mutableStateOf(false) }
     var showRemoveStock by rememberSaveable { mutableStateOf(false) }
@@ -77,7 +94,10 @@ fun QuickActions(
             modifier = Modifier.weight(1f),
             bgColor = Palette.PureWhite,
             contentColor = Palette.DarkBeigeText,
-            onClick = { showAddCSV = true }
+            onClick = {
+                showAddCSV = true
+                if(!showCsvConfirmation) launcher.launch("text/*")
+            }
         )
 
         QuickActionButton(
@@ -85,7 +105,10 @@ fun QuickActions(
             modifier = Modifier.weight(1f),
             bgColor = Palette.PureWhite,
             contentColor = Palette.DarkBeigeText,
-            onClick = { showRemoveCSV = true }
+            onClick = {
+                showRemoveCSV = true
+                if(!showCsvConfirmation) launcher.launch("text/*")
+            }
         )
     }
 
@@ -97,64 +120,16 @@ fun QuickActions(
     }
 
     if (showAddCSV && showCsvConfirmation) {
-        var skipConfirmation by rememberSaveable { mutableStateOf(false) }
-
-        AlertDialog(
-            onDismissRequest = { showAddCSV = false },
-            title = { Text("Import CSV File (Add Stock)") },
-            text = {
-                Column {
-                    Text("Do you want to import data from this CSV file?")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(
-                            checked = skipConfirmation,
-                            onCheckedChange = { skipConfirmation = it }
-                        )
-                        Text("Don't ask me again")
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    homeViewModel.toggleImportConfirmation(!skipConfirmation)
-                    showAddCSV = false
-                }) { Text("Yes, Import") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showAddCSV = false }) { Text("Cancel") }
-            }
+        AddCsvConfirmation(
+            onDismiss = { showAddCSV = false },
+            onConfirm = { launcher.launch("text/*") }
         )
     }
 
     if (showRemoveCSV && showCsvConfirmation) {
-        var skipConfirmation by rememberSaveable { mutableStateOf(false) }
-
-        AlertDialog(
-            onDismissRequest = { showRemoveCSV = false },
-            title = { Text("Import CSV File (Remove Stock)") },
-            text = {
-                Column {
-                    Text("Would you like to open the file manager to select a CSV file for import?")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(
-                            checked = skipConfirmation,
-                            onCheckedChange = { skipConfirmation = it }
-                        )
-                        Text("Don't ask me again")
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    homeViewModel.toggleImportConfirmation(!skipConfirmation)
-                    showRemoveCSV = false
-                }) { Text("Yes, Import") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showRemoveCSV = false }) { Text("Cancel") }
-            }
+        DeductCsvConfirmation(
+            onDismiss = { showRemoveCSV = false },
+            onConfirm = { launcher.launch("text/*") },
         )
     }
 }

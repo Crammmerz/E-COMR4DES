@@ -40,6 +40,7 @@ fun IntField(
     onDone: () -> Unit = {},
     label: String,
     placeholder: String,
+    annotation: String = "",
     doClear: Boolean = false
 ) {
     var textValue by remember { mutableStateOf(value.toString()) }
@@ -118,6 +119,18 @@ fun IntField(
                     imeAction = ImeAction.Done
                 ),
             )
+            if(annotation.isNotEmpty()){
+                Text(
+                    text = annotation,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.DarkGray,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .background(Color.White.copy(alpha = 0.8f))
+                        .padding(5.dp)// Slight scrim for readability
+                )
+            }
         }
         if (isError) Text(
             text = "Invalid Input",

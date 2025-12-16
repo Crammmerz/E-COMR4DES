@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -55,16 +56,17 @@ fun DateField(
     value: String,
     onValueChange: (String) -> Unit,
     onValidityChange: (Boolean) -> Unit,
-    onDone: () -> Unit = { },
+    onDone: (() -> Unit)? = null,
     header: String,
     placeholder: String,
 ) {
     val isError = value.isNotEmpty() && !isValidDate(value)
     var showDatePicker by remember { mutableStateOf(false) }
-    val focusManager = LocalFocusManager.current
     val datePickerState = rememberDatePickerState()
 
-    // Use TextFieldValue to preserve cursor position
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     var textFieldValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue(value))
     }
@@ -118,9 +120,11 @@ fun DateField(
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        if (!isError) {
+                        if (onDone != null) {
                             onDone()
+                        } else {
                             focusManager.clearFocus()
+                            keyboardController?.hide()
                         }
                     }
                 ),

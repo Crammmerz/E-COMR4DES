@@ -4,15 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +22,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.data.model.InsertBatch
@@ -59,6 +57,8 @@ fun ItemInsertionRow(
     val valid = validUnit && validDate
 
     val focusDate = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(valid) {
         if (isPersistent) onValidityChange(valid)
@@ -122,10 +122,13 @@ fun ItemInsertionRow(
                         )
                     },
                     onValidityChange = { validUnit = it },
-                    onDone = { focusDate.requestFocus() }
+                    onDone = { if(validUnit) focusDate.requestFocus() }
                 )
                 IntField(
                     modifier = Modifier.weight(1f),
+                    label = "Sub Unit",
+                    placeholder = "Enter number of sub units",
+                    doClear = true,
                     value = subUnit,
                     onValueChange = { value ->
                         onSubUnitChange(
@@ -134,25 +137,22 @@ fun ItemInsertionRow(
                             onSubUnit = { subUnit = it }
                         )
                     },
-                    label = "Sub Unit",
-                    placeholder = "Enter number of sub units",
                     onValidityChange = { validUnit = it },
-                    onDone = { focusDate.requestFocus() },
-                    doClear = true,
+                    onDone = { if(validUnit) focusDate.requestFocus() }
                 )
                 DateField(
                     modifier = Modifier.weight(1f),
-                    value = dateValue,
-                    onValueChange = { dateValue = it },
                     header = "Expiry Date",
                     placeholder = "MM/DD/YYYY",
+                    value = dateValue,
+                    onValueChange = { dateValue = it },
                     onValidityChange = { isFormatValid ->
                         val parsedDate = runCatching {
                             LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
                         }.getOrNull()
 
                         validDate = isFormatValid && parsedDate?.isAfter(LocalDate.now()) == true
-                    },
+                    }
                 )
             }
         }

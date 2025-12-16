@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Surface
@@ -16,22 +17,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.data.local.entities.UserEntity
-import com.android.inventorytracker.data.model.LoginState
 import com.android.inventorytracker.data.model.UserRole
 import com.android.inventorytracker.presentation.shared.component.input_fields.PasswordField
 import com.android.inventorytracker.presentation.shared.component.input_fields.StringField
 import kotlinx.coroutines.launch
-import com.android.inventorytracker.R
 
 // --- Pure White & Beige Palette (Uniform) ---
 private val PureWhite = Color(0xFFFFFFFF)           // Card background
@@ -124,11 +120,7 @@ fun LoginPopup(
                         maxLength = 99,
                         inputModifier = Modifier.focusRequester(focusUsername),
                         onValidationChange = { validUsername = it },
-                        onDone = {
-                            focusPassword.requestFocus()
-                        },
-                        // Assuming StringField and PasswordField use the global theme/GoogleSans.
-                        // If they are local, their TextStyle needs to be updated too.
+                        onDone = { focusPassword.requestFocus() },
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))

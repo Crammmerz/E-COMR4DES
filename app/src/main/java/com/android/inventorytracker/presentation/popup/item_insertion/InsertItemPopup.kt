@@ -5,13 +5,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
@@ -22,17 +22,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.android.inventorytracker.data.local.entities.ItemEntity
-import com.android.inventorytracker.presentation.popup.item_detail.component.PhotoSelection
 import com.android.inventorytracker.presentation.popup.item_insertion.component.HeaderSection
 import com.android.inventorytracker.presentation.popup.item_insertion.component.PhotoSelectionButton
 import com.android.inventorytracker.presentation.shared.component.input_fields.DescriptionField
@@ -138,8 +135,8 @@ fun InsertItemPopup(
                         header = "Item Name",
                         placeholder = "Enter item name",
                         modifier = Modifier.focusRequester(focusName),
-                        onValidationChange = { valid -> nameValid = valid },
-                        onDone = { focusUnit.requestFocus() }
+                        onValidationChange = { nameValid = it },
+                        onDone = { if(nameValid) focusUnit.requestFocus() }
                     )
 
                     Row(
@@ -154,7 +151,7 @@ fun InsertItemPopup(
                             placeholder = "1",
                             fieldModifier = Modifier.focusRequester(focusUnit),
                             onValidityChange = { unitThresholdValid = it },
-                            onDone = { focusExpiry.requestFocus() },
+                            onDone = { if(unitThresholdValid) focusExpiry.requestFocus() },
                             doClear = true,
                         )
 
@@ -167,7 +164,7 @@ fun InsertItemPopup(
                             annotation = annotation,
                             fieldModifier = Modifier.focusRequester(focusExpiry),
                             onValidityChange = { expiryThresholdValid = it },
-                            onDone = { focusSubUnit.requestFocus() },
+                            onDone = { if(expiryThresholdValid) focusSubUnit.requestFocus() },
                             doClear = true,
                         )
                     }
@@ -178,7 +175,6 @@ fun InsertItemPopup(
                         label = "Sub Unit Threshold",
                         placeholder = "1",
                         fieldModifier = Modifier.focusRequester(focusSubUnit),
-                        onDone = { focusDescription.requestFocus() },
                         onValidityChange = { subUnitThresholdValid = it },
                         doClear = true,
                     )

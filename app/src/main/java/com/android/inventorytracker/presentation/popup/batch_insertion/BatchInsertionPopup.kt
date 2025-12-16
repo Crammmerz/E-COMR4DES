@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.data.model.ItemModel
@@ -27,7 +29,6 @@ import com.android.inventorytracker.presentation.shared.component.primitive.Canc
 import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
-import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import com.android.inventorytracker.util.onSubUnitChange
 import com.android.inventorytracker.util.onUnitChange
 import java.time.LocalDate
@@ -53,7 +54,6 @@ fun BatchInsertionPopup(
 
     var onSubmit by rememberSaveable { mutableStateOf(false) }
 
-    val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
     LaunchedEffect(onSubmit) {
@@ -82,6 +82,8 @@ fun BatchInsertionPopup(
     ) {
         Column {
             DateField(
+                header = "Expiry Date",
+                placeholder = "MM/DD/YYYY",
                 value = dateValue,
                 onValueChange = { dateValue = it },
                 onValidityChange = { isFormatValid ->
@@ -89,13 +91,12 @@ fun BatchInsertionPopup(
                         LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
                     }.getOrNull()
                     validDate = isFormatValid && parsedDate?.isAfter(LocalDate.now()) == true
-                },
-                onDone = { focusManager.clearFocus(force = true) },
-                header = "Expiry Date",
-                placeholder = "MM/DD/YYYY"
+                }
             )
 
             FloatField(
+                label = "Unit",
+                placeholder = "Enter number of units",
                 value = unit,
                 onValueChange = { value ->
                     onUnitChange(
@@ -104,10 +105,7 @@ fun BatchInsertionPopup(
                         onSubUnit = { subUnit = it }
                     )
                 },
-                onValidityChange = { validUnit = it },
-                label = "Unit",
-                placeholder = "Enter number of units",
-                onDone = { focusManager.clearFocus(force = true) }
+                onValidityChange = { validUnit = it }
             )
 
             IntField(
@@ -122,7 +120,6 @@ fun BatchInsertionPopup(
                 label = "Sub Unit",
                 placeholder = "Enter number of sub units",
                 onValidityChange = { validUnit = it },
-                onDone = { focusManager.clearFocus(force = true) },
                 doClear = true,
             )
 

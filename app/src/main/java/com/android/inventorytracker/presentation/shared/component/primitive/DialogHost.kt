@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -24,9 +25,9 @@ fun DialogHost(
     Dialog(onDismissRequest = onDismissRequest, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Box(
             modifier = modifier
-                .fillMaxSize(0.9f)
                 .background(LightSand, shape = RoundedCornerShape(5.dp))
-                .then(if (useImePadding) Modifier.imePadding() else Modifier)
+                .then(if (useImePadding) Modifier.imePadding() else Modifier),
+            contentAlignment = Alignment.Center
         ) {
             content()
         }

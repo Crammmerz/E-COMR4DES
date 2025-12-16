@@ -22,6 +22,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -38,7 +40,7 @@ fun FloatField(
     onValueChange: (Float) -> Unit,
     onValidityChange: (Boolean) -> Unit,
     valueRange: ClosedFloatingPointRange<Float> = 0f..9999f,
-    onDone: () -> Unit = {},
+    onDone: (() -> Unit)? = null,
     label: String,
     placeholder: String,
 ) {
@@ -47,6 +49,8 @@ fun FloatField(
     var isFocused by remember { mutableStateOf(false) }
     var isError by remember { mutableStateOf(false) }
 
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(value) {
         if (!isFocused) {
@@ -112,7 +116,16 @@ fun FloatField(
                             onValidityChange(false)
                         }
                     },
-                keyboardActions = KeyboardActions(onDone = { onDone() }),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        if (onDone != null) {
+                            onDone()
+                        } else {
+                            focusManager.clearFocus()
+                            keyboardController?.hide()
+                        }
+                    }
+                ),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Done

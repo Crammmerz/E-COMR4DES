@@ -36,10 +36,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.data.model.InsertBatch
-import com.android.inventorytracker.data.model.RemoveBatch
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.util.toFormattedDateString
-import com.android.inventorytracker.util.toLocalDate
 
 @Composable
 fun BatchGroupInsertionPopup(

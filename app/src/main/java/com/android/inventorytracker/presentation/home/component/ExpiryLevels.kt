@@ -50,8 +50,8 @@ fun ExpiryLevels(
             modifier = Modifier.weight(1f)
         ) {
             val spacing = 16.dp
-            val rowsVisible = 2
-            val totalSpacing = spacing * (rowsVisible - 1)
+            val rowsVisible = 1
+            val totalSpacing = spacing * 0
             val cellHeight = (maxHeight - totalSpacing) / rowsVisible
             val gridHeight = cellHeight * rowsVisible + totalSpacing
 
@@ -66,8 +66,7 @@ fun ExpiryLevels(
                         modifier = Modifier
                             .height(cellHeight)
                             .clip(RoundedCornerShape(16.dp))
-                            .background(Palette.InnerTileBackground)
-                            .padding(12.dp),
+                            .background(Palette.InnerTileBackground),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         val imagePainter = if (model.item.imageUri != null) {

@@ -1,10 +1,6 @@
 package com.android.inventorytracker.presentation.login
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.hoverable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -15,7 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -23,7 +19,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.android.inventorytracker.data.model.LoginState
 import androidx.compose.ui.unit.sp
 import com.android.inventorytracker.data.model.UserRole
 import com.android.inventorytracker.presentation.login.viewmodel.LoginViewModel
@@ -31,80 +26,97 @@ import com.android.inventorytracker.presentation.popup.login.LoginPopup
 import com.android.inventorytracker.R
 import com.android.inventorytracker.ui.theme.Palette
 
-// --- Pure White & Beige Palette ---
-
+// --- Define Google Sans Font Family (Assuming no Bold weight is available) ---
+// NOTE: Ensure these resource names (R.font.google_sans_...) match your actual font files.
+val GoogleSansFamily = FontFamily(
+    Font(R.font.google_sans_regular, FontWeight.Normal),
+    Font(R.font.google_sans_medium, FontWeight.Medium),
+    Font(R.font.google_sans_semibold, FontWeight.SemiBold)
+)
 
 @Composable
 fun Login(
     loginViewModel: LoginViewModel = hiltViewModel()
 ) {
     val userRole = loginViewModel.userRole
+
+    // Kept the original state access for isRoleAuthEnabled as requested
     val isRoleAuthEnabled = loginViewModel.roleAuthEnabled
-    val header = if (isRoleAuthEnabled) "Login Type" else "Login"
+
+    val header = if (isRoleAuthEnabled) "Select Login Type" else "Log In"
     var showDialog by remember { mutableStateOf(false) }
 
+    // Outer Surface: Maximize white background
     Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Palette.PureWhite), // Apply strict white background
+        modifier = Modifier.fillMaxSize(),
         color = Palette.PureWhite
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 64.dp),
+                .padding(horizontal = 40.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
+            // Title: Inventory Tracker
             Text(
-                text = "Lumi Cafe",
+                text = "Inventory Tracker",
                 style = TextStyle(
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 80.sp,
-                    color = Palette.DarkBeigeText // Use dark beige for main title
+                    fontSize = 64.sp,
+                    fontFamily = GoogleSansFamily,
+                    color = Palette.DarkBeigeText
                 )
             )
 
             Spacer(modifier = Modifier.height(30.dp))
 
+            // Subtitle
             Text(
                 text = header,
                 style = TextStyle(
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 50.sp,
-                    color = Palette.LightBeigeText // Use lighter beige for sub-title
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 32.sp,
+                    fontFamily = GoogleSansFamily,
+                    color = Palette.DarkBeigeText
                 )
             )
 
-            Spacer(modifier = Modifier.height(70.dp))
+            Spacer(modifier = Modifier.height(60.dp))
 
+            // --- Horizontal Button Alignment ---
             Row(
-                modifier = Modifier.fillMaxWidth(0.7f),
-                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth(0.7f), // Keep the button group centered and proportional
+                horizontalArrangement = Arrangement.Center, // Center the buttons
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                LoginButton(
+                // Admin Button
+                LoginRefinedButton(
                     label = "Admin Login",
                     onClick = {
                         loginViewModel.updateUserRole(UserRole.ADMIN)
                         showDialog = true
-                    }
+                    },
+                    modifier = Modifier.weight(1f) // Makes button fill available space
                 )
 
                 if (isRoleAuthEnabled) {
-                    Spacer(modifier = Modifier.width(24.dp))
+                    Spacer(modifier = Modifier.width(24.dp)) // Spacer between buttons
 
-                    LoginButton(
+                    // Staff Button
+                    LoginRefinedButton(
                         label = "Staff Login",
                         onClick = {
                             loginViewModel.updateUserRole(UserRole.STAFF)
                             showDialog = true
-                        }
+                        },
+                        modifier = Modifier.weight(1f) // Makes button fill available space
                     )
                 }
             }
 
+            // Login Popup
             if (showDialog) {
                 LoginPopup(
                     userRole = userRole,
@@ -116,48 +128,39 @@ fun Login(
     }
 }
 
+/**
+ * IMPROVED BUTTON DESIGN: Wide, rounded, and uses a subtle shadow for a modern, raised look.
+ */
 @Composable
-fun LoginButton(
+fun LoginRefinedButton(
     label: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isHovered by interactionSource.collectIsHoveredAsState()
-
-    // Use a vertical gradient entirely within the beige shade
-    val backgroundBrush = Brush.verticalGradient(
-        colors = if (isHovered) {
-            // Hover state is slightly lighter beige
-            listOf(Palette.ButtonBeigeHover, Palette.ButtonBeigeBase)
-        } else {
-            // Default state is a gradient from lighter to deeper beige
-            listOf(Palette.ButtonBeigeBase, Palette.ButtonBeigeEnd)
-        }
-    )
-
     Button(
-        modifier = Modifier
-            .widthIn(min = 260.dp)
-            .height(60.dp)
-            .clip(RoundedCornerShape(30.dp))
-            .background(backgroundBrush)
-            .hoverable(interactionSource = interactionSource),
+        modifier = modifier
+            .height(60.dp) // Slightly taller button
+            .shadow(
+                elevation = 6.dp, // Subtle shadow for depth
+                shape = RoundedCornerShape(16.dp)
+            ),
         onClick = onClick,
-        interactionSource = interactionSource,
-        shape = RoundedCornerShape(30.dp),
+        shape = RoundedCornerShape(16.dp), // Rounded corners
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent, // Transparent since background is applied via brush
-            contentColor = Palette.PureWhite // White text inside the beige button
+            // Use a solid beige color
+            containerColor = Palette.ButtonBeigeBase,
+            contentColor = Palette.PureWhite
         ),
-        contentPadding = PaddingValues(horizontal = 28.dp, vertical = 12.dp),
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+        // Use 0 elevation in ButtonDefaults since we are applying elevation via .shadow() modifier
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp, pressedElevation = 0.dp),
+        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
     ) {
         Text(
             text = label,
             style = TextStyle(
-                fontWeight = FontWeight.Medium,
-                fontSize = 20.sp,
-                color = Palette.PureWhite // White text
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 20.sp, // Slightly larger font for prominence
+                fontFamily = GoogleSansFamily
             )
         )
     }

@@ -32,7 +32,7 @@ fun AddNewItemButton(onClick: () -> Unit) {
             contentColor = Color.White
         )
     ) {
-        Text("Add new Item")
+        Text("Add New Item")
     }
 }
 @Composable

@@ -1,32 +1,23 @@
 package com.android.inventorytracker.presentation.popup.batch_insertion
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.presentation.shared.component.input_fields.DateField
-import com.android.inventorytracker.presentation.shared.component.input_fields.IntField
 import com.android.inventorytracker.presentation.shared.component.input_fields.FloatField
-import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
-import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
+import com.android.inventorytracker.presentation.shared.component.input_fields.IntField
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.util.onSubUnitChange
@@ -34,9 +25,12 @@ import com.android.inventorytracker.util.onUnitChange
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.BorderStroke
 
-// Define the Dark Brown color for the button (copied from InsertItemPopup.kt)
-val ButtonDarkBrown = Color(0xFF4A3B32)
+
+private val DialogBg = Color(0xFFFFF8F3)
+private val ActionBrown = Color(0xFF5D4037)
 
 @Composable
 fun BatchInsertionPopup(
@@ -53,19 +47,21 @@ fun BatchInsertionPopup(
     val valid = validDate && validUnit
 
     var onSubmit by rememberSaveable { mutableStateOf(false) }
-
     val context = LocalContext.current
 
     LaunchedEffect(onSubmit) {
-        if(valid){
+        if (valid) {
             val selectedDate = runCatching {
                 LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
             }.getOrNull()
+
             if (selectedDate != null) {
                 val batch = ItemBatchEntity(
                     itemId = itemModel.item.id,
                     subUnit = subUnit,
-                    expiryDate = selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                    expiryDate = selectedDate
+                        .atStartOfDay(ZoneId.systemDefault())
+                        .toInstant()
                         .toEpochMilli()
                 )
                 batchViewModel.onStoreBatch(batch)
@@ -73,34 +69,55 @@ fun BatchInsertionPopup(
             }
         }
     }
+
     DialogHost(
-        Modifier
-            .fillMaxHeight(0.8f)
-            .fillMaxWidth(0.5f),
+        modifier = Modifier
+            .width(420.dp)
+            .wrapContentHeight()
+            .background(DialogBg, RoundedCornerShape(20.dp)),
         onDismissRequest = onDismiss,
         useImePadding = true
     ) {
-        Column {
+        Column(
+            modifier = Modifier.padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+
+            // 🔹 TITLE
+            Text(
+                text = "Add Stock",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            Text(
+                text = "Specify the expiry date and amount you wish to add.",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray
+            )
+
+            Spacer(Modifier.height(6.dp))
+
             DateField(
                 header = "Expiry Date",
                 placeholder = "MM/DD/YYYY",
                 value = dateValue,
                 onValueChange = { dateValue = it },
                 onValidityChange = { isFormatValid ->
-                    val parsedDate = runCatching {
+                    val parsed = runCatching {
                         LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
                     }.getOrNull()
-                    validDate = isFormatValid && parsedDate?.isAfter(LocalDate.now()) == true
+                    validDate = isFormatValid && parsed?.isAfter(LocalDate.now()) == true
                 }
             )
 
             FloatField(
                 label = "Unit",
-                placeholder = "Enter number of units",
+                placeholder = "0",
                 value = unit,
                 onValueChange = { value ->
                     onUnitChange(
-                        unit = value, itemModel.item.subUnitThreshold,
+                        unit = value,
+                        threshold = itemModel.item.subUnitThreshold,
                         onUnit = { unit = it },
                         onSubUnit = { subUnit = it }
                     )
@@ -112,34 +129,59 @@ fun BatchInsertionPopup(
                 value = subUnit,
                 onValueChange = { value ->
                     onSubUnitChange(
-                        subUnit = value, itemModel.item.subUnitThreshold,
+                        subUnit = value,
+                        threshold = itemModel.item.subUnitThreshold,
                         onUnit = { unit = it },
                         onSubUnit = { subUnit = it }
                     )
                 },
                 label = "Sub Unit",
-                placeholder = "Enter number of sub units",
+                placeholder = "0",
                 onValidityChange = { validUnit = it },
-                doClear = true,
+                doClear = true
             )
 
-            Row {
-                CancelButton(onClick = { onDismiss() })
+            Spacer(Modifier.height(18.dp))
 
-                // FIX APPLIED: Explicitly define the onClick parameter and apply the theme color
-                ConfirmButton(
-                    text = "Add Stock",
-                    containerColor = ButtonDarkBrown, // Apply theme color
+            // 🔹 ACTION BUTTONS
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                // Cancel (transparent + brown border)
+                OutlinedButton(
+                    onClick = onDismiss,
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(1.dp, ActionBrown),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = ActionBrown
+                    )
+                ) {
+                    Text("Cancel")
+                }
+
+                Spacer(Modifier.width(12.dp))
+
+                Button(
                     onClick = {
                         when {
                             !validDate ->
                                 Toast.makeText(context, "Please enter a valid date", Toast.LENGTH_SHORT).show()
                             !validUnit ->
                                 Toast.makeText(context, "Please enter valid unit/subunit", Toast.LENGTH_SHORT).show()
-                            valid -> onSubmit = true
+                            else -> onSubmit = true
                         }
-                    }
-                )
+                    },
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ActionBrown,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Add Stock")
+                }
             }
         }
     }

@@ -1,27 +1,13 @@
 package com.android.inventorytracker.presentation.popup.item_insertion
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -39,9 +25,6 @@ import com.android.inventorytracker.presentation.shared.component.primitive.Canc
 import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.ui.theme.Palette
 import com.android.inventorytracker.util.convertDaysToString
-
-// Define Theme Colors
-
 
 @Composable
 fun InsertItemPopup(
@@ -62,7 +45,8 @@ fun InsertItemPopup(
     var expiryThresholdValid by rememberSaveable { mutableStateOf(true) }
     var subUnitThresholdValid by rememberSaveable { mutableStateOf(true) }
 
-    val allValid = nameValid && unitThresholdValid && expiryThresholdValid && subUnitThresholdValid
+    val allValid =
+        nameValid && unitThresholdValid && expiryThresholdValid && subUnitThresholdValid
 
     val focusName = remember { FocusRequester() }
     val focusUnit = remember { FocusRequester() }
@@ -70,20 +54,19 @@ fun InsertItemPopup(
     val focusExpiry = remember { FocusRequester() }
     val focusDescription = remember { FocusRequester() }
 
-    var annotation by remember{ mutableStateOf("") }
+    var annotation by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         focusName.requestFocus()
     }
+
     LaunchedEffect(expiryThreshold) {
         annotation = if (expiryThresholdValid) {
             convertDaysToString(expiryThreshold)
-        } else {
-            ""
-        }
+        } else ""
     }
 
-    fun doInsert(){
+    fun doInsert() {
         if (allValid) {
             val item = ItemEntity(
                 imageUri = imageUri,
@@ -108,7 +91,7 @@ fun InsertItemPopup(
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
-                .width(300.dp)
+                .width(380.dp)   // ✅ INCREASED WIDTH
                 .height(600.dp),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Palette.PopupSurface),
@@ -123,12 +106,15 @@ fun InsertItemPopup(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+
                     HeaderSection()
+
                     PhotoSelectionButton(
                         modifier = Modifier.fillMaxWidth(),
                         image = imageUri,
                         onPickImage = { imageUri = it }
                     )
+
                     StringField(
                         value = name,
                         onValueChange = { name = it },
@@ -136,7 +122,7 @@ fun InsertItemPopup(
                         placeholder = "Enter item name",
                         modifier = Modifier.focusRequester(focusName),
                         onValidationChange = { nameValid = it },
-                        onDone = { if(nameValid) focusUnit.requestFocus() }
+                        onDone = { if (nameValid) focusUnit.requestFocus() }
                     )
 
                     Row(
@@ -151,7 +137,7 @@ fun InsertItemPopup(
                             placeholder = "1",
                             fieldModifier = Modifier.focusRequester(focusUnit),
                             onValidityChange = { unitThresholdValid = it },
-                            onDone = { if(unitThresholdValid) focusExpiry.requestFocus() },
+                            onDone = { if (unitThresholdValid) focusExpiry.requestFocus() },
                             doClear = true,
                         )
 
@@ -164,7 +150,7 @@ fun InsertItemPopup(
                             annotation = annotation,
                             fieldModifier = Modifier.focusRequester(focusExpiry),
                             onValidityChange = { expiryThresholdValid = it },
-                            onDone = { if(expiryThresholdValid) focusSubUnit.requestFocus() },
+                            onDone = { if (expiryThresholdValid) focusSubUnit.requestFocus() },
                             doClear = true,
                         )
                     }
@@ -194,9 +180,9 @@ fun InsertItemPopup(
                         CancelButton(onClick = onDismiss)
 
                         ConfirmButton(
-                            "Add Item",
+                            text = "Add Item",
                             containerColor = Palette.ButtonDarkBrown,
-                            onClick = { doInsert() },
+                            onClick = { doInsert() }
                         )
                     }
                 }
@@ -205,8 +191,6 @@ fun InsertItemPopup(
     }
 }
 
-
-
 @Preview(
     showBackground = true,
     name = "AddNewItemPopup Preview",
@@ -214,9 +198,8 @@ fun InsertItemPopup(
 )
 @Composable
 fun AddNewItemPopupPreview() {
-    // Simple no-op callbacks for preview. onAdd receives the created ItemEntity.
     InsertItemPopup(
-        onDismiss = { /* no-op for preview */ },
-        onInsert = { /* no-op for preview */ }
+        onDismiss = {},
+        onInsert = {}
     )
 }

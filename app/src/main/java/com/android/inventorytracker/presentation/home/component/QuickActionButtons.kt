@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.android.inventorytracker.presentation.home.viewmodel.HomeViewModel
 import com.android.inventorytracker.presentation.popup.batch_group_insertion.BatchGroupInsertionPopup
 import com.android.inventorytracker.presentation.popup.batch_group_removal.BatchGroupRemovalPopup
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel

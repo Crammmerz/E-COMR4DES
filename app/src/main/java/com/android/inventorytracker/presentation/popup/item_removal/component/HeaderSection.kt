@@ -8,38 +8,50 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.Modifier
 
-private val CoffeeBrown = Color(0xFF5D4037)
-private val MutedText = Color(0xFF7A6A5F)
+// SAME color used in Add New Item header
+private val TextDarkBrown = Color(0xFF4A3B32)
 
 @Composable
 fun HeaderSection(onClose: () -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    Column {
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Text(
                 text = "Remove Inventory Items",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = CoffeeBrown
+                color = TextDarkBrown,
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 24.sp
             )
 
             Spacer(modifier = Modifier.weight(1f))
 
             IconButton(onClick = onClose) {
-                Icon(Icons.Default.Close, contentDescription = "Close")
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Close",
+                    tint = TextDarkBrown
+                )
             }
         }
 
+        Spacer(modifier = Modifier.height(4.dp))
+
         Text(
             text = "Select the items you want to remove from your inventory.",
-            fontSize = 13.sp,
-            color = MutedText
+            color = Color.Gray,
+            fontWeight = FontWeight.Normal,
+            fontSize = 14.sp
         )
+
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }

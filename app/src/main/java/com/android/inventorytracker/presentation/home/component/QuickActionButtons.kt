@@ -3,14 +3,13 @@ package com.android.inventorytracker.presentation.home.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Remove
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,6 +26,8 @@ import com.android.inventorytracker.presentation.popup.batch_group_insertion.Bat
 import com.android.inventorytracker.presentation.popup.batch_group_removal.BatchGroupRemovalPopup
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import com.android.inventorytracker.ui.theme.Palette
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.draw.shadow
 
 @Composable
 fun QuickActions(
@@ -39,7 +40,6 @@ fun QuickActions(
     var showRemoveStock by rememberSaveable { mutableStateOf(false) }
     var showRemoveCSV by rememberSaveable { mutableStateOf(false) }
 
-
     Row(
         modifier = modifier
             .height(60.dp)
@@ -48,25 +48,28 @@ fun QuickActions(
     ) {
         QuickActionButton(
             label = "Add Stock",
+            icon = Icons.Rounded.Add,
             modifier = Modifier.weight(1f),
-            bgColor = Palette.AccentBeigePrimary,
-            contentColor = Palette.PureWhite,
+            bgColor = Color(0xFF9D8A7C),
+            contentColor = Color(0xFFFFFFFF),
             onClick = { showAddStock = true }
         )
 
         QuickActionButton(
             label = "Deduct Stock",
+            icon = Icons.Rounded.Remove,
             modifier = Modifier.weight(1f),
-            bgColor = Palette.AccentBeigeLight,
-            contentColor = Palette.DarkBeigeText,
+            bgColor = Color(0xFF565449),
+            contentColor = Color(0xFFFFFFFF),
             onClick = { showRemoveStock = true }
         )
 
         QuickActionButton(
             label = "Deduct Stocks (.csv)",
+            icon = null, // No icon for CSV
             modifier = Modifier.weight(1f),
-            bgColor = Palette.PureWhite,
-            contentColor = Palette.DarkBeigeText,
+            bgColor = Color(0xFFE0E0E0),
+            contentColor = Color(0xFF000000),
             onClick = { showRemoveCSV = true }
         )
     }
@@ -85,6 +88,7 @@ fun QuickActions(
 @Composable
 fun QuickActionButton(
     label: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector? = null,
     modifier: Modifier = Modifier,
     bgColor: Color,
     contentColor: Color,
@@ -93,6 +97,11 @@ fun QuickActionButton(
     Box(
         modifier = modifier
             .fillMaxHeight()
+            .shadow(
+                elevation = 6.dp,
+                shape = RoundedCornerShape(999.dp),
+                clip = false
+            )
             .background(
                 color = bgColor,
                 shape = RoundedCornerShape(999.dp)
@@ -104,10 +113,26 @@ fun QuickActionButton(
                 onClick = onClick
             ),
     ) {
-        Text(
-            modifier = Modifier.align(Alignment.Center),
-            text = label,
-            color = contentColor,
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.align(Alignment.Center)
+        ) {
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = label,
+                    tint = contentColor,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+
+            Text(
+                text = label,
+                color = contentColor,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }

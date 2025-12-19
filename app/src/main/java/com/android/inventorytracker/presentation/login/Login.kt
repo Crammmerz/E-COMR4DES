@@ -18,13 +18,9 @@ import com.android.inventorytracker.data.model.UserRole
 import com.android.inventorytracker.presentation.login.viewmodel.LoginViewModel
 import com.android.inventorytracker.presentation.popup.login.LoginPopup
 import com.android.inventorytracker.R
+import com.android.inventorytracker.ui.theme.GoogleSans
 import com.android.inventorytracker.ui.theme.Palette
 
-val GoogleSansFamily = FontFamily(
-    Font(R.font.google_sans_regular, FontWeight.Normal),
-    Font(R.font.google_sans_medium, FontWeight.Medium),
-    Font(R.font.google_sans_semibold, FontWeight.SemiBold)
-)
 
 @Composable
 fun Login(
@@ -51,7 +47,7 @@ fun Login(
                 style = TextStyle(
                     fontWeight = FontWeight.Bold,
                     fontSize = 64.sp,
-                    fontFamily = GoogleSansFamily,
+                    fontFamily = GoogleSans,
                     color = Palette.DarkBeigeText,
                     letterSpacing = (-1.5).sp // iOS-style tracking
                 )
@@ -64,7 +60,7 @@ fun Login(
                 style = TextStyle(
                     fontWeight = FontWeight.Medium,
                     fontSize = 24.sp,
-                    fontFamily = GoogleSansFamily,
+                    fontFamily = GoogleSans,
                     color = Palette.DarkBeigeText.copy(alpha = 0.7f)
                 )
             )
@@ -144,7 +140,7 @@ fun LoginRefinedButton(
             style = TextStyle(
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 18.sp,
-                fontFamily = GoogleSansFamily,
+                fontFamily = GoogleSans,
                 letterSpacing = 0.sp
             )
         )

@@ -54,50 +54,41 @@ fun Home(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = hiltViewM
                 horizontalArrangement = Arrangement.spacedBy(32.dp),
                 verticalAlignment = Alignment.Top
             ) {
-                if (expiryItems.isEmpty() && stockItems.isEmpty()) {
+                Surface(
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(32.dp),
+                    tonalElevation = 0.dp,
+                    shadowElevation = 8.dp,
+                    color = Palette.iOSCardWhite
+                ) {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(32.dp)
                     ) {
-                        CircularProgressIndicator()
+                        ExpiryLevels(
+                            modifier = Modifier.fillMaxSize(),
+                            itemModel = expiryItems
+                        )
                     }
-                } else {
-                    Surface(
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(32.dp),
-                        tonalElevation = 0.dp,
-                        shadowElevation = 8.dp,
-                        color = Palette.iOSCardWhite
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(32.dp)
-                        ) {
-                            ExpiryLevels(
-                                modifier = Modifier.fillMaxSize(),
-                                itemModel = expiryItems
-                            )
-                        }
-                    }
+                }
 
-                    Surface(
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(32.dp),
-                        tonalElevation = 0.dp,
-                        shadowElevation = 8.dp,
-                        color = Palette.iOSCardWhite
+                Surface(
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(32.dp),
+                    tonalElevation = 0.dp,
+                    shadowElevation = 8.dp,
+                    color = Palette.iOSCardWhite
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(32.dp)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(32.dp)
-                        ) {
-                            StockLevels(
-                                modifier = Modifier.fillMaxSize(),
-                                itemModel = stockItems
-                            )
-                        }
+                        StockLevels(
+                            modifier = Modifier.fillMaxSize(),
+                            itemModel = stockItems
+                        )
                     }
                 }
             }

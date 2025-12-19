@@ -45,92 +45,97 @@ fun ExpiryLevels(
                 color = Palette.DarkBeigeText
             )
         )
-
-        BoxWithConstraints(
-            modifier = Modifier.weight(1f)
-        ) {
-            val spacing = 16.dp
-            val rowsVisible = 1
-            val totalSpacing = spacing * 0
-            val cellHeight = (maxHeight - totalSpacing) / rowsVisible
-            val gridHeight = cellHeight * rowsVisible + totalSpacing
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                horizontalArrangement = Arrangement.spacedBy(spacing),
-                verticalArrangement = Arrangement.spacedBy(spacing),
-                modifier = Modifier.height(gridHeight)
+        if(itemModel.isNotEmpty()) {
+            BoxWithConstraints(
+                modifier = Modifier.weight(1f)
             ) {
-                items(itemModel) { model ->
-                    Column(
-                        modifier = Modifier
-                            .height(cellHeight)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Palette.InnerTileBackground),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        val imagePainter = if (model.item.imageUri != null) {
-                            rememberAsyncImagePainter(
-                                model = model.item.imageUri,
-                                placeholder = painterResource(R.drawable.outline_add_photo_alternate_24),
-                                error = painterResource(R.drawable.outline_add_photo_alternate_24)
-                            )
-                        } else {
-                            painterResource(id = R.drawable.outline_add_photo_alternate_24)
-                        }
+                val spacing = 16.dp
+                val rowsVisible = 1
+                val totalSpacing = spacing * 0
+                val cellHeight = (maxHeight - totalSpacing) / rowsVisible
+                val gridHeight = cellHeight * rowsVisible + totalSpacing
 
-                        Image(
-                            painter = imagePainter,
-                            contentDescription = "Item image: ${model.item.name}",
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    horizontalArrangement = Arrangement.spacedBy(spacing),
+                    verticalArrangement = Arrangement.spacedBy(spacing),
+                    modifier = Modifier.height(gridHeight)
+                ) {
+                    items(itemModel) { model ->
+                        Column(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(12.dp))
-                                .weight(1f)
-                                .fillMaxWidth(),
-                            contentScale = ContentScale.Crop
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Text(
-                            text = model.item.name,
-                            modifier = Modifier.fillMaxWidth(),
-                            // Apply Google Sans Medium for item name
-                            style = TextStyle(
-                                fontWeight = FontWeight.Medium, // Use Medium for item name
-                                fontSize = 16.sp, // Approximate size for bodyMedium
-                                color = Palette.DarkBeigeText
-                            )
-                        )
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                                .height(cellHeight)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Palette.InnerTileBackground),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+                            val imagePainter = if (model.item.imageUri != null) {
+                                rememberAsyncImagePainter(
+                                    model = model.item.imageUri,
+                                    placeholder = painterResource(R.drawable.outline_add_photo_alternate_24),
+                                    error = painterResource(R.drawable.outline_add_photo_alternate_24)
+                                )
+                            } else {
+                                painterResource(id = R.drawable.outline_add_photo_alternate_24)
+                            }
+
+                            Image(
+                                painter = imagePainter,
+                                contentDescription = "Item image: ${model.item.name}",
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .weight(1f)
+                                    .fillMaxWidth(),
+                                contentScale = ContentScale.Crop
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
                             Text(
-                                text = "Expires in",
-                                // Apply Google Sans Regular for detail text
+                                text = model.item.name,
+                                modifier = Modifier.fillMaxWidth(),
+                                // Apply Google Sans Medium for item name
                                 style = TextStyle(
-                                    fontWeight = FontWeight.Normal, // Use Regular for label text
-                                    fontSize = 12.sp, // Approximate size for bodySmall
+                                    fontWeight = FontWeight.Medium, // Use Medium for item name
+                                    fontSize = 16.sp, // Approximate size for bodyMedium
                                     color = Palette.DarkBeigeText
                                 )
                             )
-                            Text(
-                                text = model.expiryMessage,
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(999.dp))
-                                    .background(model.expiryColor.copy(alpha = 0.12f))
-                                    .padding(horizontal = 8.dp, vertical = 4.dp),
-                                style = TextStyle(
-                                    fontWeight = FontWeight.Normal,
-                                    fontSize = 12.sp,
-                                    color = model.expiryColor
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Expires in",
+                                    // Apply Google Sans Regular for detail text
+                                    style = TextStyle(
+                                        fontWeight = FontWeight.Normal, // Use Regular for label text
+                                        fontSize = 12.sp, // Approximate size for bodySmall
+                                        color = Palette.DarkBeigeText
+                                    )
                                 )
-                            )
+                                Text(
+                                    text = model.expiryMessage,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(999.dp))
+                                        .background(model.expiryColor.copy(alpha = 0.12f))
+                                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                                    style = TextStyle(
+                                        fontWeight = FontWeight.Normal,
+                                        fontSize = 12.sp,
+                                        color = model.expiryColor
+                                    )
+                                )
+                            }
                         }
                     }
                 }
+            }
+        } else {
+            Box(modifier = Modifier.weight(1f).fillMaxWidth()){
+                Text("Nothing to worry about — no alerts")
             }
         }
     }

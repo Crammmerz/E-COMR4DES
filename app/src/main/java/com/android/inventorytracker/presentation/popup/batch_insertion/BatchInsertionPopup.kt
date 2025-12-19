@@ -27,6 +27,8 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 
 
 private val DialogBg = Color(0xFFFFF8F3)
@@ -46,10 +48,19 @@ fun BatchInsertionPopup(
     var validDate by rememberSaveable { mutableStateOf(false) }
     val valid = validDate && validUnit
 
-    var onSubmit by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
 
-    LaunchedEffect(onSubmit) {
+    val focusUnit = remember { FocusRequester() }
+    val focusSubUnit = remember { FocusRequester() }
+    val focusExpiry = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusExpiry.requestFocus()
+    }
+
+    fun doSubmit() {
+        if(!validDate) Toast.makeText(context, "Please enter a valid date", Toast.LENGTH_SHORT).show()
+        if(!validUnit) Toast.makeText(context, "Please enter valid unit/subunit", Toast.LENGTH_SHORT).show()
         if (valid) {
             val selectedDate = runCatching {
                 LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
@@ -83,7 +94,6 @@ fun BatchInsertionPopup(
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
 
-            // 🔹 TITLE
             Text(
                 text = "Add Stock",
                 style = MaterialTheme.typography.titleLarge
@@ -98,6 +108,7 @@ fun BatchInsertionPopup(
             Spacer(Modifier.height(6.dp))
 
             DateField(
+                fieldModifier = Modifier.focusRequester(focusExpiry),
                 header = "Expiry Date",
                 placeholder = "MM/DD/YYYY",
                 value = dateValue,
@@ -107,10 +118,12 @@ fun BatchInsertionPopup(
                         LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
                     }.getOrNull()
                     validDate = isFormatValid && parsed?.isAfter(LocalDate.now()) == true
-                }
+                },
+                onDone = { if (validDate) focusUnit.requestFocus() }
             )
 
             FloatField(
+                fieldModifier = Modifier.focusRequester(focusUnit),
                 label = "Unit",
                 placeholder = "0",
                 value = unit,
@@ -122,10 +135,12 @@ fun BatchInsertionPopup(
                         onSubUnit = { subUnit = it }
                     )
                 },
-                onValidityChange = { validUnit = it }
+                onValidityChange = { validUnit = it },
+                onDone = { if(validUnit) doSubmit() }
             )
 
             IntField(
+                fieldModifier = Modifier.focusRequester(focusSubUnit),
                 value = subUnit,
                 onValueChange = { value ->
                     onSubUnitChange(
@@ -138,19 +153,18 @@ fun BatchInsertionPopup(
                 label = "Sub Unit",
                 placeholder = "0",
                 onValidityChange = { validUnit = it },
-                doClear = true
+                doClear = true,
+                onDone = { if(validUnit) doSubmit() }
             )
 
             Spacer(Modifier.height(18.dp))
 
-            // 🔹 ACTION BUTTONS
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
-                // Cancel (transparent + brown border)
                 OutlinedButton(
                     onClick = onDismiss,
                     shape = RoundedCornerShape(8.dp),
@@ -166,13 +180,7 @@ fun BatchInsertionPopup(
 
                 Button(
                     onClick = {
-                        when {
-                            !validDate ->
-                                Toast.makeText(context, "Please enter a valid date", Toast.LENGTH_SHORT).show()
-                            !validUnit ->
-                                Toast.makeText(context, "Please enter valid unit/subunit", Toast.LENGTH_SHORT).show()
-                            else -> onSubmit = true
-                        }
+
                     },
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(

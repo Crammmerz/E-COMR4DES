@@ -27,7 +27,8 @@ fun Inventory(
     batchViewModel: BatchViewModel = hiltViewModel(),
     loginViewModel: LoginViewModel = hiltViewModel()
 ) {
-    val BackgroundColor = Color(0xFFFEF7ED)
+    // ✅ FIX: Lowercase variable name (Image 8 warning)
+    val backgroundColor = Color(0xFFFEF7ED)
 
     val itemModels by itemViewModel.itemModelList.collectAsState()
     var showAddItem by rememberSaveable { mutableStateOf(false) }
@@ -36,15 +37,14 @@ fun Inventory(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundColor)
+            .background(backgroundColor)
             .padding(vertical = 8.dp)
     ) {
-
-        /* 🔹 HEADER ROW (ALIGNED WITH LIST ITEMS) */
+        /* 🔹 HEADER ROW */
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp), // ✅ MATCH ITEM ROW PADDING
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -64,19 +64,17 @@ fun Inventory(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        HeaderSection(
-            modifier = Modifier.padding(horizontal = 16.dp) // ✅ align headers too
-        )
+        HeaderSection(modifier = Modifier.padding(horizontal = 16.dp))
 
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp), // ✅ SAME AS HEADER
+                .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            items(itemModels, key = { it.item.id }) {
+            items(itemModels, key = { it.item.id }) { itemModel ->
                 ItemDataRow(
-                    model = it,
+                    model = itemModel,
                     itemViewModel = itemViewModel,
                     batchViewModel = batchViewModel
                 )
@@ -87,7 +85,9 @@ fun Inventory(
     if (showAddItem) {
         InsertItemPopup(
             onDismiss = { showAddItem = false },
-            onInsert = itemViewModel::insertItem
+            onInsert = { itemEntity ->
+                itemViewModel.insertItem(itemEntity)
+            }
         )
     }
 
@@ -95,7 +95,13 @@ fun Inventory(
         DeleteItemPopup(
             model = itemModels,
             onDismiss = { showDeleteItem = false },
-            onDelete = itemViewModel::deleteItem
+            onDelete = { selectedIds ->
+                // ✅ FIX: Dahil list ang binibigay ng popup, kailangan nating i-loop
+                // para tumugma sa deleteItem(itemEntity) ng ViewModel
+                itemModels.filter { it.item.id in selectedIds }.forEach {
+                    itemViewModel.deleteItem(it.item)
+                }
+            }
         )
     }
 }

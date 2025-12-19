@@ -1,34 +1,18 @@
 package com.android.inventorytracker.presentation.popup.batch_targeted_removal
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,17 +25,14 @@ import com.android.inventorytracker.presentation.shared.component.input_fields.F
 import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
 import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
+import com.android.inventorytracker.ui.theme.Palette
+import com.android.inventorytracker.ui.theme.GoogleSans
 import com.android.inventorytracker.util.onSubUnitChange
 import com.android.inventorytracker.util.onUnitChange
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-
-// Theme Colors copied for consistency
-val PopupSurface = Color(0xFFFFF9F5)
-val ButtonDarkBrown = Color(0xFF4A3B32)
-val TextDarkBrown = Color(0xFF4A3B32)
 
 @Composable
 fun BatchTargetedRemoval(
@@ -66,105 +47,95 @@ fun BatchTargetedRemoval(
     var validDate by rememberSaveable { mutableStateOf(false) }
     var dateValue by rememberSaveable { mutableStateOf("") }
 
-
+    // ✅ Kailangan ito para sa scroll
+    val scrollState = rememberScrollState()
     val context = LocalContext.current
-    val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
-                .fillMaxWidth(0.55f)
-                .fillMaxHeight(0.65f),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = PopupSurface),
+                .width(480.dp)
+                .heightIn(max = 620.dp), // ✅ Max height para hindi lumampas sa screen
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = Palette.PopupSurface),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(24.dp) // Padding for the content area
-            ) {
-                // 1. Content Column (Header + Inputs)
-                // We constrain the height here to ensure it doesn't collide with the buttons.
+            Column(modifier = Modifier.padding(24.dp)) {
+                // Header (Static)
+                Text(
+                    text = "Deduct Stock",
+                    style = TextStyle(
+                        fontFamily = GoogleSans,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp,
+                        color = Palette.ButtonDarkBrown
+                    )
+                )
+                Text(
+                    text = "Specify the date and amount you wish to remove.",
+                    style = TextStyle(fontFamily = GoogleSans, fontSize = 13.sp, color = Color.Gray)
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // ✅ Scrollable Content Area
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.9f), // **FIX: Constrain height to reserve space (10%)**
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                        .weight(1f, fill = false) // ✅ Ito ang magic para maging slim pero scrollable
+                        .verticalScroll(scrollState),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // --- Header ---
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Text(
-                            "Deduct Stock (Targeted)",
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = TextDarkBrown
-                        )
-                        Text(
-                            "Specify the date and amount you wish to remove.",
-                            color = Color.Gray,
-                            fontSize = 14.sp
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                    }
+                    DateField(
+                        header = "Expiry Date",
+                        placeholder = "MM/DD/YYYY",
+                        value = dateValue,
+                        onValueChange = { dateValue = it },
+                        onValidityChange = { validDate = it }
+                    )
 
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        DateField(
-                            header = "Expiry Date",
-                            placeholder = "MM/DD/YYYY",
-                            value = dateValue,
-                            onValueChange = { dateValue = it },
-                            onValidityChange = { validDate = it }
-                        )
-
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         FloatField(
+                            modifier = Modifier.weight(1f),
                             label = "Unit",
-                            placeholder = "Enter number of units",
+                            placeholder = "0",
                             value = unit,
                             onValueChange = { value ->
-                                onUnitChange(
-                                    unit = value, threshold,
-                                    onUnit = { unit = it },
-                                    onSubUnit = { subUnit = it }
-                                )
+                                onUnitChange(value, threshold, { unit = it }, { subUnit = it })
                             },
                             onValidityChange = { validUnit = it }
                         )
 
                         IntField(
+                            modifier = Modifier.weight(1f),
                             label = "Sub Unit",
-                            placeholder = "Enter number of sub units",
+                            placeholder = "0",
                             doClear = true,
                             value = subUnit,
                             onValueChange = { value ->
-                                onSubUnitChange(
-                                    subUnit = value, threshold,
-                                    onUnit = { unit = it },
-                                    onSubUnit = { subUnit = it }
-                                )
+                                onSubUnitChange(value, threshold, { unit = it }, { subUnit = it })
                             },
                             onValidityChange = { validUnit = it }
                         )
                     }
+
+                    // Kung may balak kang magdagdag pa ng items dito, kusa na siyang mag-i-scroll.
                 }
 
-                // 2. Buttons Row (Independent of Content Column's height)
+                // Footer (Static/Fixed at the bottom)
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.5f))
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomEnd), // **FIX: Aligned to the absolute bottom**
-                    horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.End),
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    CancelButton(onClick = { onDismiss() })
-
+                    CancelButton(onClick = onDismiss)
                     ConfirmButton(
                         text = "Deduct Stock",
-                        containerColor = ButtonDarkBrown,
+                        containerColor = Palette.ButtonDarkBrown,
+                        enabled = validUnit && validDate, // Mas maganda kung disabled hangga't walang input
                         onClick = {
                             val selectedDate = runCatching {
                                 LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
@@ -172,22 +143,16 @@ fun BatchTargetedRemoval(
 
                             val exist = selectedDate?.let { date ->
                                 batch.firstOrNull {
-                                    val batchDate = Instant.ofEpochMilli(it.expiryDate)
-                                        .atZone(ZoneId.systemDefault())
-                                        .toLocalDate()
-                                    batchDate == date
+                                    Instant.ofEpochMilli(it.expiryDate).atZone(ZoneId.systemDefault()).toLocalDate() == date
                                 }
                             }
 
-                            when {
-                                selectedDate == null || exist == null ->
-                                    Toast.makeText(context, "Please enter a valid Date", Toast.LENGTH_SHORT).show()
-                                !validUnit ->
-                                    Toast.makeText(context, "Invalid Input", Toast.LENGTH_SHORT).show()
-                                else -> {
-                                    batchViewModel.onTargetedDeductStock(exist, subUnit)
-                                    onDismiss()
-                                }
+                            if (selectedDate == null || exist == null) {
+                                Toast.makeText(context, "No batch found for this date", Toast.LENGTH_SHORT).show()
+                            } else {
+                                batchViewModel.onTargetedDeductStock(exist, subUnit)
+                                onDismiss()
+                                Toast.makeText(context, "Stock Deducted!", Toast.LENGTH_SHORT).show()
                             }
                         }
                     )

@@ -1,6 +1,5 @@
 package com.android.inventorytracker.presentation.popup.batch_group_insertion.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -8,7 +7,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -119,7 +117,8 @@ fun ItemInsertionRow(
                         onValueChange = { value ->
                             onUnitChange(value, model.item.subUnitThreshold, { unit = it }, { subUnit = it })
                         },
-                        onValidityChange = { validUnit = it }
+                        onValidityChange = { validUnit = it },
+                        onDone = { focusDate.requestFocus() }
                     )
                     IntField(
                         modifier = Modifier.weight(1f),
@@ -130,7 +129,8 @@ fun ItemInsertionRow(
                         onValueChange = { value ->
                             onSubUnitChange(value, model.item.subUnitThreshold, { unit = it }, { subUnit = it })
                         },
-                        onValidityChange = { validUnit = it }
+                        onValidityChange = { validUnit = it },
+                        onDone = { focusDate.requestFocus() }
                     )
                     DateField(
                         modifier = Modifier.weight(1.2f), // Give date more space

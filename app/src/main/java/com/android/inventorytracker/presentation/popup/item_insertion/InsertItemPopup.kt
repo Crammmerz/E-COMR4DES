@@ -48,12 +48,15 @@ fun InsertItemPopup(
 
     var nameValid by rememberSaveable { mutableStateOf(false) }
     var unitThresholdValid by rememberSaveable { mutableStateOf(true) }
+    var subUnitThresholdValid by rememberSaveable { mutableStateOf(true) }
     var expiryThresholdValid by rememberSaveable { mutableStateOf(true) }
 
-    val allValid = nameValid && unitThresholdValid && expiryThresholdValid
+    // ✅ Added subUnitThresholdValid to validation
+    val allValid = nameValid && unitThresholdValid && subUnitThresholdValid && expiryThresholdValid
 
     val focusName = remember { FocusRequester() }
     val focusUnit = remember { FocusRequester() }
+    val focusSubUnit = remember { FocusRequester() }
     val focusExpiry = remember { FocusRequester() }
 
     var annotation by remember { mutableStateOf("") }
@@ -65,25 +68,20 @@ fun InsertItemPopup(
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
-                .width(480.dp)
-                .heightIn(max = 620.dp), // Limitadong height para mag-trigger ang scroll
+                .width(520.dp) // Nilakihan ko konti para magkasya yung 3 columns
+                .heightIn(max = 620.dp),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = Palette.PopupSurface),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize() // Siguraduhing gamit ang buong Card space
-                    .padding(24.dp)
-            ) {
+            Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
                 HeaderSection()
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Dito sa Column na ito dapat lilitaw lahat ng inputs
                 Column(
                     modifier = Modifier
-                        .weight(1f) // Pinaka-importante: Kumukuha ng available space
+                        .weight(1f)
                         .verticalScroll(scrollState),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
@@ -102,18 +100,30 @@ fun InsertItemPopup(
                         onValidationChange = { nameValid = it }
                     )
 
+                    // ✅ ROW WITH 3 COLUMNS: Unit, Sub-Unit, and Expiry
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         IntField(
                             modifier = Modifier.weight(1f),
                             value = unitThreshold,
                             onValueChange = { unitThreshold = it },
-                            label = "Stock Threshold",
+                            label = "Unit Threshold",
                             placeholder = "1",
                             fieldModifier = Modifier.focusRequester(focusUnit),
                             onValidityChange = { unitThresholdValid = it },
+                            doClear = true
+                        )
+
+                        IntField(
+                            modifier = Modifier.weight(1f),
+                            value = subUnitThreshold,
+                            onValueChange = { subUnitThreshold = it },
+                            label = "Sub Unit", // ✅ Eto yung nawala mhie
+                            placeholder = "1",
+                            fieldModifier = Modifier.focusRequester(focusSubUnit),
+                            onValidityChange = { subUnitThresholdValid = it },
                             doClear = true
                         )
 
@@ -130,17 +140,15 @@ fun InsertItemPopup(
                         )
                     }
 
-                    // Eto yung DescriptionField, nilagyan ko ng height modifier para sure na may box
                     DescriptionField(
                         value = description,
                         onValueChange = { description = it },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(120.dp) // Explicit height para siguradong kita ang box
+                            .height(120.dp)
                     )
                 }
 
-                // Bottom Section (Buttons)
                 Spacer(modifier = Modifier.height(16.dp))
                 HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.5f))
                 Spacer(modifier = Modifier.height(16.dp))
@@ -152,11 +160,7 @@ fun InsertItemPopup(
                 ) {
                     Text(
                         text = if (allValid) "Ready to add" else "Fill required fields",
-                        style = TextStyle(
-                            fontFamily = GoogleSans,
-                            fontSize = 12.sp,
-                            color = Color.Gray
-                        )
+                        style = TextStyle(fontFamily = GoogleSans, fontSize = 12.sp, color = Color.Gray)
                     )
 
                     Spacer(modifier = Modifier.weight(1f))

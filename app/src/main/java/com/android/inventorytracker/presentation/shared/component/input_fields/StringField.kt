@@ -19,6 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -32,7 +34,7 @@ fun StringField(
     value: String,
     onValueChange: (String) -> Unit,
     onValidationChange: ((Boolean) -> Unit)? = null,
-    onDone: () -> Unit,
+    onDone: (() -> Unit)? = null,
     header: String,
     placeholder: String,
     maxLength: Int = 30,
@@ -41,6 +43,9 @@ fun StringField(
     val isTooLong = value.length > maxLength
     val isEmpty = value.isBlank()
     val hasError = isTooLong || isEmpty
+
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(hasError) {
         onValidationChange?.invoke(!hasError)
@@ -97,7 +102,12 @@ fun StringField(
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        if (!hasError) onDone()
+                        if (onDone != null) {
+                            onDone()
+                        } else {
+                            focusManager.clearFocus()
+                            keyboardController?.hide()
+                        }
                     }
                 ),
             )

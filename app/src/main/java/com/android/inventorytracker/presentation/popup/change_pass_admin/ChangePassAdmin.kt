@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +24,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.data.local.entities.UserEntity
-import com.android.inventorytracker.data.model.UserRole
 import com.android.inventorytracker.presentation.shared.component.input_fields.PasswordField
 import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
 import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
@@ -91,7 +91,7 @@ fun ChangePassAdmin(
                 onValueChange = { oldPassword = it },
                 header = "Old Password",
                 onValidityChange = { validOldPass = it },
-                onDone = { focusNewPass.requestFocus() }
+                onDone = { if(valid) focusNewPass.requestFocus() }
             )
 
             PasswordField(
@@ -100,7 +100,7 @@ fun ChangePassAdmin(
                 onValueChange = { newPassword = it },
                 header = "New Password",
                 onValidityChange = { validNewPass = it },
-                onDone = { focusConfirmPass.requestFocus() }
+                onDone = { if(isMatch) focusConfirmPass.requestFocus() }
             )
 
             PasswordField(
@@ -109,7 +109,7 @@ fun ChangePassAdmin(
                 onValueChange = { confirmPass = it },
                 header = "Confirm Password",
                 onValidityChange = { validConfirmPass = it },
-                onDone = { doSubmit() }
+                onDone =  { doSubmit() }
             )
 
             if(!isMatch) Text("Passwords do not match")

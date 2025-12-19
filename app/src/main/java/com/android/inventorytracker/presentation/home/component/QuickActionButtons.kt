@@ -1,26 +1,16 @@
 package com.android.inventorytracker.presentation.home.component
 
-import android.net.Uri
-import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -33,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.android.inventorytracker.presentation.home.viewmodel.HomeViewModel
 import com.android.inventorytracker.presentation.popup.batch_group_insertion.BatchGroupInsertionPopup
 import com.android.inventorytracker.presentation.popup.batch_group_removal.BatchGroupRemovalPopup
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
@@ -43,29 +32,13 @@ import com.android.inventorytracker.ui.theme.Palette
 fun QuickActions(
     modifier: Modifier = Modifier,
     itemViewModel: ItemViewModel = hiltViewModel(),
-    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val model by itemViewModel.itemModelList.collectAsState(initial = emptyList())
-    var csvUri: String? by remember { mutableStateOf(null) }
-
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        val isCsv = uri?.toString()?.endsWith(".csv") ?: false
-        csvUri = if (isCsv) {
-            uri.toString()
-        } else {
-            null
-        }
-        Log.d("QuickActions", "CSV URI: $csvUri")
-    }
 
     var showAddStock by rememberSaveable { mutableStateOf(false) }
     var showRemoveStock by rememberSaveable { mutableStateOf(false) }
-    var showAddCSV by rememberSaveable { mutableStateOf(false) }
     var showRemoveCSV by rememberSaveable { mutableStateOf(false) }
 
-    val showCsvConfirmation by homeViewModel.showImportConfirmation.collectAsState(initial = true)
 
     Row(
         modifier = modifier
@@ -90,48 +63,23 @@ fun QuickActions(
         )
 
         QuickActionButton(
-            label = "Add Stocks (.csv)",
-            modifier = Modifier.weight(1f),
-            bgColor = Palette.PureWhite,
-            contentColor = Palette.DarkBeigeText,
-            onClick = {
-                showAddCSV = true
-                if(!showCsvConfirmation) launcher.launch("text/*")
-            }
-        )
-
-        QuickActionButton(
             label = "Deduct Stocks (.csv)",
             modifier = Modifier.weight(1f),
             bgColor = Palette.PureWhite,
             contentColor = Palette.DarkBeigeText,
-            onClick = {
-                showRemoveCSV = true
-                if(!showCsvConfirmation) launcher.launch("text/*")
-            }
+            onClick = { showRemoveCSV = true }
         )
     }
 
     if (showAddStock) {
         BatchGroupInsertionPopup(model = model, onDismiss = { showAddStock = false })
     }
+
     if (showRemoveStock) {
         BatchGroupRemovalPopup(model = model, onDismiss = { showRemoveStock = false })
     }
 
-    if (showAddCSV && showCsvConfirmation) {
-        AddCsvConfirmation(
-            onDismiss = { showAddCSV = false },
-            onConfirm = { launcher.launch("text/*") }
-        )
-    }
-
-    if (showRemoveCSV && showCsvConfirmation) {
-        DeductCsvConfirmation(
-            onDismiss = { showRemoveCSV = false },
-            onConfirm = { launcher.launch("text/*") },
-        )
-    }
+    ImportCsv(doImport = showRemoveCSV, onDismiss = { showRemoveCSV = false })
 }
 
 @Composable

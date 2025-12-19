@@ -11,7 +11,7 @@ import com.android.inventorytracker.presentation.settings.component.Security
 
 @Composable
 fun Setting() {
-    Column (modifier = Modifier.fillMaxSize().padding(10.dp)) {
+    Column (modifier = Modifier.fillMaxSize()) {
         Security()
     }
 }

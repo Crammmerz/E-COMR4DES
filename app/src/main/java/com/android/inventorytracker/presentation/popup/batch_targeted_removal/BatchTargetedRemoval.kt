@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -27,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,10 +63,13 @@ fun BatchTargetedRemoval(
     var unit by rememberSaveable { mutableFloatStateOf(0f) }
     var subUnit by rememberSaveable { mutableIntStateOf(0) }
     var validUnit by rememberSaveable { mutableStateOf(false) }
+    var validDate by rememberSaveable { mutableStateOf(false) }
     var dateValue by rememberSaveable { mutableStateOf("") }
 
-    val focusManager = LocalFocusManager.current
+
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -104,22 +109,21 @@ fun BatchTargetedRemoval(
                         Spacer(modifier = Modifier.height(12.dp))
                     }
 
-                    // --- Input Fields ---
-                    // Note: If you have a huge number of inputs, this inner column needs scrolling.
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         DateField(
+                            header = "Expiry Date",
+                            placeholder = "MM/DD/YYYY",
                             value = dateValue,
                             onValueChange = { dateValue = it },
-                            onValidityChange = { /* optional */ },
-                            onDone = { focusManager.clearFocus(force = true) },
-                            header = "Expiry Date",
-                            placeholder = "MM/DD/YYYY"
+                            onValidityChange = { validDate = it }
                         )
 
                         FloatField(
+                            label = "Unit",
+                            placeholder = "Enter number of units",
                             value = unit,
                             onValueChange = { value ->
                                 onUnitChange(
@@ -128,12 +132,13 @@ fun BatchTargetedRemoval(
                                     onSubUnit = { subUnit = it }
                                 )
                             },
-                            onValidityChange = { validUnit = it },
-                            label = "Unit",
-                            placeholder = "Enter number of units",
+                            onValidityChange = { validUnit = it }
                         )
 
                         IntField(
+                            label = "Sub Unit",
+                            placeholder = "Enter number of sub units",
+                            doClear = true,
                             value = subUnit,
                             onValueChange = { value ->
                                 onSubUnitChange(
@@ -142,10 +147,7 @@ fun BatchTargetedRemoval(
                                     onSubUnit = { subUnit = it }
                                 )
                             },
-                            onValidityChange = { validUnit = it },
-                            label = "Sub Unit",
-                            placeholder = "Enter number of sub units",
-                            doClear = true,
+                            onValidityChange = { validUnit = it }
                         )
                     }
                 }

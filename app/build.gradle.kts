@@ -56,6 +56,7 @@ dependencies {
     // Compose BOM
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.compose.runtime.livedata)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     debugImplementation(platform(libs.androidx.compose.bom))
 

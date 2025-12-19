@@ -27,6 +27,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 
 @Composable
@@ -37,7 +39,7 @@ fun IntField(
     onValueChange: (Int) -> Unit,
     onValidityChange: (Boolean) -> Unit,
     valueRange: IntRange = 1..9999,
-    onDone: () -> Unit = {},
+    onDone: (() -> Unit)? = null,
     label: String,
     placeholder: String,
     annotation: String = "",
@@ -47,6 +49,8 @@ fun IntField(
     var isFocused by remember { mutableStateOf(false) }
     var isError by remember { mutableStateOf(false) }
 
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(value) {
         if (!isFocused) {
@@ -113,7 +117,16 @@ fun IntField(
                             onValidityChange(false)
                         }
                     },
-                keyboardActions = KeyboardActions( onDone = { onDone() }),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        if (onDone != null) {
+                            onDone()
+                        } else {
+                            focusManager.clearFocus()
+                            keyboardController?.hide()
+                        }
+                    }
+                ),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Done

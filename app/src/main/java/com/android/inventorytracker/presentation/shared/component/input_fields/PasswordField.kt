@@ -25,12 +25,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -48,7 +49,7 @@ fun PasswordField(
     value: String,
     onValueChange: (String) -> Unit,
     onValidityChange: (Boolean) -> Unit,
-    onDone: () -> Unit,
+    onDone: (() -> Unit)? = null,
     header: String,
     minLength: Int = 3,
 ) {
@@ -57,8 +58,10 @@ fun PasswordField(
     val isLengthError = value.isNotEmpty() && value.length < minLength
     val isFormatError = value != value.trim()
 
-
     val isValid = value.isNotEmpty() && !isLengthError && !isFormatError
+
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(isValid) {
         onValidityChange(isValid)
@@ -101,7 +104,12 @@ fun PasswordField(
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        if (isValid) onDone()
+                        if (onDone != null) {
+                            onDone()
+                        } else {
+                            focusManager.clearFocus()
+                            keyboardController?.hide()
+                        }
                     }
                 ),
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),

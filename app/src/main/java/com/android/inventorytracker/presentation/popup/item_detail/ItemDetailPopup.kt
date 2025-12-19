@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +24,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
@@ -75,6 +78,9 @@ fun ItemDetailPopup(
     var riskyFieldChanged by rememberSaveable { mutableStateOf(false) }
     val doUpdate = itemModel.item != updatedItem
     val allValid = nameValid && isStockThresholdValid && expiryThresholdValid && subUnitThresholdValid
+
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(expiryThreshold) {
         annotation = if (expiryThresholdValid) {
@@ -130,8 +136,7 @@ fun ItemDetailPopup(
                         onValueChange = { if(role == UserRole.ADMIN) name = it },
                         header = "Item Name",
                         placeholder = "Enter item name",
-                        onValidationChange = { nameValid = it },
-                        onDone = {  }
+                        onValidationChange = { nameValid = it }
                     )
 
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -141,8 +146,7 @@ fun ItemDetailPopup(
                                 onValueChange = { if(role == UserRole.ADMIN) unitThreshold = it },
                                 label = "Low Stock Threshold",
                                 placeholder = "Enter threshold",
-                                onValidityChange = { isStockThresholdValid = it },
-                                onDone = {  }
+                                onValidityChange = { isStockThresholdValid = it }
                             )
                         }
                         Column(Modifier.weight(1f)) {
@@ -152,8 +156,7 @@ fun ItemDetailPopup(
                                 label = "Expiry Threshold",
                                 placeholder = "Enter threshold (Days)",
                                 annotation = annotation,
-                                onValidityChange = {  expiryThresholdValid = it },
-                                onDone = {  }
+                                onValidityChange = {  expiryThresholdValid = it }
                             )
                         }
                     }
@@ -162,8 +165,7 @@ fun ItemDetailPopup(
                         onValueChange = { if(role == UserRole.ADMIN) subUnitThreshold = it },
                         label = "Sub Unit",
                         placeholder = "Enter threshold",
-                        onValidityChange = { subUnitThresholdValid = it },
-                        onDone = { }
+                        onValidityChange = { subUnitThresholdValid = it }
                     )
                     if(itemModel.item.subUnitThreshold > subUnitThreshold){
                         Text(

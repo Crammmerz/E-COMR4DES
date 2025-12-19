@@ -61,8 +61,27 @@ fun InsertItemPopup(
 
     var annotation by remember { mutableStateOf("") }
 
+    LaunchedEffect(Unit) {
+        focusName.requestFocus()
+    }
+
     LaunchedEffect(expiryThreshold) {
         annotation = if (expiryThresholdValid) convertDaysToString(expiryThreshold) else ""
+    }
+
+    fun doInsert(){
+        onInsert(
+            ItemEntity(
+                imageUri = imageUri,
+                name = name.trim(),
+                unitThreshold = unitThreshold,
+                subUnitThreshold = subUnitThreshold,
+                expiryThreshold = expiryThreshold,
+                description = description.trim()
+            )
+        )
+        onDismiss()
+        Toast.makeText(context, "Item added!", Toast.LENGTH_SHORT).show()
     }
 
     Dialog(onDismissRequest = onDismiss) {
@@ -97,46 +116,48 @@ fun InsertItemPopup(
                         header = "Item Name",
                         placeholder = "Enter item name",
                         modifier = Modifier.focusRequester(focusName),
-                        onValidationChange = { nameValid = it }
+                        onValidationChange = { nameValid = it },
+                        onDone = { focusUnit.requestFocus() }
                     )
 
-                    // ✅ ROW WITH 3 COLUMNS: Unit, Sub-Unit, and Expiry
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         IntField(
                             modifier = Modifier.weight(1f),
-                            value = unitThreshold,
-                            onValueChange = { unitThreshold = it },
+                            fieldModifier = Modifier.focusRequester(focusUnit),
                             label = "Unit Threshold",
                             placeholder = "1",
-                            fieldModifier = Modifier.focusRequester(focusUnit),
+                            doClear = true,
+                            value = unitThreshold,
+                            onValueChange = { unitThreshold = it },
                             onValidityChange = { unitThresholdValid = it },
-                            doClear = true
+                            onDone = { focusSubUnit.requestFocus() }
                         )
 
                         IntField(
                             modifier = Modifier.weight(1f),
+                            fieldModifier = Modifier.focusRequester(focusSubUnit),
+                            label = "Sub Unit",
+                            placeholder = "1",
+                            doClear = true,
                             value = subUnitThreshold,
                             onValueChange = { subUnitThreshold = it },
-                            label = "Sub Unit", // ✅ Eto yung nawala mhie
-                            placeholder = "1",
-                            fieldModifier = Modifier.focusRequester(focusSubUnit),
                             onValidityChange = { subUnitThresholdValid = it },
-                            doClear = true
+                            onDone = { focusExpiry.requestFocus() }
                         )
 
                         IntField(
                             modifier = Modifier.weight(1f),
-                            value = expiryThreshold,
-                            onValueChange = { expiryThreshold = it },
+                            fieldModifier = Modifier.focusRequester(focusExpiry),
                             label = "Expiry Threshold",
                             placeholder = "0",
+                            doClear = true,
+                            value = expiryThreshold,
+                            onValueChange = { expiryThreshold = it },
                             annotation = annotation,
-                            fieldModifier = Modifier.focusRequester(focusExpiry),
                             onValidityChange = { expiryThresholdValid = it },
-                            doClear = true
                         )
                     }
 
@@ -171,20 +192,7 @@ fun InsertItemPopup(
                         text = "Add Item",
                         containerColor = Palette.ButtonDarkBrown,
                         enabled = allValid,
-                        onClick = {
-                            onInsert(
-                                ItemEntity(
-                                    imageUri = imageUri,
-                                    name = name.trim(),
-                                    unitThreshold = unitThreshold,
-                                    subUnitThreshold = subUnitThreshold,
-                                    expiryThreshold = expiryThreshold,
-                                    description = description.trim()
-                                )
-                            )
-                            onDismiss()
-                            Toast.makeText(context, "Item added!", Toast.LENGTH_SHORT).show()
-                        }
+                        onClick = { doInsert() }
                     )
                 }
             }

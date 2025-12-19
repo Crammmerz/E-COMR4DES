@@ -8,7 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.android.inventorytracker.presentation.settings.component.Security
 
-
 @Composable
 fun Setting() {
     Column (modifier = Modifier.fillMaxSize()) {

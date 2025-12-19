@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -47,9 +48,37 @@ fun BatchTargetedRemoval(
     var validDate by rememberSaveable { mutableStateOf(false) }
     var dateValue by rememberSaveable { mutableStateOf("") }
 
+    val focusUnit = remember { FocusRequester() }
+    val focusSubUnit = remember { FocusRequester() }
+    val focusDate = remember { FocusRequester() }
+
     // ✅ Kailangan ito para sa scroll
     val scrollState = rememberScrollState()
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        focusDate.requestFocus()
+    }
+
+    fun doSubmit(){
+        val selectedDate = runCatching {
+            LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+        }.getOrNull()
+
+        val exist = selectedDate?.let { date ->
+            batch.firstOrNull {
+                Instant.ofEpochMilli(it.expiryDate).atZone(ZoneId.systemDefault()).toLocalDate() == date
+            }
+        }
+
+        if (selectedDate == null || exist == null) {
+            Toast.makeText(context, "No batch found for this date", Toast.LENGTH_SHORT).show()
+        } else {
+            batchViewModel.onTargetedDeductStock(exist, subUnit)
+            onDismiss()
+            Toast.makeText(context, "Stock Deducted!", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -90,7 +119,8 @@ fun BatchTargetedRemoval(
                         placeholder = "MM/DD/YYYY",
                         value = dateValue,
                         onValueChange = { dateValue = it },
-                        onValidityChange = { validDate = it }
+                        onValidityChange = { validDate = it },
+                        onDone = { focusSubUnit.requestFocus() }
                     )
 
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -102,7 +132,8 @@ fun BatchTargetedRemoval(
                             onValueChange = { value ->
                                 onUnitChange(value, threshold, { unit = it }, { subUnit = it })
                             },
-                            onValidityChange = { validUnit = it }
+                            onValidityChange = { validUnit = it },
+                            onDone = { doSubmit() }
                         )
 
                         IntField(
@@ -114,7 +145,8 @@ fun BatchTargetedRemoval(
                             onValueChange = { value ->
                                 onSubUnitChange(value, threshold, { unit = it }, { subUnit = it })
                             },
-                            onValidityChange = { validUnit = it }
+                            onValidityChange = { validUnit = it },
+                            onDone = { doSubmit() }
                         )
                     }
 
@@ -136,25 +168,7 @@ fun BatchTargetedRemoval(
                         text = "Deduct Stock",
                         containerColor = Palette.ButtonDarkBrown,
                         enabled = validUnit && validDate, // Mas maganda kung disabled hangga't walang input
-                        onClick = {
-                            val selectedDate = runCatching {
-                                LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
-                            }.getOrNull()
-
-                            val exist = selectedDate?.let { date ->
-                                batch.firstOrNull {
-                                    Instant.ofEpochMilli(it.expiryDate).atZone(ZoneId.systemDefault()).toLocalDate() == date
-                                }
-                            }
-
-                            if (selectedDate == null || exist == null) {
-                                Toast.makeText(context, "No batch found for this date", Toast.LENGTH_SHORT).show()
-                            } else {
-                                batchViewModel.onTargetedDeductStock(exist, subUnit)
-                                onDismiss()
-                                Toast.makeText(context, "Stock Deducted!", Toast.LENGTH_SHORT).show()
-                            }
-                        }
+                        onClick = { doSubmit() }
                     )
                 }
             }

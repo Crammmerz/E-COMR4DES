@@ -27,6 +27,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.focus.FocusRequester
 
 
 private val DialogBg = Color(0xFFFFF8F3)
@@ -46,10 +47,19 @@ fun BatchInsertionPopup(
     var validDate by rememberSaveable { mutableStateOf(false) }
     val valid = validDate && validUnit
 
-    var onSubmit by rememberSaveable { mutableStateOf(false) }
+    val focusUnit = remember { FocusRequester() }
+    val focusSubUnit = remember { FocusRequester() }
+    val focusDate = remember { FocusRequester() }
+
     val context = LocalContext.current
 
-    LaunchedEffect(onSubmit) {
+    LaunchedEffect(Unit) {
+        focusDate.requestFocus()
+    }
+
+    fun doSubmit() {
+        if(!validDate) Toast.makeText(context, "Please enter a valid date", Toast.LENGTH_SHORT).show()
+        if(!validUnit) Toast.makeText(context, "Please enter valid unit/subunit", Toast.LENGTH_SHORT).show()
         if (valid) {
             val selectedDate = runCatching {
                 LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
@@ -107,7 +117,8 @@ fun BatchInsertionPopup(
                         LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
                     }.getOrNull()
                     validDate = isFormatValid && parsed?.isAfter(LocalDate.now()) == true
-                }
+                },
+                onDone = { focusUnit.requestFocus() }
             )
 
             FloatField(
@@ -122,10 +133,14 @@ fun BatchInsertionPopup(
                         onSubUnit = { subUnit = it }
                     )
                 },
-                onValidityChange = { validUnit = it }
+                onValidityChange = { validUnit = it },
+                onDone = { doSubmit() }
             )
 
             IntField(
+                label = "Sub Unit",
+                placeholder = "0",
+                doClear = true,
                 value = subUnit,
                 onValueChange = { value ->
                     onSubUnitChange(
@@ -135,10 +150,8 @@ fun BatchInsertionPopup(
                         onSubUnit = { subUnit = it }
                     )
                 },
-                label = "Sub Unit",
-                placeholder = "0",
                 onValidityChange = { validUnit = it },
-                doClear = true
+                onDone = { doSubmit() }
             )
 
             Spacer(Modifier.height(18.dp))
@@ -165,15 +178,7 @@ fun BatchInsertionPopup(
                 Spacer(Modifier.width(12.dp))
 
                 Button(
-                    onClick = {
-                        when {
-                            !validDate ->
-                                Toast.makeText(context, "Please enter a valid date", Toast.LENGTH_SHORT).show()
-                            !validUnit ->
-                                Toast.makeText(context, "Please enter valid unit/subunit", Toast.LENGTH_SHORT).show()
-                            else -> onSubmit = true
-                        }
-                    },
+                    onClick = { doSubmit() },
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = ActionBrown,

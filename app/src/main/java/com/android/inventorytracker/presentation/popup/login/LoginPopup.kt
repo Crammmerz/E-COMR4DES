@@ -29,11 +29,7 @@ import com.android.inventorytracker.presentation.shared.component.input_fields.S
 import kotlinx.coroutines.launch
 
 // --- Define Google Sans Font Family ---
-private val GoogleSansFamily = FontFamily(
-    Font(R.font.google_sans_regular, FontWeight.Normal),
-    Font(R.font.google_sans_medium, FontWeight.Medium),
-    Font(R.font.google_sans_semibold, FontWeight.SemiBold)
-)
+val GoogleSansFamily = FontFamily.Default
 
 // --- Pure White & Beige Palette ---
 private val PureWhite = Color(0xFFFFFFFF)

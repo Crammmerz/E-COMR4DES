@@ -27,11 +27,7 @@ import com.android.inventorytracker.ui.theme.Palette
 import kotlinx.coroutines.launch
 
 // --- Define Google Sans Family ---
-private val GoogleSansFamily = FontFamily(
-    Font(R.font.google_sans_regular, FontWeight.Normal),
-    Font(R.font.google_sans_medium, FontWeight.Medium),
-    Font(R.font.google_sans_semibold, FontWeight.SemiBold)
-)
+val GoogleSansFamily = FontFamily.Default
 
 @Composable
 fun ChangePassStaff(

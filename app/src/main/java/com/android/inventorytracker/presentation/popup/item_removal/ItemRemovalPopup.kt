@@ -9,6 +9,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -19,112 +21,89 @@ import com.android.inventorytracker.presentation.popup.item_removal.component.In
 import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
 import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.ui.theme.Palette
+import com.android.inventorytracker.ui.theme.GoogleSans
 
 @Composable
 fun DeleteItemPopup(
     model: List<ItemModel>,
-    onDelete: (ItemEntity) -> Unit,
+    onDelete: (List<Int>) -> Unit, // In-update para tumanggap ng list ng IDs
     onDismiss: () -> Unit
 ) {
     val selectedIds = remember { mutableStateListOf<Int>() }
+    // Note: showConfirm is used for your confirmation logic
     var showConfirm by remember { mutableStateOf(false) }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
-                .width(360.dp)
-                .height(560.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Palette.PopupSurface
-            ),
+                .width(480.dp)
+                .heightIn(max = 620.dp), // Identical max height sa Insert
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = Palette.PopupSurface),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .fillMaxWidth()
+                    .padding(24.dp)
             ) {
-
-                // HEADER (same hierarchy as InsertItemPopup)
+                // Header section na may close button
                 HeaderSection(onClose = onDismiss)
 
-                // LIST
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Listahan ng items na pwedeng i-delete
                 LazyColumn(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f, fill = false),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(model, key = { it.item.id }) { itemModel ->
-                        val id = itemModel.item.id
                         InventoryItem(
                             itemModel = itemModel,
-                            isChecked = selectedIds.contains(id),
+                            isChecked = selectedIds.contains(itemModel.item.id),
                             onCheckedChange = { checked ->
-                                if (checked) selectedIds.add(id)
-                                else selectedIds.remove(id)
+                                if (checked) selectedIds.add(itemModel.item.id)
+                                else selectedIds.remove(itemModel.item.id)
                             }
                         )
                     }
                 }
 
-                Divider()
+                // Footer section na kapareho ng styling sa Insert
+                Spacer(modifier = Modifier.height(24.dp))
+                HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.5f))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                // FOOTER
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = "${selectedIds.size} selected",
-                        fontSize = 12.sp,
-                        color = Color.Gray
+                        text = "${selectedIds.size} items selected",
+                        style = TextStyle(
+                            fontFamily = GoogleSans,
+                            fontSize = 12.sp,
+                            color = Color.Gray
+                        )
                     )
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    // Cancel (reddish like Deduct)
-                    CancelButton(
-                        text = "Cancel",
-                        onClick = onDismiss
-                    )
+                    CancelButton(onClick = onDismiss)
 
                     ConfirmButton(
                         text = "Remove",
                         containerColor = Palette.ButtonDarkBrown,
                         enabled = selectedIds.isNotEmpty(),
-                        onClick = { showConfirm = true }
+                        onClick = {
+                            onDelete(selectedIds.toList())
+                            onDismiss()
+                        }
                     )
                 }
             }
         }
-    }
-
-    // CONFIRM DIALOG
-    if (showConfirm) {
-        AlertDialog(
-            onDismissRequest = { showConfirm = false },
-            title = { Text("Confirm Removal") },
-            text = { Text("Remove ${selectedIds.size} selected item(s)?") },
-            confirmButton = {
-                TextButton(onClick = {
-                    model.forEach {
-                        if (selectedIds.contains(it.item.id)) {
-                            onDelete(it.item)
-                        }
-                    }
-                    showConfirm = false
-                    onDismiss()
-                }) {
-                    Text("Remove", color = Color.Red)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showConfirm = false }) {
-                    Text("Cancel")
-                }
-            }
-        )
     }
 }

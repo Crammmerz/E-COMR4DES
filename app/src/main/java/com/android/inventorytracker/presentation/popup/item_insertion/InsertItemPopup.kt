@@ -2,18 +2,22 @@ package com.android.inventorytracker.presentation.popup.item_insertion
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.android.inventorytracker.data.local.entities.ItemEntity
 import com.android.inventorytracker.presentation.popup.item_insertion.component.HeaderSection
@@ -24,6 +28,7 @@ import com.android.inventorytracker.presentation.shared.component.input_fields.I
 import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
 import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.ui.theme.Palette
+import com.android.inventorytracker.ui.theme.GoogleSans
 import com.android.inventorytracker.util.convertDaysToString
 
 @Composable
@@ -32,6 +37,7 @@ fun InsertItemPopup(
     onInsert: (ItemEntity) -> Unit
 ) {
     val context = LocalContext.current
+    val scrollState = rememberScrollState()
 
     var imageUri by rememberSaveable { mutableStateOf<String?>(null) }
     var name by rememberSaveable { mutableStateOf("") }
@@ -43,72 +49,44 @@ fun InsertItemPopup(
     var nameValid by rememberSaveable { mutableStateOf(false) }
     var unitThresholdValid by rememberSaveable { mutableStateOf(true) }
     var expiryThresholdValid by rememberSaveable { mutableStateOf(true) }
-    var subUnitThresholdValid by rememberSaveable { mutableStateOf(true) }
 
-    val allValid =
-        nameValid && unitThresholdValid && expiryThresholdValid && subUnitThresholdValid
+    val allValid = nameValid && unitThresholdValid && expiryThresholdValid
 
     val focusName = remember { FocusRequester() }
     val focusUnit = remember { FocusRequester() }
-    val focusSubUnit = remember { FocusRequester() }
     val focusExpiry = remember { FocusRequester() }
-    val focusDescription = remember { FocusRequester() }
 
     var annotation by remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
-        focusName.requestFocus()
-    }
-
     LaunchedEffect(expiryThreshold) {
-        annotation = if (expiryThresholdValid) {
-            convertDaysToString(expiryThreshold)
-        } else ""
-    }
-
-    fun doInsert() {
-        if (allValid) {
-            val item = ItemEntity(
-                imageUri = imageUri,
-                name = name.trim(),
-                unitThreshold = unitThreshold,
-                subUnitThreshold = subUnitThreshold,
-                expiryThreshold = expiryThreshold,
-                description = description.trim()
-            )
-            onInsert(item)
-            onDismiss()
-            Toast.makeText(context, "Item added!", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(
-                context,
-                "Please fill required fields",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+        annotation = if (expiryThresholdValid) convertDaysToString(expiryThreshold) else ""
     }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
-                .width(380.dp)   // ✅ INCREASED WIDTH
-                .height(600.dp),
-            shape = RoundedCornerShape(16.dp),
+                .width(480.dp)
+                .heightIn(max = 620.dp), // Limitadong height para mag-trigger ang scroll
+            shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = Palette.PopupSurface),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
-            Box(
+            Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxSize() // Siguraduhing gamit ang buong Card space
                     .padding(24.dp)
             ) {
+                HeaderSection()
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Dito sa Column na ito dapat lilitaw lahat ng inputs
                 Column(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .weight(1f) // Pinaka-importante: Kumukuha ng available space
+                        .verticalScroll(scrollState),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-
-                    HeaderSection()
-
                     PhotoSelectionButton(
                         modifier = Modifier.fillMaxWidth(),
                         image = imageUri,
@@ -121,8 +99,7 @@ fun InsertItemPopup(
                         header = "Item Name",
                         placeholder = "Enter item name",
                         modifier = Modifier.focusRequester(focusName),
-                        onValidationChange = { nameValid = it },
-                        onDone = { if (nameValid) focusUnit.requestFocus() }
+                        onValidationChange = { nameValid = it }
                     )
 
                     Row(
@@ -137,8 +114,7 @@ fun InsertItemPopup(
                             placeholder = "1",
                             fieldModifier = Modifier.focusRequester(focusUnit),
                             onValidityChange = { unitThresholdValid = it },
-                            onDone = { if (unitThresholdValid) focusExpiry.requestFocus() },
-                            doClear = true,
+                            doClear = true
                         )
 
                         IntField(
@@ -146,60 +122,68 @@ fun InsertItemPopup(
                             value = expiryThreshold,
                             onValueChange = { expiryThreshold = it },
                             label = "Expiry Threshold",
-                            placeholder = "Enter threshold (Days)",
+                            placeholder = "0",
                             annotation = annotation,
                             fieldModifier = Modifier.focusRequester(focusExpiry),
                             onValidityChange = { expiryThresholdValid = it },
-                            onDone = { if (expiryThresholdValid) focusSubUnit.requestFocus() },
-                            doClear = true,
+                            doClear = true
                         )
                     }
 
-                    IntField(
-                        value = subUnitThreshold,
-                        onValueChange = { subUnitThreshold = it },
-                        label = "Sub Unit Threshold",
-                        placeholder = "1",
-                        fieldModifier = Modifier.focusRequester(focusSubUnit),
-                        onValidityChange = { subUnitThresholdValid = it },
-                        doClear = true,
-                    )
-
+                    // Eto yung DescriptionField, nilagyan ko ng height modifier para sure na may box
                     DescriptionField(
                         value = description,
                         onValueChange = { description = it },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f),
-                        fieldModifier = Modifier.focusRequester(focusDescription)
+                            .height(120.dp) // Explicit height para siguradong kita ang box
+                    )
+                }
+
+                // Bottom Section (Buttons)
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.5f))
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = if (allValid) "Ready to add" else "Fill required fields",
+                        style = TextStyle(
+                            fontFamily = GoogleSans,
+                            fontSize = 12.sp,
+                            color = Color.Gray
+                        )
                     )
 
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        CancelButton(onClick = onDismiss)
+                    Spacer(modifier = Modifier.weight(1f))
 
-                        ConfirmButton(
-                            text = "Add Item",
-                            containerColor = Palette.ButtonDarkBrown,
-                            onClick = { doInsert() }
-                        )
-                    }
+                    CancelButton(onClick = onDismiss)
+
+                    ConfirmButton(
+                        text = "Add Item",
+                        containerColor = Palette.ButtonDarkBrown,
+                        enabled = allValid,
+                        onClick = {
+                            onInsert(
+                                ItemEntity(
+                                    imageUri = imageUri,
+                                    name = name.trim(),
+                                    unitThreshold = unitThreshold,
+                                    subUnitThreshold = subUnitThreshold,
+                                    expiryThreshold = expiryThreshold,
+                                    description = description.trim()
+                                )
+                            )
+                            onDismiss()
+                            Toast.makeText(context, "Item added!", Toast.LENGTH_SHORT).show()
+                        }
+                    )
                 }
             }
         }
     }
-}
-
-@Preview(
-    showBackground = true,
-    name = "AddNewItemPopup Preview",
-    device = "spec:width=960dp,height=600dp,dpi=240,isRound=false,orientation=landscape"
-)
-@Composable
-fun AddNewItemPopupPreview() {
-    InsertItemPopup(
-        onDismiss = {},
-        onInsert = {}
-    )
 }

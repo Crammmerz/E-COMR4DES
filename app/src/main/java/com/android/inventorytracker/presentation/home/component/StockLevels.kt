@@ -15,26 +15,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.unit.sp
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.ui.theme.Palette
 
-// --- Google Sans Font Family Definition ---
-
 @Composable
-fun StockLevels(modifier: Modifier, itemModel: List<ItemModel>){
+fun StockLevels(modifier: Modifier, itemModel: List<ItemModel>) {
 
-    Column(modifier = modifier
-        .background(Palette.PureWhite)
-        .padding(24.dp)
-    ){
+    Column(
+        modifier = modifier
+            .background(Palette.PureWhite)
+            .padding(24.dp)
+    ) {
         // Header Text
         Text(
             text = "Stocks",
@@ -45,56 +44,64 @@ fun StockLevels(modifier: Modifier, itemModel: List<ItemModel>){
             )
         )
 
-        // List of Stock Items
-        LazyColumn (
-            modifier = Modifier
-                .padding(top = 16.dp)
-                .weight(1f),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(itemModel) { model ->
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    // Item Name
-                    Text(
-                        model.item.name,
-                        style = TextStyle(
-                            fontWeight = FontWeight.Medium, // Medium for item name
-                            fontSize = 16.sp,
-                            color = Palette.DarkBeigeText
-                        )
-                    )
-
-                    // Progress Bar Row
-                    Row (
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(top = 4.dp)
+        if (itemModel.isNotEmpty()) {
+            LazyColumn(
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .weight(1f),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(itemModel) { model ->
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        // Linear Progress Indicator (iOS Look)
-                        LinearProgressIndicator(
-                            progress = { (model.totalUnit().toFloat() / model.item.unitThreshold.toFloat()) },
-                            modifier = Modifier
-                                .weight(1f)
-                                .clip(RoundedCornerShape(8.dp))
-                                .height(8.dp),
-                            color = model.stockColor, // Retain model's color for visual alert
-                            trackColor = Palette.BeigeProgressTrack // Use light beige track color
-                        )
-
-                        // Count Text
+                        // Item Name
                         Text(
-                            text = "${model.totalUnitFormatted()} / ${model.item.unitThreshold}",
-                            modifier = Modifier.width(100.dp),
-                            textAlign = TextAlign.End,
+                            model.item.name,
                             style = TextStyle(
-                                fontWeight = FontWeight.Normal, // Regular for detail count
-                                fontSize = 14.sp,
-                                color = Palette.LightBeigeText // Use light beige for subtle count text
+                                fontWeight = FontWeight.Medium, // Medium for item name
+                                fontSize = 16.sp,
+                                color = Palette.DarkBeigeText
                             )
                         )
+
+                        // Progress Bar Row
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(top = 4.dp)
+                        ) {
+                            // Linear Progress Indicator (iOS Look)
+                            LinearProgressIndicator(
+                                progress = {
+                                    (model.totalUnit()
+                                        .toFloat() / model.item.unitThreshold.toFloat())
+                                },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .height(8.dp),
+                                color = model.stockColor, // Retain model's color for visual alert
+                                trackColor = Palette.BeigeProgressTrack // Use light beige track color
+                            )
+
+                            // Count Text
+                            Text(
+                                text = "${model.totalUnitFormatted()} / ${model.item.unitThreshold}",
+                                modifier = Modifier.width(100.dp),
+                                textAlign = TextAlign.End,
+                                style = TextStyle(
+                                    fontWeight = FontWeight.Normal, // Regular for detail count
+                                    fontSize = 14.sp,
+                                    color = Palette.LightBeigeText // Use light beige for subtle count text
+                                )
+                            )
+                        }
                     }
                 }
+            }
+        } else {
+            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                Text("You're stocked up — no low stock alerts")
             }
         }
     }

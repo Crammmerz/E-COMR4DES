@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">InventoryTracker</string>
+    <string name="app_name">Inventory Tracker</string>
 
     <!-- Channel Names -->
     <string name="channel_name_critical">Critical Alerts</string>

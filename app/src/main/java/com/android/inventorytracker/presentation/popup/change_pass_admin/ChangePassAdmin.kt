@@ -25,12 +25,6 @@ import com.android.inventorytracker.presentation.shared.component.primitive.Conf
 import com.android.inventorytracker.ui.theme.Palette
 import kotlinx.coroutines.launch
 
-val GoogleSansFamily = FontFamily(
-    Font(R.font.google_sans, FontWeight.Normal),
-    Font(R.font.google_sans, FontWeight.Medium),
-    Font(R.font.google_sans, FontWeight.SemiBold)
-)
-
 
 @Composable
 fun ChangePassAdmin(
@@ -54,6 +48,13 @@ fun ChangePassAdmin(
     val focusNewPass = remember { FocusRequester() }
     val focusConfirmPass = remember { FocusRequester() }
 
+    fun doSubmit(){
+        scope.launch {
+            val user = UserEntity(username = "admin", passwordHash = oldPassword, role = "ADMIN")
+            if(onSubmit(user, newPassword)) onDismiss()
+        }
+    }
+
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false)
@@ -71,7 +72,6 @@ fun ChangePassAdmin(
                 Text(
                     text = "Admin Password Change",
                     style = TextStyle(
-                        fontFamily = GoogleSansFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 22.sp,
                         letterSpacing = (-0.5).sp
@@ -85,21 +85,24 @@ fun ChangePassAdmin(
                         value = oldPassword,
                         onValueChange = { oldPassword = it },
                         header = "Old Password",
-                        onValidityChange = { validOld = it } // Fix para sa error
+                        onValidityChange = { validOld = it }, // Fix para sa error
+                        onDone = { focusNewPass.requestFocus() }
                     )
                     PasswordField(
                         fieldModifier = Modifier.focusRequester(focusNewPass),
                         value = newPassword,
                         onValueChange = { newPassword = it },
                         header = "New Password",
-                        onValidityChange = { validNew = it } // Fix para sa error
+                        onValidityChange = { validNew = it }, // Fix para sa error
+                        onDone = { focusConfirmPass.requestFocus() }
                     )
                     PasswordField(
                         fieldModifier = Modifier.focusRequester(focusConfirmPass),
                         value = confirmPass,
                         onValueChange = { confirmPass = it },
                         header = "Confirm Password",
-                        onValidityChange = { validConfirm = it } // Fix para sa error
+                        onValidityChange = { validConfirm = it }, // Fix para sa error
+                        onDone = { focusOldPass.requestFocus() }
                     )
                 }
 
@@ -111,7 +114,6 @@ fun ChangePassAdmin(
                     // Ito ang "teknik" para maging Google Sans ang buttons
                     CompositionLocalProvider(
                         LocalTextStyle provides TextStyle(
-                            fontFamily = GoogleSansFamily,
                             fontWeight = FontWeight.Medium,
                             fontSize = 16.sp
                         )
@@ -123,12 +125,7 @@ fun ChangePassAdmin(
                         ConfirmButton(
                             text = "Change Password",
                             enabled = valid && isMatch,
-                            onClick = {
-                                scope.launch {
-                                    val user = UserEntity(username = "admin", passwordHash = oldPassword, role = "ADMIN")
-                                    if(onSubmit(user, newPassword)) onDismiss()
-                                }
-                            }
+                            onClick = { doSubmit() },
                         )
                     }
                 }

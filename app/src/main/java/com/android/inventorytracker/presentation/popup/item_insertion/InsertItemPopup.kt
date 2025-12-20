@@ -124,10 +124,10 @@ fun InsertItemPopup(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        IntField(
+                        IntField( // Low Stock Alerts 20% of the unit threshold value
                             modifier = Modifier.weight(1f),
                             fieldModifier = Modifier.focusRequester(focusUnit),
-                            label = "Unit Threshold",
+                            label = "Low Stock Threshold",
                             placeholder = "1",
                             doClear = true,
                             value = unitThreshold,
@@ -136,19 +136,7 @@ fun InsertItemPopup(
                             onDone = { focusSubUnit.requestFocus() }
                         )
 
-                        IntField(
-                            modifier = Modifier.weight(1f),
-                            fieldModifier = Modifier.focusRequester(focusSubUnit),
-                            label = "Sub Unit",
-                            placeholder = "1",
-                            doClear = true,
-                            value = subUnitThreshold,
-                            onValueChange = { subUnitThreshold = it },
-                            onValidityChange = { subUnitThresholdValid = it },
-                            onDone = { focusExpiry.requestFocus() }
-                        )
-
-                        IntField(
+                        IntField( // Expiry Alerts
                             modifier = Modifier.weight(1f),
                             fieldModifier = Modifier.focusRequester(focusExpiry),
                             label = "Expiry Threshold",
@@ -158,6 +146,18 @@ fun InsertItemPopup(
                             onValueChange = { expiryThreshold = it },
                             annotation = annotation,
                             onValidityChange = { expiryThresholdValid = it },
+                            onDone = { focusSubUnit.requestFocus() }
+                        )
+
+                        IntField( // sub‑unit is basically a smaller measurable piece that belongs to a bigger unit.
+                            modifier = Modifier.weight(1f),
+                            fieldModifier = Modifier.focusRequester(focusSubUnit),
+                            label = "Sub Unit",
+                            placeholder = "1",
+                            doClear = true,
+                            value = subUnitThreshold,
+                            onValueChange = { subUnitThreshold = it },
+                            onValidityChange = { subUnitThresholdValid = it }
                         )
                     }
 

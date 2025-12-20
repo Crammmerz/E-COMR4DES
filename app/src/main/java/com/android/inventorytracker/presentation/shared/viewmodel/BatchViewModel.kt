@@ -25,7 +25,11 @@ class BatchViewModel @Inject constructor(
             if (existing==null) {
                 itemRepository.insertBatch(batch)
             } else {
-                existing.subUnit += batch.subUnit
+                val newSubUnit = existing.subUnit.toLong() + batch.subUnit.toLong()
+                if (newSubUnit > Int.MAX_VALUE) {
+                    throw IllegalStateException("Integer limit exceeded for subUnit")
+                }
+                existing.subUnit = newSubUnit.toInt()
                 itemRepository.updateBatch(existing)
             }
         }

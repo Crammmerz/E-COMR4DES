@@ -2,7 +2,6 @@ package com.android.inventorytracker.presentation.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -10,6 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.presentation.home.component.ExpiryLevels
@@ -18,22 +18,18 @@ import com.android.inventorytracker.presentation.home.component.StockLevels
 import com.android.inventorytracker.presentation.home.component.QuickActions
 import com.android.inventorytracker.presentation.home.viewmodel.HomeViewModel
 import com.android.inventorytracker.ui.theme.Palette
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Remove
-import androidx.compose.material3.Icon
-
 
 @Composable
 fun Home(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = hiltViewModel()) {
     val expiryItems by homeViewModel.expiryItems.collectAsState(initial = emptyList())
     val stockItems by homeViewModel.stockItems.collectAsState(initial = emptyList())
 
+    // ✅ Match the background color used in the Inventory screen
+    val backgroundColor = Color(0xFFFEF7ED)
+
     Surface(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Palette.iOSBackgroundLight),
-        color = Palette.iOSBackgroundLight
+        modifier = modifier.fillMaxSize(),
+        color = backgroundColor
     ) {
         Column(
             modifier = Modifier
@@ -54,6 +50,7 @@ fun Home(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = hiltViewM
                 horizontalArrangement = Arrangement.spacedBy(32.dp),
                 verticalAlignment = Alignment.Top
             ) {
+                // Expiry Levels Card
                 Surface(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(32.dp),
@@ -73,6 +70,7 @@ fun Home(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = hiltViewM
                     }
                 }
 
+                // Stock Levels Card
                 Surface(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(32.dp),
@@ -95,4 +93,3 @@ fun Home(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = hiltViewM
         }
     }
 }
-

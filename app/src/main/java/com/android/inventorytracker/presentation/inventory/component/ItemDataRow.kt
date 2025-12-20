@@ -34,7 +34,6 @@ import com.android.inventorytracker.presentation.popup.item_detail.ItemDetailPop
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 
-// Colors matching the new design reference (Lumi Cafe Theme)
 val SurfaceWhite = Color.White
 val LightBeigeField = Color(0xFFF2ECE6) // Background for Name/Expiry boxes
 val AccentBrown = Color(0xFFC19A6B)     // Background for "Current" box

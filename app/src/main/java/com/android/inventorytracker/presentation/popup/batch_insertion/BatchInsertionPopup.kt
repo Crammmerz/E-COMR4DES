@@ -1,37 +1,39 @@
 package com.android.inventorytracker.presentation.popup.batch_insertion
 
 import android.widget.Toast
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.presentation.shared.component.input_fields.DateField
 import com.android.inventorytracker.presentation.shared.component.input_fields.FloatField
 import com.android.inventorytracker.presentation.shared.component.input_fields.IntField
-import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
+import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
+import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
+import com.android.inventorytracker.ui.theme.GoogleSans
+import com.android.inventorytracker.ui.theme.Palette
 import com.android.inventorytracker.util.onSubUnitChange
 import com.android.inventorytracker.util.onUnitChange
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.ui.focus.FocusRequester
-
-
-private val DialogBg = Color(0xFFFFF8F3)
-private val ActionBrown = Color(0xFF5D4037)
 
 @Composable
 fun BatchInsertionPopup(
@@ -45,12 +47,12 @@ fun BatchInsertionPopup(
 
     var validUnit by rememberSaveable { mutableStateOf(false) }
     var validDate by rememberSaveable { mutableStateOf(false) }
-    val valid = validDate && validUnit
 
     val focusUnit = remember { FocusRequester() }
     val focusSubUnit = remember { FocusRequester() }
     val focusDate = remember { FocusRequester() }
 
+    val scrollState = rememberScrollState()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -58,134 +60,133 @@ fun BatchInsertionPopup(
     }
 
     fun doSubmit() {
-        if(!validDate) Toast.makeText(context, "Please enter a valid date", Toast.LENGTH_SHORT).show()
-        if(!validUnit) Toast.makeText(context, "Please enter valid unit/subunit", Toast.LENGTH_SHORT).show()
-        if (valid) {
-            val selectedDate = runCatching {
-                LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
-            }.getOrNull()
+        val selectedDate = runCatching {
+            LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+        }.getOrNull()
 
-            if (selectedDate != null) {
-                val batch = ItemBatchEntity(
-                    itemId = itemModel.item.id,
-                    subUnit = subUnit,
-                    expiryDate = selectedDate
-                        .atStartOfDay(ZoneId.systemDefault())
-                        .toInstant()
-                        .toEpochMilli()
-                )
-                batchViewModel.onStoreBatch(batch)
-                onDismiss()
-            }
+        if (selectedDate == null) {
+            Toast.makeText(context, "Please enter a valid date", Toast.LENGTH_SHORT).show()
+        } else if (!validUnit) {
+            Toast.makeText(context, "Please enter valid unit/subunit", Toast.LENGTH_SHORT).show()
+        } else {
+            val batch = ItemBatchEntity(
+                itemId = itemModel.item.id,
+                subUnit = subUnit,
+                expiryDate = selectedDate
+                    .atStartOfDay(ZoneId.systemDefault())
+                    .toInstant()
+                    .toEpochMilli()
+            )
+            batchViewModel.onStoreBatch(batch)
+            onDismiss()
+            Toast.makeText(context, "Stock Added!", Toast.LENGTH_SHORT).show()
         }
     }
 
-    DialogHost(
-        modifier = Modifier
-            .width(420.dp)
-            .wrapContentHeight()
-            .background(DialogBg, RoundedCornerShape(20.dp)),
-        onDismissRequest = onDismiss,
-        useImePadding = true
-    ) {
-        Column(
-            modifier = Modifier.padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            modifier = Modifier
+                .width(480.dp)
+                .heightIn(max = 620.dp),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = Palette.PopupSurface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
-
-            // 🔹 TITLE
-            Text(
-                text = "Add Stock",
-                style = MaterialTheme.typography.titleLarge
-            )
-
-            Text(
-                text = "Specify the expiry date and amount you wish to add.",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
-            )
-
-            Spacer(Modifier.height(6.dp))
-
-            DateField(
-                header = "Expiry Date",
-                placeholder = "MM/DD/YYYY",
-                value = dateValue,
-                onValueChange = { dateValue = it },
-                onValidityChange = { isFormatValid ->
-                    val parsed = runCatching {
-                        LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
-                    }.getOrNull()
-                    validDate = isFormatValid && parsed?.isAfter(LocalDate.now()) == true
-                },
-                onDone = { focusUnit.requestFocus() }
-            )
-
-            FloatField(
-                label = "Unit",
-                placeholder = "0",
-                value = unit,
-                onValueChange = { value ->
-                    onUnitChange(
-                        unit = value,
-                        threshold = itemModel.item.subUnitThreshold,
-                        onUnit = { unit = it },
-                        onSubUnit = { subUnit = it }
+            Column(modifier = Modifier.padding(24.dp)) {
+                // Header (Exact copy of Removal design)
+                Text(
+                    text = "Add Stock",
+                    style = TextStyle(
+                        fontFamily = GoogleSans,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp,
+                        color = Palette.ButtonDarkBrown
                     )
-                },
-                onValidityChange = { validUnit = it },
-                onDone = { doSubmit() }
-            )
+                )
+                Text(
+                    text = "Specify the expiry date and amount you wish to add.",
+                    style = TextStyle(fontFamily = GoogleSans, fontSize = 13.sp, color = Color.Gray)
+                )
 
-            IntField(
-                label = "Sub Unit",
-                placeholder = "0",
-                doClear = true,
-                value = subUnit,
-                onValueChange = { value ->
-                    onSubUnitChange(
-                        subUnit = value,
-                        threshold = itemModel.item.subUnitThreshold,
-                        onUnit = { unit = it },
-                        onSubUnit = { subUnit = it }
-                    )
-                },
-                onValidityChange = { validUnit = it },
-                onDone = { doSubmit() }
-            )
+                Spacer(modifier = Modifier.height(20.dp))
 
-            Spacer(Modifier.height(18.dp))
-
-            // 🔹 ACTION BUTTONS
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                // Cancel (transparent + brown border)
-                OutlinedButton(
-                    onClick = onDismiss,
-                    shape = RoundedCornerShape(8.dp),
-                    border = BorderStroke(1.dp, ActionBrown),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = ActionBrown
-                    )
+                // Scrollable Content Area
+                Column(
+                    modifier = Modifier
+                        .weight(1f, fill = false)
+                        .verticalScroll(scrollState),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text("Cancel")
+                    DateField(
+                        header = "Expiry Date",
+                        placeholder = "MM/DD/YYYY",
+                        value = dateValue,
+                        onValueChange = { dateValue = it },
+                        onValidityChange = { isFormatValid ->
+                            // Check if the current dateValue is parseable
+                            val parsed = runCatching {
+                                LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+                            }.getOrNull()
+                            validDate = isFormatValid && parsed != null
+                        },
+                        onDone = { focusUnit.requestFocus() }
+                    )
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        FloatField(
+                            modifier = Modifier.weight(1f),
+                            label = "Unit",
+                            placeholder = "0",
+                            value = unit,
+                            onValueChange = { value ->
+                                onUnitChange(
+                                    unit = value,
+                                    threshold = itemModel.item.subUnitThreshold,
+                                    onUnit = { unit = it },
+                                    onSubUnit = { subUnit = it }
+                                )
+                            },
+                            onValidityChange = { validUnit = it },
+                            onDone = { focusSubUnit.requestFocus() }
+                        )
+
+                        IntField(
+                            modifier = Modifier.weight(1f),
+                            label = "Sub Unit",
+                            placeholder = "0",
+                            doClear = true,
+                            value = subUnit,
+                            onValueChange = { value ->
+                                onSubUnitChange(
+                                    subUnit = value,
+                                    threshold = itemModel.item.subUnitThreshold,
+                                    onUnit = { unit = it },
+                                    onSubUnit = { subUnit = it }
+                                )
+                            },
+                            onValidityChange = { validUnit = it },
+                            onDone = { doSubmit() }
+                        )
+                    }
                 }
 
-                Spacer(Modifier.width(12.dp))
+                // Footer (Static)
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.5f))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                Button(
-                    onClick = { doSubmit() },
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = ActionBrown,
-                        contentColor = Color.White
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Add Stock")
+                    CancelButton(onClick = onDismiss)
+                    ConfirmButton(
+                        text = "Add Stock",
+                        containerColor = Palette.ButtonDarkBrown,
+                        enabled = validUnit && validDate,
+                        onClick = { doSubmit() }
+                    )
                 }
             }
         }

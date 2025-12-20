@@ -108,7 +108,7 @@ fun ItemRemovalRow(
                         placeholder = "0",
                         doClear = true,
                         value = subUnit,
-                        valueRange = 0..model.totalSubUnit(),
+                        valueRange = 1..model.totalSubUnit(),
                         onValueChange = { value ->
                             onSubUnitChange(value, model.item.subUnitThreshold, { unit = it }, { subUnit = it })
                         },

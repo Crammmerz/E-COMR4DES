@@ -39,7 +39,7 @@ fun FloatField(
     value: Float,
     onValueChange: (Float) -> Unit,
     onValidityChange: (Boolean) -> Unit,
-    valueRange: ClosedFloatingPointRange<Float> = 0f..9999f,
+    valueRange: ClosedFloatingPointRange<Float> = 0f..1000f,
     onDone: (() -> Unit)? = null,
     label: String,
     placeholder: String,

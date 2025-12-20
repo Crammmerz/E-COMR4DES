@@ -38,7 +38,7 @@ fun IntField(
     value: Int,
     onValueChange: (Int) -> Unit,
     onValidityChange: (Boolean) -> Unit,
-    valueRange: IntRange = 1..9999,
+    valueRange: IntRange = 1..20000,
     onDone: (() -> Unit)? = null,
     label: String,
     placeholder: String,

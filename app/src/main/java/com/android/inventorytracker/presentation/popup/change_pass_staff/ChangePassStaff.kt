@@ -27,11 +27,6 @@ import com.android.inventorytracker.ui.theme.Palette
 import kotlinx.coroutines.launch
 
 // --- Define Google Sans Family ---
-private val GoogleSansFamily = FontFamily(
-    Font(R.font.google_sans_regular, FontWeight.Normal),
-    Font(R.font.google_sans_medium, FontWeight.Medium),
-    Font(R.font.google_sans_semibold, FontWeight.SemiBold)
-)
 
 @Composable
 fun ChangePassStaff(
@@ -96,7 +91,6 @@ fun ChangePassStaff(
                 Text(
                     text = "Staff Password Change",
                     style = TextStyle(
-                        fontFamily = GoogleSansFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp,
                         letterSpacing = (-0.5).sp
@@ -130,7 +124,6 @@ fun ChangePassStaff(
                         Text(
                             text = "Passwords do not match",
                             style = TextStyle(
-                                fontFamily = GoogleSansFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 14.sp
                             ),
@@ -141,7 +134,6 @@ fun ChangePassStaff(
                         Text(
                             text = "Unable to change password",
                             style = TextStyle(
-                                fontFamily = GoogleSansFamily,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 14.sp
                             ),
@@ -158,7 +150,6 @@ fun ChangePassStaff(
                     // Force Google Sans on Buttons
                     CompositionLocalProvider(
                         LocalTextStyle provides TextStyle(
-                            fontFamily = GoogleSansFamily,
                             fontWeight = FontWeight.Medium,
                             fontSize = 16.sp
                         )

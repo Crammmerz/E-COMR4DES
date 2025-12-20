@@ -145,6 +145,7 @@ fun BatchTargetedRemoval(
                             onValueChange = { value ->
                                 onSubUnitChange(value, threshold, { unit = it }, { subUnit = it })
                             },
+                            valueRange = 1..2147483647,
                             onValidityChange = { validUnit = it },
                             onDone = { doSubmit() }
                         )

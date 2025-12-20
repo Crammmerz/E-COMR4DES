@@ -129,6 +129,7 @@ fun ItemInsertionRow(
                         onValueChange = { value ->
                             onSubUnitChange(value, model.item.subUnitThreshold, { unit = it }, { subUnit = it })
                         },
+                        valueRange = 1..2000000,
                         onValidityChange = { validUnit = it },
                         onDone = { focusDate.requestFocus() }
                     )

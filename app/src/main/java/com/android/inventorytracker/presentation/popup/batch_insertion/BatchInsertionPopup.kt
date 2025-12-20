@@ -150,6 +150,7 @@ fun BatchInsertionPopup(
                         onSubUnit = { subUnit = it }
                     )
                 },
+                valueRange = 1..2000000,
                 onValidityChange = { validUnit = it },
                 onDone = { doSubmit() }
             )

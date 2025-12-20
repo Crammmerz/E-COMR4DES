@@ -127,7 +127,7 @@ fun BatchInsertionPopup(
                             val parsed = runCatching {
                                 LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
                             }.getOrNull()
-                            validDate = isFormatValid && parsed != null
+                            validDate = isFormatValid && parsed?.isAfter(LocalDate.now()) == true
                         },
                         onDone = { focusUnit.requestFocus() }
                     )

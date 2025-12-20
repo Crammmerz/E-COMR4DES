@@ -35,9 +35,9 @@ import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 
 val SurfaceWhite = Color.White
-val LightBeigeField = Color(0xFFF2ECE6) // Background for Name/Expiry boxes
-val AccentBrown = Color(0xFFC19A6B)     // Background for "Current" box
-val ActionBrown = Color(0xFF8D6E63)     // Color for the View button
+val LightBeigeField = Color(0xFFF2ECE6)
+val AccentBrown = Color(0xFFC19A6B)
+val ActionBrown = Color(0xFF8D6E63)
 val BorderColor = Color(0xFFE0E0E0)
 
 @Composable
@@ -67,12 +67,14 @@ fun ItemDataRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(15.dp)
         ) {
+
             // 1. Image
-            val painter = if(model.item.imageUri != null){
+            val painter = if (model.item.imageUri != null) {
                 rememberAsyncImagePainter(model = model.item.imageUri)
             } else {
                 painterResource(id = R.drawable.outline_add_photo_alternate_24)
             }
+
             Image(
                 painter = painter,
                 contentDescription = "Item Image",
@@ -83,7 +85,7 @@ fun ItemDataRow(
                     .background(Color.LightGray.copy(alpha = 0.2f))
             )
 
-            // 2. Item Name (Weight 3.0f - INCREASED to fill space)
+            // 2. Item Name
             DataFieldBox(
                 text = model.item.name,
                 backgroundColor = LightBeigeField,
@@ -91,15 +93,16 @@ fun ItemDataRow(
                 modifier = Modifier.weight(3.0f)
             )
 
-            // 3. Expiry (Weight 1.2f)
+            // 3. Expiry
             DataFieldBox(
-                text = if(model.nearestExpiryFormatted == "N/A") "No Date" else model.nearestExpiryFormatted,
+                text = if (model.nearestExpiryFormatted == "N/A") "No Date"
+                else model.nearestExpiryFormatted,
                 backgroundColor = LightBeigeField,
                 textColor = Color.DarkGray,
                 modifier = Modifier.weight(1.2f)
             )
 
-            // 5. "Current" (Highlight Brown Box) (Weight 0.8f)
+            // 4. Current stock
             DataFieldBox(
                 text = model.totalUnitFormatted(),
                 backgroundColor = AccentBrown,
@@ -109,13 +112,13 @@ fun ItemDataRow(
                 isBold = true
             )
 
-            // 6. Actions (+ / - / View) (Weight 1.5f)
+            // 5. Actions
             Row(
                 modifier = Modifier.weight(1.5f),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Minus Button
+
                 ActionButton(
                     modifier = Modifier.weight(0.25f),
                     icon = Icons.Default.Remove,
@@ -123,15 +126,13 @@ fun ItemDataRow(
                     enabled = model.batch.isNotEmpty()
                 )
 
-                // Plus Button
                 ActionButton(
                     modifier = Modifier.weight(0.25f),
                     icon = Icons.Default.Add,
                     onClick = { showInsertBatch = true },
-                    enabled = true,
+                    enabled = true
                 )
 
-                // View More Button
                 ViewMoreButton(
                     modifier = Modifier.weight(0.5f),
                     onClick = { showItemDetail = true }
@@ -140,31 +141,34 @@ fun ItemDataRow(
         }
     }
 
-    // Popups
+    /* ---------------- Popups ---------------- */
+
     if (showItemDetail) {
         ItemDetailPopup(
             itemModel = model,
             onDismiss = { showItemDetail = false },
-            onUpdateItem = itemViewModel::updateItem,
-            onUpdateBatch = batchViewModel::onConvertBatch
+            onUpdateItem = itemViewModel::updateItem
         )
     }
-    if(showInsertBatch) {
+
+    if (showInsertBatch) {
         BatchInsertionPopup(
             itemModel = model,
             onDismiss = { showInsertBatch = false }
         )
     }
-    if(showDeleteBatch) {
+
+    if (showDeleteBatch) {
         BatchTargetedRemoval(
             threshold = model.item.subUnitThreshold,
             batch = model.batch,
-            onDismiss = { showDeleteBatch = false },
+            onDismiss = { showDeleteBatch = false }
         )
     }
 }
 
-// Helper for the colored data boxes
+/* ---------------- Helpers ---------------- */
+
 @Composable
 fun DataFieldBox(
     text: String,
@@ -186,25 +190,33 @@ fun DataFieldBox(
             text = text,
             color = textColor,
             fontSize = 13.sp,
-            fontWeight = if(isBold) FontWeight.Bold else FontWeight.Normal,
+            fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal,
             maxLines = 1
         )
     }
 }
 
-// Helper for the small circle +/- buttons
 @Composable
-fun ActionButton(icon: ImageVector, onClick: () -> Unit, enabled: Boolean, modifier: Modifier) {
+fun ActionButton(
+    icon: ImageVector,
+    onClick: () -> Unit,
+    enabled: Boolean,
+    modifier: Modifier
+) {
     IconButton(
         modifier = modifier.background(Color.White),
         onClick = onClick,
         enabled = enabled
     ) {
-        Icon(imageVector = icon, contentDescription = "")
+        Icon(imageVector = icon, contentDescription = null)
     }
 }
+
 @Composable
-fun ViewMoreButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun ViewMoreButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
     Box(
         modifier = modifier
             .height(32.dp)
@@ -214,6 +226,11 @@ fun ViewMoreButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
             .padding(horizontal = 8.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text("View", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Text(
+            text = "View",
+            color = Color.White,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
 }

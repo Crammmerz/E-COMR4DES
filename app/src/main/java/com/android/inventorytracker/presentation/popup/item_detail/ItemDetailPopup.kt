@@ -1,42 +1,31 @@
 package com.android.inventorytracker.presentation.popup.item_detail
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.android.inventorytracker.data.local.entities.ItemBatchEntity
 import com.android.inventorytracker.data.local.entities.ItemEntity
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.data.model.UserRole
 import com.android.inventorytracker.presentation.login.viewmodel.LoginViewModel
-import com.android.inventorytracker.presentation.popup.item_detail.component.BatchExpirySection
-import com.android.inventorytracker.presentation.popup.item_detail.component.PhotoSelection
-import com.android.inventorytracker.presentation.shared.component.input_fields.DescriptionField
-import com.android.inventorytracker.presentation.shared.component.input_fields.IntField
-import com.android.inventorytracker.presentation.shared.component.input_fields.StringField
-import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
-import com.android.inventorytracker.util.convertDaysToString
+import com.android.inventorytracker.presentation.popup.item_detail.component.*
+import com.android.inventorytracker.presentation.shared.component.input_fields.*
+import com.android.inventorytracker.presentation.shared.component.primitive.*
+import com.android.inventorytracker.ui.theme.GoogleSans
+import com.android.inventorytracker.ui.theme.Palette
 
 @Composable
 fun ItemDetailPopup(
@@ -44,178 +33,201 @@ fun ItemDetailPopup(
     loginViewModel: LoginViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
     onUpdateItem: (ItemEntity) -> Unit,
-    onUpdateBatch: (List<ItemBatchEntity>, Int, Int) -> Unit
 ) {
     val role = loginViewModel.userRole
 
-    var imageUri by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.imageUri) }
-    var name by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.name) }
-    var unitThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.unitThreshold) }
-    var subUnitThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.subUnitThreshold) }
-    var expiryThreshold by rememberSaveable(itemModel.item.id) { mutableIntStateOf(itemModel.item.expiryThreshold) }
-    var description by rememberSaveable(itemModel.item.id) { mutableStateOf(itemModel.item.description) }
-
-    var annotation by remember{ mutableStateOf("") }
-
-    val updatedItem = itemModel.item.copy(
-                imageUri = imageUri,
-                name = name,
-                unitThreshold = unitThreshold,
-                subUnitThreshold = subUnitThreshold,
-                expiryThreshold = expiryThreshold,
-                description = description
-            )
-
-    var nameValid by remember { mutableStateOf(true) }
-    var isStockThresholdValid by remember { mutableStateOf(true) }
-    var expiryThresholdValid by remember { mutableStateOf(true) }
-    var subUnitThresholdValid by remember { mutableStateOf(true) }
-
-    var showAlert by remember { mutableStateOf(false) }
-    var riskyFieldChanged by rememberSaveable { mutableStateOf(false) }
-    val doUpdate = itemModel.item != updatedItem
-    val allValid = nameValid && isStockThresholdValid && expiryThresholdValid && subUnitThresholdValid
-
-    LaunchedEffect(expiryThreshold) {
-        annotation = if (expiryThresholdValid) {
-            convertDaysToString(expiryThreshold)
-        } else {
-            ""
-        }
+    var imageUri by rememberSaveable(itemModel.item.id) {
+        mutableStateOf(itemModel.item.imageUri)
     }
-    fun checkRiskyChanges(): Boolean {
-        return itemModel.item.unitThreshold != updatedItem.unitThreshold ||
-                itemModel.item.subUnitThreshold != updatedItem.subUnitThreshold ||
-                itemModel.item.expiryThreshold != updatedItem.expiryThreshold
+    var name by rememberSaveable(itemModel.item.id) {
+        mutableStateOf(itemModel.item.name)
     }
-
-    fun onUpdateItem() {
-        if (allValid && doUpdate) {
-            if (itemModel.item.subUnitThreshold != updatedItem.subUnitThreshold) {
-                onUpdateBatch(
-                    itemModel.batch,
-                    itemModel.item.subUnitThreshold,
-                    updatedItem.subUnitThreshold
-                )
-            }
-            onUpdateItem(updatedItem)
-        }
+    var unitThreshold by rememberSaveable(itemModel.item.id) {
+        mutableIntStateOf(itemModel.item.unitThreshold)
+    }
+    var expiryThreshold by rememberSaveable(itemModel.item.id) {
+        mutableIntStateOf(itemModel.item.expiryThreshold)
+    }
+    var subUnitThreshold by rememberSaveable(itemModel.item.id) {
+        mutableIntStateOf(itemModel.item.subUnitThreshold)
+    }
+    var description by rememberSaveable(itemModel.item.id) {
+        mutableStateOf(itemModel.item.description)
     }
 
     DialogHost(
-        modifier = Modifier
-            .height(500.dp)
-            .width(800.dp),
-        useImePadding = true,
-        onDismissRequest = { onDismiss() },
+        modifier = Modifier.width(900.dp).height(650.dp),
+        onDismissRequest = onDismiss
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(10.dp)
+                .padding(24.dp)
         ) {
-            Row(
-                Modifier.weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Column(Modifier.weight(0.40f)) {
-                    PhotoSelection(
-                        image = imageUri,
-                        enabled = role == UserRole.ADMIN,
-                        onPickImage = { if(role == UserRole.ADMIN) imageUri = it }
-                    )
-                    Text("ID: ${itemModel.item.id}")
-                    StringField(
-                        value = name,
-                        onValueChange = { if(role == UserRole.ADMIN) name = it },
-                        header = "Item Name",
-                        placeholder = "Enter item name",
-                        onValidationChange = { nameValid = it }
-                    )
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Column(Modifier.weight(1f)) {
-                            IntField(
-                                value = unitThreshold,
-                                onValueChange = { if(role == UserRole.ADMIN) unitThreshold = it },
-                                label = "Low Stock Threshold",
-                                placeholder = "Enter threshold",
-                                onValidityChange = { isStockThresholdValid = it }
-                            )
-                        }
-                        Column(Modifier.weight(1f)) {
-                            IntField(
-                                value = expiryThreshold,
-                                onValueChange = { if(role == UserRole.ADMIN) expiryThreshold = it },
-                                label = "Expiry Threshold",
-                                placeholder = "Enter threshold (Days)",
-                                annotation = annotation,
-                                onValidityChange = {  expiryThresholdValid = it }
-                            )
-                        }
-                    }
-                    IntField(
-                        value = subUnitThreshold,
-                        onValueChange = { if(role == UserRole.ADMIN) subUnitThreshold = it },
-                        label = "Sub Unit",
-                        placeholder = "Enter threshold",
-                        onValidityChange = { subUnitThresholdValid = it }
-                    )
-                    if(itemModel.item.subUnitThreshold > subUnitThreshold){
-                        Text(
-                            text = "⚠️ Lowering this value reduces precision. Existing stock will be converted to larger units.",
-                            color = Color.Red,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                    Spacer(Modifier.weight(1f))
-                    Button(onClick = {
-                        riskyFieldChanged = checkRiskyChanges()
-                        if (riskyFieldChanged) {
-                            showAlert = true
-                        } else {
-                            onUpdateItem()
-                            onDismiss()
-                        }
-                    },
-                        enabled = allValid && doUpdate
+            /* ---------------- Header ---------------- */
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "Item Details",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = GoogleSans
+                )
+
+                Spacer(Modifier.weight(1f))
+
+                Surface(
+                    color = Color(0xFFE8F5E9),
+                    shape = RoundedCornerShape(16.dp),
+                    border = BorderStroke(1.dp, Color(0xFF4CAF50))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Update Item")
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = Color(0xFF4CAF50),
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            text = "In Stock",
+                            color = Color(0xFF2E7D32),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
 
-                Column(Modifier.weight(0.60f)) {
-                    DescriptionField(
-                        value = description,
-                        onValueChange = { if(role == UserRole.ADMIN) description = it },
-                        modifier = Modifier.weight(0.45f)
+                IconButton(onClick = onDismiss) {
+                    Icon(Icons.Default.Close, contentDescription = null)
+                }
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            /* ---------------- Body ---------------- */
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(24.dp),
+                modifier = Modifier.weight(1f)
+            ) {
+
+                /* -------- Left Column -------- */
+                Column(Modifier.weight(0.4f)) {
+                    PhotoSelection(
+                        modifier = Modifier
+                            .aspectRatio(1f)
+                            .clip(RoundedCornerShape(16.dp)),
+                        image = imageUri,
+                        enabled = role == UserRole.ADMIN,
+                        onPickImage = { imageUri = it }
                     )
 
-                    Spacer(Modifier.height(10.dp))
+                    Spacer(Modifier.height(16.dp))
+
+                    DescriptionField(
+                        value = description,
+                        onValueChange = { description = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp)
+                    )
+                }
+
+                /* -------- Right Column -------- */
+                Column(Modifier.weight(0.6f)) {
+
+                    Surface(
+                        color = Color(0xFFEEEEEE),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            text = "ID: #${itemModel.item.id}",
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            fontSize = 12.sp
+                        )
+                    }
+
+                    Spacer(Modifier.height(12.dp))
+
+                    StringField(
+                        value = name,
+                        header = "Item Name",
+                        placeholder = "Enter item name",
+                        onValueChange = { name = it },
+                        onValidationChange = { }
+                    )
+
+                    Spacer(Modifier.height(12.dp))
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        IntField(
+                            value = unitThreshold,
+                            label = "Low Stock",
+                            placeholder = "0",
+                            modifier = Modifier.weight(1f),
+                            onValueChange = { unitThreshold = it },
+                            onValidityChange = { }
+                        )
+
+                        IntField(
+                            value = expiryThreshold,
+                            label = "Expiry",
+                            placeholder = "Days",
+                            modifier = Modifier.weight(1f),
+                            onValueChange = { expiryThreshold = it },
+                            onValidityChange = { }
+                        )
+                    }
+
+                    Spacer(Modifier.height(12.dp))
+
+                    IntField(
+                        value = subUnitThreshold,
+                        label = "Sub Unit",
+                        placeholder = "0",
+                        onValueChange = { subUnitThreshold = it },
+                        onValidityChange = { }
+                    )
+
+                    Spacer(Modifier.height(16.dp))
 
                     BatchExpirySection(
                         model = itemModel,
-                        modifier = Modifier.weight(0.55f)
+                        modifier = Modifier.weight(1f)
                     )
                 }
             }
-        }
-    }
-    if (showAlert) {
-        AlertDialog(
-            onDismissRequest = { showAlert = false },
-            title = { Text("Confirm Risky Update") },
-            text = { Text("⚠️ Updating thresholds or expiry may affect stock alerts and batch logic. Proceed?") },
-            confirmButton = {
-                TextButton(onClick = {
-                    onUpdateItem()
-                    showAlert = false
-                    onDismiss()
-                }) { Text("Yes, Update") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showAlert = false }) { Text("Cancel") }
+
+            /* ---------------- Footer ---------------- */
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                CancelButton(onClick = onDismiss)
+
+                ConfirmButton(
+                    text = "Update Item",
+                    containerColor = Palette.ButtonDarkBrown,
+                    onClick = {
+                        onUpdateItem(
+                            itemModel.item.copy(
+                                name = name,
+                                imageUri = imageUri,
+                                description = description,
+                                unitThreshold = unitThreshold,
+                                expiryThreshold = expiryThreshold,
+                                subUnitThreshold = subUnitThreshold
+                            )
+                        )
+                        onDismiss()
+                    }
+                )
             }
-        )
+        }
     }
 }

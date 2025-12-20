@@ -2,6 +2,7 @@ package com.android.inventorytracker.presentation.popup.batch_group_insertion
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -38,11 +39,27 @@ fun BatchGroupInsertionPopup(
     batchViewModel: BatchViewModel = hiltViewModel(),
     onDismiss: () -> Unit
 ) {
-    val context = LocalContext.current
     val persistentItems by itemViewModel.persistentItems.collectAsState()
     var inputMap by remember { mutableStateOf<Map<Int, InsertBatch>>(emptyMap()) }
     var validityMap by remember { mutableStateOf<Map<Int, Boolean>>(emptyMap()) }
     var showConfirmation by remember { mutableStateOf(false) }
+    var valid by remember { mutableStateOf(false) }
+
+    LaunchedEffect(inputMap, validityMap) {
+        val validItems = inputMap.filter { (id, _) -> id in persistentItems }.values.toList()
+        valid = validItems.isNotEmpty() && validItems.all { validityMap[it.itemId] == true }
+    }
+
+    fun onConfirm(){
+        if(valid){
+            val validItems = inputMap.filter { (id, _) -> id in persistentItems && validityMap[id] == true }.values.toList()
+            validItems.forEach { op ->
+                batchViewModel.onStoreBatch(ItemBatchEntity(itemId = op.itemId, subUnit = op.subunit, expiryDate = op.expiryDate))
+            }
+            itemViewModel.reset()
+            onDismiss()
+        }
+    }
 
     Dialog(onDismissRequest = {
         itemViewModel.reset()
@@ -66,7 +83,7 @@ fun BatchGroupInsertionPopup(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(modifier = Modifier.focusable(false),horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     SearchField(Modifier.weight(1f))
                     SortDropdownMenu()
                 }
@@ -123,7 +140,7 @@ fun BatchGroupInsertionPopup(
                     ConfirmButton(
                         text = "Store Batch",
                         containerColor = Palette.ButtonDarkBrown,
-                        enabled = persistentItems.isNotEmpty(),
+                        enabled = valid && persistentItems.isNotEmpty(),
                         onClick = { showConfirmation = true }
                     )
                 }
@@ -132,19 +149,12 @@ fun BatchGroupInsertionPopup(
     }
 
     if (showConfirmation) {
-        val validItems = inputMap.filter { (id, _) -> id in persistentItems && validityMap[id] == true }.values.toList()
         AlertDialog(
             onDismissRequest = { showConfirmation = false },
             title = { Text("Confirm Action", style = TextStyle(fontFamily = GoogleSans, fontWeight = FontWeight.Bold)) },
             text = { Text("Do you want to add these batches?", style = TextStyle(fontFamily = GoogleSans)) },
             confirmButton = {
-                TextButton(onClick = {
-                    validItems.forEach { op ->
-                        batchViewModel.onStoreBatch(ItemBatchEntity(itemId = op.itemId, subUnit = op.subunit, expiryDate = op.expiryDate))
-                    }
-                    itemViewModel.reset()
-                    onDismiss()
-                }) { Text("Confirm", style = TextStyle(fontFamily = GoogleSans, color = Palette.ButtonDarkBrown)) }
+                TextButton(onClick = { onConfirm() }) { Text("Confirm", style = TextStyle(fontFamily = GoogleSans, color = Palette.ButtonDarkBrown)) }
             },
             dismissButton = {
                 TextButton(onClick = { showConfirmation = false }) { Text("Cancel", style = TextStyle(fontFamily = GoogleSans)) }

@@ -43,15 +43,16 @@ fun CsvRemovalPopup(
     val data = csvViewModel.data.observeAsState(emptyList())
     val dropped = csvViewModel.droppedCount.observeAsState()
     var validityMap by remember { mutableStateOf<Map<Int, Boolean>>(emptyMap()) }
+    var valid by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
     fun onConfirm(){
-        val allValid = data.value.all { row ->
+        valid = data.value.all { row ->
             validityMap[row.id] == true
         }
 
-        if (allValid) {
+        if (valid) {
             data.value.forEach { row ->
                 val matchedModel = model.value.firstOrNull { it.item.id == row.id }
                 matchedModel?.let {

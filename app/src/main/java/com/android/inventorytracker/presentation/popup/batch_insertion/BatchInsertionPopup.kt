@@ -129,6 +129,7 @@ fun BatchInsertionPopup(
                             }.getOrNull()
                             validDate = isFormatValid && parsed?.isAfter(LocalDate.now()) == true
                         },
+                        validateAfterToday = true,
                         onDone = { focusUnit.requestFocus() }
                     )
 

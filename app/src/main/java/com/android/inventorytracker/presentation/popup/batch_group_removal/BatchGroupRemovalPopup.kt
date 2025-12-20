@@ -2,6 +2,7 @@ package com.android.inventorytracker.presentation.popup.batch_group_removal
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -40,7 +41,24 @@ fun BatchGroupRemovalPopup(
     val persistentItems by itemViewModel.persistentItems.collectAsState()
     var inputMap by remember { mutableStateOf<Map<Int, RemoveBatch>>(emptyMap()) }
     var validityMap by remember { mutableStateOf<Map<Int, Boolean>>(emptyMap()) }
+    var valid by remember { mutableStateOf(false) }
     var showConfirmation by remember { mutableStateOf(false) }
+
+    LaunchedEffect(inputMap, validityMap) {
+        val validItems = inputMap.filter { (id, _) -> id in persistentItems }.values.toList()
+        valid = validItems.isNotEmpty() && validItems.all { validityMap[it.itemId] == true }
+    }
+
+    fun onConfirm(){
+        if(valid){
+            val validItems = inputMap.filter { (id, _) -> id in persistentItems && validityMap[id] == true }.values.toList()
+            validItems.forEach { op ->
+                batchViewModel.onDeductStock(op.batches, op.subunit)
+            }
+            itemViewModel.reset()
+            onDismiss()
+        }
+    }
 
     Dialog(onDismissRequest = {
         itemViewModel.reset()
@@ -64,7 +82,7 @@ fun BatchGroupRemovalPopup(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(modifier = Modifier.focusable(false),horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     SearchField(Modifier.weight(1f))
                     SortDropdownMenu()
                 }
@@ -121,7 +139,7 @@ fun BatchGroupRemovalPopup(
                     ConfirmButton(
                         text = "Remove Batch",
                         containerColor = Palette.ButtonDarkBrown,
-                        enabled = persistentItems.isNotEmpty(),
+                        enabled = valid,
                         onClick = { showConfirmation = true }
                     )
                 }
@@ -130,17 +148,12 @@ fun BatchGroupRemovalPopup(
     }
 
     if (showConfirmation) {
-        val validItems = inputMap.filter { (id, _) -> id in persistentItems && validityMap[id] == true }.values.toList()
         AlertDialog(
             onDismissRequest = { showConfirmation = false },
             title = { Text("Confirm Removal", style = TextStyle(fontFamily = GoogleSans, fontWeight = FontWeight.Bold)) },
             text = { Text("Remove these batches from stock?", style = TextStyle(fontFamily = GoogleSans)) },
             confirmButton = {
-                TextButton(onClick = {
-                    validItems.forEach { op -> batchViewModel.onDeductStock(op.batches, op.subunit) }
-                    itemViewModel.reset()
-                    onDismiss()
-                }) { Text("Confirm", style = TextStyle(fontFamily = GoogleSans, color = Color.Red)) }
+                TextButton(onClick = { onConfirm() }) { Text("Confirm", style = TextStyle(fontFamily = GoogleSans, color = Color.Red)) }
             },
             dismissButton = {
                 TextButton(onClick = { showConfirmation = false }) { Text("Cancel", style = TextStyle(fontFamily = GoogleSans)) }

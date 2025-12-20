@@ -2,12 +2,16 @@ package com.android.inventorytracker.presentation.popup.batch_group_insertion.co
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -84,7 +88,6 @@ fun ItemInsertionRow(
                     onCheckedChange = { itemViewModel.togglePersistence(model.item.id, it) },
                     colors = CheckboxDefaults.colors(checkedColor = Palette.ButtonDarkBrown)
                 )
-
                 Column(modifier = Modifier.padding(start = 8.dp)) {
                     Text(
                         text = model.item.name,
@@ -100,6 +103,15 @@ fun ItemInsertionRow(
                             style = TextStyle(fontFamily = GoogleSans, fontSize = 12.sp, color = Color.Gray)
                         )
                     }
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                if(isPersistent) {
+                    Icon(
+                        modifier = Modifier.padding(10.dp),
+                        imageVector = if(valid) Icons.Default.Check else Icons.Default.Close,
+                        contentDescription = "Validity",
+                        tint = if(valid) Color.Green else Color.Red
+                    )
                 }
             }
 
@@ -135,6 +147,7 @@ fun ItemInsertionRow(
                     )
                     DateField(
                         modifier = Modifier.weight(1.2f), // Give date more space
+                        fieldModifier = Modifier.focusRequester(focusDate),
                         header = "Expiry",
                         placeholder = "MM/DD/YYYY",
                         value = dateValue,
@@ -142,7 +155,8 @@ fun ItemInsertionRow(
                         onValidityChange = { isFormatValid ->
                             val parsedDate = runCatching { LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy")) }.getOrNull()
                             validDate = isFormatValid && parsedDate?.isAfter(LocalDate.now()) == true
-                        }
+                        },
+                        validateAfterToday = true
                     )
                 }
             }

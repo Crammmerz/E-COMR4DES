@@ -2,6 +2,7 @@ package com.android.inventorytracker.presentation.shared.component.input_fields
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -17,8 +18,12 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -39,6 +44,12 @@ fun SearchField(
     maxLength: Int = 30
 ) {
     var name by rememberSaveable { mutableStateOf("") }
+
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    val dummyFocusRequester = remember { FocusRequester() }
+
 
     // 🔹 Debounce search input: fires only after user stops typing for 300ms
     LaunchedEffect(Unit) {
@@ -69,7 +80,10 @@ fun SearchField(
         Spacer(modifier = Modifier.width(8.dp))
 
         Box(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .focusable(true)
+                .focusRequester(dummyFocusRequester),
             contentAlignment = Alignment.CenterStart
         ) {
             BasicTextField(
@@ -81,7 +95,11 @@ fun SearchField(
                 maxLines = 1,
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(
-                    onSearch = { itemViewModel.setSearchQuery(name.trim()) }
+                    onSearch = {
+                        dummyFocusRequester.requestFocus()
+                        focusManager.clearFocus(force = true)
+                        keyboardController?.hide()
+                    }
                 ),
                 modifier = Modifier.fillMaxWidth()
             )

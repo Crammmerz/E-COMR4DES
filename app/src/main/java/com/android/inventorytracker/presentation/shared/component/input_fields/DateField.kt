@@ -53,14 +53,20 @@ import java.time.format.DateTimeParseException
 fun DateField(
     modifier: Modifier = Modifier,
     fieldModifier: Modifier = Modifier,
+    header: String,
+    placeholder: String,
     value: String,
     onValueChange: (String) -> Unit,
     onValidityChange: (Boolean) -> Unit,
+    validateAfterToday: Boolean = false,
     onDone: (() -> Unit)? = null,
-    header: String,
-    placeholder: String,
 ) {
-    val isError = value.isNotEmpty() && !isValidDate(value)
+    val isError = value.isNotEmpty() && (
+            !isValidDate(value) ||
+                    (validateAfterToday && runCatching {
+                        LocalDate.parse(value, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+                    }.getOrNull()?.isAfter(LocalDate.now()) != true)
+            )
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
 
@@ -100,7 +106,16 @@ fun DateField(
                     val formatted = formatDateInput(newValue.text)
 
                     onValueChange(formatted)
-                    onValidityChange(isValidDate(formatted))
+
+                    val formatValid = isValidDate(formatted)
+                    val afterTodayValid = if (validateAfterToday && formatValid) {
+                        val parsed = runCatching {
+                            LocalDate.parse(formatted, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+                        }.getOrNull()
+                        parsed?.isAfter(LocalDate.now()) == true
+                    } else true
+
+                    onValidityChange(formatValid && afterTodayValid)
 
                     val addedChars = formatted.length - rawDigits.length
                     val newCursor = (newValue.selection.end + addedChars).coerceAtMost(formatted.length)
@@ -123,7 +138,7 @@ fun DateField(
                         if (onDone != null) {
                             onDone()
                         } else {
-                            focusManager.clearFocus()
+                            focusManager.clearFocus(force = true)
                             keyboardController?.hide()
                         }
                     }
@@ -150,7 +165,7 @@ fun DateField(
 
         if (isError) {
             Text(
-                text = "Invalid Date (MM/DD/YYYY)",
+                text = "Invalid Date",
                 color = MaterialTheme.colorScheme.error,
                 fontSize = 10.sp
             )

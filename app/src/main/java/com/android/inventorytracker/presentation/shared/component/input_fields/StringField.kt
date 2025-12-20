@@ -105,7 +105,7 @@ fun StringField(
                         if (onDone != null) {
                             onDone()
                         } else {
-                            focusManager.clearFocus()
+                            focusManager.clearFocus(force = true)
                             keyboardController?.hide()
                         }
                     }

@@ -3,6 +3,9 @@ package com.android.inventorytracker.presentation.popup.batch_group_removal.comp
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -83,6 +86,15 @@ fun ItemRemovalRow(
                         )
                     }
                 }
+                Spacer(modifier = Modifier.weight(1f))
+                if(isPersistent) {
+                    Icon(
+                        modifier = Modifier.padding(10.dp),
+                        imageVector = if(valid) Icons.Default.Check else Icons.Default.Close,
+                        contentDescription = "Validity",
+                        tint = if(valid) Color.Green else Color.Red
+                    )
+                }
             }
 
             if (isPersistent) {
@@ -101,6 +113,7 @@ fun ItemRemovalRow(
                             onUnitChange(value, model.item.subUnitThreshold, { unit = it }, { subUnit = it })
                         },
                         onValidityChange = { valid = it && (unit > 0 || subUnit > 0) && (subUnit <= model.totalSubUnit()) },
+                        onDone = null
                     )
                     IntField(
                         modifier = Modifier.weight(1f),
@@ -113,6 +126,7 @@ fun ItemRemovalRow(
                             onSubUnitChange(value, model.item.subUnitThreshold, { unit = it }, { subUnit = it })
                         },
                         onValidityChange = { valid = it && (unit > 0 || subUnit > 0) && (subUnit <= model.totalSubUnit()) },
+                        onDone = null
                     )
                 }
             }

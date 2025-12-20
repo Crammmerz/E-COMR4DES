@@ -48,7 +48,6 @@ fun BatchTargetedRemoval(
     var validDate by rememberSaveable { mutableStateOf(false) }
     var dateValue by rememberSaveable { mutableStateOf("") }
 
-    val focusUnit = remember { FocusRequester() }
     val focusSubUnit = remember { FocusRequester() }
     val focusDate = remember { FocusRequester() }
 
@@ -132,6 +131,7 @@ fun BatchTargetedRemoval(
                             onValueChange = { value ->
                                 onUnitChange(value, threshold, { unit = it }, { subUnit = it })
                             },
+                            valueRange = 0f..3000f,
                             onValidityChange = { validUnit = it },
                             onDone = { doSubmit() }
                         )

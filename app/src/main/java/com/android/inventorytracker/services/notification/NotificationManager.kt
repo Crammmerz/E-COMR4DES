@@ -7,13 +7,9 @@ import java.time.LocalDate
 
 fun inventoryNotifier(itemModels: List<ItemModel>, context: Context, today: LocalDate) {
     val zeroItems = itemModels.filter { it.totalSubUnit() == 0 }
-    val expiredItems = itemModels.filter { it.nearestExpiryDate?.isBefore(today) ?: false }
-    val lowItems = itemModels.filter { it.totalSubUnit() > 0 && it.totalUnit() <= it.item.unitThreshold * 0.20 }
-    val expiringItems = itemModels.filter { model ->
-        model.nearestExpiryDate?.let { date ->
-            !date.isBefore(today) && !date.isAfter(today.plusDays(model.item.expiryThreshold.toLong()))
-        } ?: false
-    }
+    val expiredItems = itemModels.filter { it.hasExpired }
+    val lowItems = itemModels.filter { it.totalSubUnit() > 0 && it.isLowStock }
+    val expiringItems = itemModels.filter { it.isExpiringSoon && !it.hasExpired }
 
     notifyIfNotEmpty(
         context,

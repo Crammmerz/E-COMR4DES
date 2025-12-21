@@ -60,6 +60,7 @@ fun ItemDetailPopup(
                 expiryThreshold != model.item.expiryThreshold ||
                 subUnitThreshold != model.item.subUnitThreshold
     }
+
     fun hasChanged(): Boolean{
         return name != model.item.name ||
                 imageUri != model.item.imageUri ||
@@ -256,7 +257,7 @@ fun ItemDetailPopup(
                 ConfirmButton(
                     text = "Update Item",
                     containerColor = Palette.ButtonDarkBrown,
-                    enabled = hasChanged() && valid,
+                    enabled = hasChanged() && valid && loginViewModel.userRole == UserRole.ADMIN,
                     onClick = {
                         if(shouldTriggerWarning()){
                             showWarning = true

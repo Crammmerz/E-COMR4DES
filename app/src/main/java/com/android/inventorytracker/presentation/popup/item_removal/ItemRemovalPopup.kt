@@ -10,11 +10,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.android.inventorytracker.data.local.entities.ItemEntity
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.presentation.popup.item_removal.component.HeaderSection
 import com.android.inventorytracker.presentation.popup.item_removal.component.InventoryItem
@@ -97,13 +95,36 @@ fun DeleteItemPopup(
                         text = "Remove",
                         containerColor = Palette.ButtonDarkBrown,
                         enabled = selectedIds.isNotEmpty(),
-                        onClick = {
-                            onDelete(selectedIds.toList())
-                            onDismiss()
-                        }
+                        onClick = { showConfirm = true }
                     )
                 }
             }
         }
+    }
+    if(showConfirm){
+        AlertDialog(
+            onDismissRequest = { showConfirm = false },
+            title = { Text("Remove Item?") },
+            text = {
+                Column {
+                    Text("Are you sure you want to remove the selected items?")
+                    Text("This action cannot be undone.")
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    onDelete(selectedIds.toList())
+                    onDismiss()
+                    showConfirm = false
+                }) {
+                    Text("Remove")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showConfirm = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }

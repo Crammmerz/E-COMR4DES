@@ -11,14 +11,11 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.android.inventorytracker.R
 import com.android.inventorytracker.data.local.entities.UserEntity
 import com.android.inventorytracker.presentation.shared.component.input_fields.PasswordField
 import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
@@ -122,7 +119,7 @@ fun ChangePassStaff(
                 Column {
                     if (!isMatch) {
                         Text(
-                            text = "Passwords do not match",
+                            text = "Password do not match",
                             style = TextStyle(
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 14.sp

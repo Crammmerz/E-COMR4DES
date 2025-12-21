@@ -9,15 +9,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.android.inventorytracker.R
 import com.android.inventorytracker.data.local.entities.UserEntity
 import com.android.inventorytracker.presentation.shared.component.input_fields.PasswordField
 import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
@@ -42,6 +40,8 @@ fun ChangePassAdmin(
 
     val valid = validOld && validNew && validConfirm
     val isMatch = newPassword == confirmPass
+    var successChange by rememberSaveable { mutableStateOf<Boolean?>(null) }
+
     val scope = rememberCoroutineScope()
 
     val focusOldPass = remember { FocusRequester() }
@@ -51,7 +51,9 @@ fun ChangePassAdmin(
     fun doSubmit(){
         scope.launch {
             val user = UserEntity(username = "admin", passwordHash = oldPassword, role = "ADMIN")
-            if(onSubmit(user, newPassword)) onDismiss()
+            val success = onSubmit(user, newPassword)
+            successChange = success
+            if(success) onDismiss()
         }
     }
 
@@ -104,6 +106,29 @@ fun ChangePassAdmin(
                         onValidityChange = { validConfirm = it }, // Fix para sa error
                         onDone = { focusOldPass.requestFocus() }
                     )
+                }
+
+                Column {
+                    if (!isMatch) {
+                        Text(
+                            text = "Password do not match",
+                            style = TextStyle(
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp
+                            ),
+                            color = Color.Red
+                        )
+                    }
+                    if (successChange == false) {
+                        Text(
+                            text = "Unable to change password",
+                            style = TextStyle(
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp
+                            ),
+                            color = Color.Red
+                        )
+                    }
                 }
 
                 Row(

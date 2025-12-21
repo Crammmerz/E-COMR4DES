@@ -133,7 +133,7 @@ fun InsertItemPopup(
                             value = unitThreshold,
                             onValueChange = { unitThreshold = it },
                             onValidityChange = { unitThresholdValid = it },
-                            onDone = { focusSubUnit.requestFocus() }
+                            onDone = { focusExpiry.requestFocus() }
                         )
 
                         IntField( // Expiry Alerts

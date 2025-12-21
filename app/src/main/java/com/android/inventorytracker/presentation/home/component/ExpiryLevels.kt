@@ -38,7 +38,6 @@ fun ExpiryLevels(
     ) {
         Text(
             text = "Expiry",
-            // Apply Google Sans SemiBold for the title
             style = TextStyle(
                 fontWeight = FontWeight.SemiBold, // Use SemiBold for the main header
                 fontSize = 24.sp, // Approximate size for titleLarge
@@ -65,7 +64,6 @@ fun ExpiryLevels(
                         Column(
                             modifier = Modifier
                                 .height(cellHeight)
-                                .clip(RoundedCornerShape(16.dp))
                                 .background(Palette.InnerTileBackground),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {

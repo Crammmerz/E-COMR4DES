@@ -31,6 +31,12 @@ fun DeleteItemPopup(
     // Note: showConfirm is used for your confirmation logic
     var showConfirm by remember { mutableStateOf(false) }
 
+    fun doDelete(){
+        onDelete(selectedIds.toList())
+        onDismiss()
+        showConfirm = false
+    }
+
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
@@ -112,11 +118,7 @@ fun DeleteItemPopup(
                 }
             },
             confirmButton = {
-                TextButton(onClick = {
-                    onDelete(selectedIds.toList())
-                    onDismiss()
-                    showConfirm = false
-                }) {
+                TextButton(onClick = { doDelete() }) {
                     Text("Remove")
                 }
             },

@@ -51,6 +51,12 @@ fun BatchTargetedRemoval(
     val focusSubUnit = remember { FocusRequester() }
     val focusDate = remember { FocusRequester() }
 
+    val selectedDate = runCatching {
+        LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+    }.getOrNull()
+
+    var exist: ItemBatchEntity? = null
+
     // ✅ Kailangan ito para sa scroll
     val scrollState = rememberScrollState()
     val context = LocalContext.current
@@ -59,31 +65,33 @@ fun BatchTargetedRemoval(
         focusDate.requestFocus()
     }
 
-    fun doSubmit(){
-        val selectedDate = runCatching {
-            LocalDate.parse(dateValue, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
-        }.getOrNull()
-
-        val exist = selectedDate?.let { date ->
+    LaunchedEffect(selectedDate) {
+        exist = selectedDate?.let { date ->
             batch.firstOrNull {
                 Instant.ofEpochMilli(it.expiryDate).atZone(ZoneId.systemDefault()).toLocalDate() == date
             }
         }
+    }
 
-        if (selectedDate == null || exist == null) {
+    fun doSubmit(){
+        if (exist == null) {
             Toast.makeText(context, "No batch found for this date", Toast.LENGTH_SHORT).show()
-        } else {
-            batchViewModel.onTargetedDeductStock(exist, subUnit)
-            onDismiss()
-            Toast.makeText(context, "Stock Deducted!", Toast.LENGTH_SHORT).show()
+            return
         }
+        if(exist!!.subUnit < subUnit){
+            Toast.makeText(context, "Insufficient stock ${exist!!.subUnit}", Toast.LENGTH_SHORT).show()
+            return
+        }
+        batchViewModel.onTargetedDeductStock(exist!!, subUnit)
+        onDismiss()
+        Toast.makeText(context, "Stock Deducted!", Toast.LENGTH_SHORT).show()
     }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
                 .width(480.dp)
-                .heightIn(max = 620.dp), // ✅ Max height para hindi lumampas sa screen
+                .heightIn(max = 620.dp),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = Palette.PopupSurface),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
@@ -145,12 +153,11 @@ fun BatchTargetedRemoval(
                             onValueChange = { value ->
                                 onSubUnitChange(value, threshold, { unit = it }, { subUnit = it })
                             },
-                            valueRange = 1..2147483647,
+                            valueRange = if(exist == null) 0..0 else 1..exist!!.subUnit,
                             onValidityChange = { validUnit = it },
                             onDone = { doSubmit() }
                         )
                     }
-
                     // Kung may balak kang magdagdag pa ng items dito, kusa na siyang mag-i-scroll.
                 }
 
@@ -168,7 +175,7 @@ fun BatchTargetedRemoval(
                     ConfirmButton(
                         text = "Deduct Stock",
                         containerColor = Palette.ButtonDarkBrown,
-                        enabled = validUnit && validDate, // Mas maganda kung disabled hangga't walang input
+                        enabled = validUnit && validDate && exist != null, // Mas maganda kung disabled hangga't walang input
                         onClick = { doSubmit() }
                     )
                 }

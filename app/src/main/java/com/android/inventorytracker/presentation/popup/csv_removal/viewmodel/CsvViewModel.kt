@@ -34,16 +34,12 @@ class CsvViewModel @Inject constructor(
 
     fun loadCsv(csvUri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
-
             val context = getApplication<Application>().applicationContext
-
             var dropped = 0
-
             val validIds = itemRepository.observeItemModels()
                 .first()
                 .map { it.item.id }
                 .toSet()
-
             val parsedList = context.contentResolver.openInputStream(csvUri)
                 ?.bufferedReader()
                 ?.useLines { lines ->
@@ -52,7 +48,6 @@ class CsvViewModel @Inject constructor(
                             val tokens = line.split(",")
                             val id = tokens.getOrNull(0)?.toIntOrNull()
                             val subunit = tokens.getOrNull(1)?.toIntOrNull()
-
                             if (id != null && subunit != null) {
                                 if (!validIds.contains(id)) {
                                     dropped++

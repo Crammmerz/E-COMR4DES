@@ -145,7 +145,7 @@ fun ItemDataRow(
 
     if (showItemDetail) {
         ItemDetailPopup(
-            itemModel = model,
+            model = model,
             onDismiss = { showItemDetail = false },
             onUpdateItem = itemViewModel::updateItem
         )

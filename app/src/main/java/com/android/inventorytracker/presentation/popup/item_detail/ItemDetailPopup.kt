@@ -24,39 +24,77 @@ import com.android.inventorytracker.presentation.login.viewmodel.LoginViewModel
 import com.android.inventorytracker.presentation.popup.item_detail.component.*
 import com.android.inventorytracker.presentation.shared.component.input_fields.*
 import com.android.inventorytracker.presentation.shared.component.primitive.*
+import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.ui.theme.GoogleSans
 import com.android.inventorytracker.ui.theme.Palette
 
 @Composable
 fun ItemDetailPopup(
-    itemModel: ItemModel,
+    model: ItemModel,
     loginViewModel: LoginViewModel = hiltViewModel(),
+    batchViewModel: BatchViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
     onUpdateItem: (ItemEntity) -> Unit,
 ) {
     val role = loginViewModel.userRole
 
-    var imageUri by rememberSaveable(itemModel.item.id) {
-        mutableStateOf(itemModel.item.imageUri)
+    var imageUri by rememberSaveable(model.item.id) {
+        mutableStateOf(model.item.imageUri)
     }
-    var name by rememberSaveable(itemModel.item.id) {
-        mutableStateOf(itemModel.item.name)
+    var name by rememberSaveable(model.item.id) { mutableStateOf(model.item.name) }
+    var unitThreshold by rememberSaveable(model.item.id) { mutableIntStateOf(model.item.unitThreshold) }
+    var expiryThreshold by rememberSaveable(model.item.id) { mutableIntStateOf(model.item.expiryThreshold) }
+    var subUnitThreshold by rememberSaveable(model.item.id) { mutableIntStateOf(model.item.subUnitThreshold) }
+    var description by rememberSaveable(model.item.id) { mutableStateOf(model.item.description) }
+
+    var validName by remember { mutableStateOf(true) }
+    var validUnit by remember { mutableStateOf(true) }
+    var validExpiry by remember { mutableStateOf(true) }
+    var validSubUnit by remember { mutableStateOf(true) }
+    var showWarning by remember { mutableStateOf(false) }
+
+    val valid = validName && validUnit && validExpiry && validSubUnit
+
+    fun shouldTriggerWarning(): Boolean{
+        return unitThreshold != model.item.unitThreshold ||
+                expiryThreshold != model.item.expiryThreshold ||
+                subUnitThreshold != model.item.subUnitThreshold
     }
-    var unitThreshold by rememberSaveable(itemModel.item.id) {
-        mutableIntStateOf(itemModel.item.unitThreshold)
+    fun hasChanged(): Boolean{
+        return name != model.item.name ||
+                imageUri != model.item.imageUri ||
+                description != model.item.description ||
+                unitThreshold != model.item.unitThreshold ||
+                expiryThreshold != model.item.expiryThreshold ||
+                subUnitThreshold != model.item.subUnitThreshold
     }
-    var expiryThreshold by rememberSaveable(itemModel.item.id) {
-        mutableIntStateOf(itemModel.item.expiryThreshold)
-    }
-    var subUnitThreshold by rememberSaveable(itemModel.item.id) {
-        mutableIntStateOf(itemModel.item.subUnitThreshold)
-    }
-    var description by rememberSaveable(itemModel.item.id) {
-        mutableStateOf(itemModel.item.description)
+
+    fun onConfirm(){
+        if(valid) {
+            if(model.item.subUnitThreshold != subUnitThreshold){
+                batchViewModel.onConvertBatch(
+                    batches = model.batch,
+                    subUnitThreshold = model.item.subUnitThreshold,
+                    newSubUnitThreshold = subUnitThreshold
+                )
+            }
+            onUpdateItem(
+                model.item.copy(
+                    name = name,
+                    imageUri = imageUri,
+                    description = description,
+                    unitThreshold = unitThreshold,
+                    expiryThreshold = expiryThreshold,
+                    subUnitThreshold = subUnitThreshold
+                )
+            )
+        }
     }
 
     DialogHost(
-        modifier = Modifier.width(900.dp).height(650.dp),
+        modifier = Modifier
+            .width(900.dp)
+            .height(650.dp),
         onDismissRequest = onDismiss
     ) {
         Column(
@@ -64,7 +102,6 @@ fun ItemDetailPopup(
                 .fillMaxSize()
                 .padding(24.dp)
         ) {
-
             /* ---------------- Header ---------------- */
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
@@ -144,7 +181,7 @@ fun ItemDetailPopup(
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
-                            text = "ID: #${itemModel.item.id}",
+                            text = "ID: #${model.item.id}",
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                             fontSize = 12.sp
                         )
@@ -157,7 +194,7 @@ fun ItemDetailPopup(
                         header = "Item Name",
                         placeholder = "Enter item name",
                         onValueChange = { name = it },
-                        onValidationChange = { }
+                        onValidationChange = { validName = it }
                     )
 
                     Spacer(Modifier.height(12.dp))
@@ -169,7 +206,7 @@ fun ItemDetailPopup(
                             placeholder = "0",
                             modifier = Modifier.weight(1f),
                             onValueChange = { unitThreshold = it },
-                            onValidityChange = { }
+                            onValidityChange = { validUnit = it }
                         )
 
                         IntField(
@@ -178,7 +215,7 @@ fun ItemDetailPopup(
                             placeholder = "Days",
                             modifier = Modifier.weight(1f),
                             onValueChange = { expiryThreshold = it },
-                            onValidityChange = { }
+                            onValidityChange = { validExpiry = it }
                         )
                     }
 
@@ -189,13 +226,19 @@ fun ItemDetailPopup(
                         label = "Sub Unit",
                         placeholder = "0",
                         onValueChange = { subUnitThreshold = it },
-                        onValidityChange = { }
+                        onValidityChange = { validSubUnit = it }
                     )
-
+                    if(model.item.subUnitThreshold > subUnitThreshold){
+                        Text(
+                            text = "⚠ Lowering this value reduces precision. Existing stock will be converted to larger units",
+                            color = Color.Red,
+                            fontSize = 10.sp
+                        )
+                    }
                     Spacer(Modifier.height(16.dp))
 
                     BatchExpirySection(
-                        model = itemModel,
+                        model = model,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -213,21 +256,43 @@ fun ItemDetailPopup(
                 ConfirmButton(
                     text = "Update Item",
                     containerColor = Palette.ButtonDarkBrown,
+                    enabled = hasChanged() && valid,
                     onClick = {
-                        onUpdateItem(
-                            itemModel.item.copy(
-                                name = name,
-                                imageUri = imageUri,
-                                description = description,
-                                unitThreshold = unitThreshold,
-                                expiryThreshold = expiryThreshold,
-                                subUnitThreshold = subUnitThreshold
-                            )
-                        )
-                        onDismiss()
+                        if(shouldTriggerWarning()){
+                            showWarning = true
+                        } else {
+                            onConfirm()
+                        }
                     }
                 )
             }
         }
+    }
+
+    if(showWarning){
+        AlertDialog(
+            onDismissRequest = { showWarning = false },
+            title = { Text("Warning") },
+            text = {
+                Column {
+                    Text("Heads up: modifying these values means the app will apply different logic going forward.")
+                    Text("Proceed?")
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                        onConfirm()
+                        showWarning = false
+                    }
+                ) {
+                    Text("Update")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showWarning = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }

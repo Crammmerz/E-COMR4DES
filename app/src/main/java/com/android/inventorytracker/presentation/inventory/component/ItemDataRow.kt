@@ -41,9 +41,9 @@ val BorderColor = Color(0xFFE0E0E0)
 
 @Composable
 fun ItemDataRow(
+    modifier: Modifier = Modifier,
     model: ItemModel,
     itemViewModel: ItemViewModel,
-    modifier: Modifier = Modifier
 ) {
     var showItemDetail by rememberSaveable { mutableStateOf(false) }
     var showInsertBatch by rememberSaveable { mutableStateOf(false) }

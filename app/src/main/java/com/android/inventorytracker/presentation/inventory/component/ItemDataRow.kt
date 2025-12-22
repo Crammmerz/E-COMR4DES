@@ -31,7 +31,6 @@ import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.presentation.popup.batch_insertion.BatchInsertionPopup
 import com.android.inventorytracker.presentation.popup.batch_targeted_removal.BatchTargetedRemoval
 import com.android.inventorytracker.presentation.popup.item_detail.ItemDetailPopup
-import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 
 val SurfaceWhite = Color.White
@@ -44,7 +43,6 @@ val BorderColor = Color(0xFFE0E0E0)
 fun ItemDataRow(
     model: ItemModel,
     itemViewModel: ItemViewModel,
-    batchViewModel: BatchViewModel,
     modifier: Modifier = Modifier
 ) {
     var showItemDetail by rememberSaveable { mutableStateOf(false) }
@@ -119,21 +117,21 @@ fun ItemDataRow(
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
-                ActionButton(
+                ActionButtons(
                     modifier = Modifier.weight(0.25f),
                     icon = Icons.Default.Remove,
                     onClick = { showDeleteBatch = true },
                     enabled = model.batch.isNotEmpty()
                 )
 
-                ActionButton(
+                ActionButtons(
                     modifier = Modifier.weight(0.25f),
                     icon = Icons.Default.Add,
                     onClick = { showInsertBatch = true },
                     enabled = true
                 )
 
-                ViewMoreButton(
+                ViewMoreButtons(
                     modifier = Modifier.weight(0.5f),
                     onClick = { showItemDetail = true }
                 )
@@ -167,8 +165,6 @@ fun ItemDataRow(
     }
 }
 
-/* ---------------- Helpers ---------------- */
-
 @Composable
 fun DataFieldBox(
     text: String,
@@ -197,7 +193,7 @@ fun DataFieldBox(
 }
 
 @Composable
-fun ActionButton(
+fun ActionButtons(
     icon: ImageVector,
     onClick: () -> Unit,
     enabled: Boolean,
@@ -213,7 +209,7 @@ fun ActionButton(
 }
 
 @Composable
-fun ViewMoreButton(
+fun ViewMoreButtons(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {

@@ -76,7 +76,6 @@ fun Inventory(
                 ItemDataRow(
                     model = itemModel,
                     itemViewModel = itemViewModel,
-                    batchViewModel = batchViewModel
                 )
             }
         }

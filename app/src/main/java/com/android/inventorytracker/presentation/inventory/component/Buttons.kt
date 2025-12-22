@@ -71,35 +71,3 @@ fun DeleteItemButton(
         )
     }
 }
-
-@Composable
-fun ItemButton(
-    text: String,
-    enabled: Boolean = true,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Button(
-        onClick = onClick,
-        enabled = enabled,
-        modifier = modifier
-            .height(40.dp), // ✅ MATCH ItemText height
-        shape = RoundedCornerShape(6.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF5D4037),
-            contentColor = Color.White,
-            disabledContainerColor = Color(0xFF5D4037),
-            disabledContentColor = Color.White
-        ),
-        contentPadding = PaddingValues(horizontal = 12.dp)
-    ) {
-        Text(
-            text = text,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1
-        )
-    }
-}
-
-

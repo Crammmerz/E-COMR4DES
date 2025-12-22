@@ -37,7 +37,7 @@ object NotificationHelper {
         }
 
         val builder = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.drawable.baseline_warning_24)
             .setContentTitle(title)
             .setContentText(text)
             .setPriority(priority)

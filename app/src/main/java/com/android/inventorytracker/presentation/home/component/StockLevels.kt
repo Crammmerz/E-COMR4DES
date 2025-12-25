@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.unit.sp
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.ui.theme.Palette
+import com.android.inventorytracker.ui.theme.GoogleSans
 
 @Composable
 fun StockLevels(modifier: Modifier, itemModel: List<ItemModel>) {
@@ -38,7 +39,8 @@ fun StockLevels(modifier: Modifier, itemModel: List<ItemModel>) {
         Text(
             text = "Stocks",
             style = TextStyle(
-                fontWeight = FontWeight.SemiBold, // SemiBold for header
+                fontFamily = GoogleSans,
+                fontWeight = FontWeight.SemiBold,
                 fontSize = 24.sp,
                 color = Palette.DarkBeigeText
             )
@@ -57,9 +59,10 @@ fun StockLevels(modifier: Modifier, itemModel: List<ItemModel>) {
                     ) {
                         // Item Name
                         Text(
-                            model.item.name,
+                            text = model.item.name,
                             style = TextStyle(
-                                fontWeight = FontWeight.Medium, // Medium for item name
+                                fontFamily = GoogleSans,
+                                fontWeight = FontWeight.Medium,
                                 fontSize = 16.sp,
                                 color = Palette.DarkBeigeText
                             )
@@ -70,18 +73,17 @@ fun StockLevels(modifier: Modifier, itemModel: List<ItemModel>) {
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.padding(top = 4.dp)
                         ) {
-                            // Linear Progress Indicator (iOS Look)
+                            // Linear Progress Indicator
                             LinearProgressIndicator(
                                 progress = {
-                                    (model.totalUnit()
-                                        .toFloat() / model.item.unitThreshold.toFloat())
+                                    (model.totalUnit().toFloat() / model.item.unitThreshold.toFloat())
                                 },
                                 modifier = Modifier
                                     .weight(1f)
                                     .clip(RoundedCornerShape(8.dp))
                                     .height(8.dp),
-                                color = model.stockColor, // Retain model's color for visual alert
-                                trackColor = Palette.BeigeProgressTrack // Use light beige track color
+                                color = model.stockColor,
+                                trackColor = Palette.BeigeProgressTrack
                             )
 
                             // Count Text
@@ -90,9 +92,10 @@ fun StockLevels(modifier: Modifier, itemModel: List<ItemModel>) {
                                 modifier = Modifier.width(100.dp),
                                 textAlign = TextAlign.End,
                                 style = TextStyle(
-                                    fontWeight = FontWeight.Normal, // Regular for detail count
+                                    fontFamily = GoogleSans,
+                                    fontWeight = FontWeight.Normal,
                                     fontSize = 14.sp,
-                                    color = Palette.LightBeigeText // Use light beige for subtle count text
+                                    color = Palette.LightBeigeText
                                 )
                             )
                         }
@@ -100,8 +103,19 @@ fun StockLevels(modifier: Modifier, itemModel: List<ItemModel>) {
                 }
             }
         } else {
-            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                Text("You're stocked up — no low stock alerts")
+            Box(
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Text(
+                    text = "You're stocked up — no low stock alerts",
+                    style = TextStyle(
+                        fontFamily = GoogleSans,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 14.sp,
+                        color = Palette.LightBeigeText
+                    )
+                )
             }
         }
     }

@@ -9,13 +9,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.android.inventorytracker.R
 import com.android.inventorytracker.data.model.UserRole
 import com.android.inventorytracker.presentation.popup.change_pass_admin.ChangePassAdmin
 import com.android.inventorytracker.presentation.popup.change_pass_staff.ChangePassStaff
@@ -23,9 +21,7 @@ import com.android.inventorytracker.presentation.settings.viewmodel.SettingsView
 import com.android.inventorytracker.ui.theme.Palette
 import com.android.inventorytracker.ui.theme.Sand
 import com.android.inventorytracker.ui.theme.LightSand
-
-// --- Define Google Sans Family ---
-val GoogleSansFamily = FontFamily.Default
+import com.android.inventorytracker.ui.theme.GoogleSans
 
 @Composable
 fun Security(
@@ -47,7 +43,7 @@ fun Security(
         Text(
             text = "User Account & Security",
             style = TextStyle(
-                fontFamily = GoogleSansFamily,
+                fontFamily = GoogleSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 28.sp,
                 color = Palette.DarkBeigeText,
@@ -57,10 +53,8 @@ fun Security(
 
         // --- Section 1: Authentication Settings ---
         SecuritySectionCard {
-            // Enable Authentication Row
             SecurityRowItem(
-                label = "Enable Authentication",
-                fontFamily = GoogleSansFamily
+                label = "Enable Authentication"
             ) {
                 Checkbox(
                     checked = isAuthEnabled,
@@ -75,10 +69,8 @@ fun Security(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Role Authentication Row
             SecurityRowItem(
-                label = "Role Authentication",
-                fontFamily = GoogleSansFamily
+                label = "Role Authentication"
             ) {
                 Checkbox(
                     checked = isRoleAuthEnabled,
@@ -94,30 +86,24 @@ fun Security(
 
         // --- Section 2: Password Change ---
         SecuritySectionCard {
-            // Admin Password Row
             SecurityRowItem(
-                label = "Admin Password Change",
-                fontFamily = GoogleSansFamily
+                label = "Admin Password Change"
             ) {
                 SecurityActionButton(
                     label = "Change Password",
                     enabled = isAuthEnabled,
-                    fontFamily = GoogleSansFamily,
                     onClick = { role = UserRole.ADMIN }
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Staff Password Row
             SecurityRowItem(
-                label = "Staff Password Change",
-                fontFamily = GoogleSansFamily
+                label = "Staff Password Change"
             ) {
                 SecurityActionButton(
                     label = "Change Password",
                     enabled = isAuthEnabled && isRoleAuthEnabled,
-                    fontFamily = GoogleSansFamily,
                     onClick = { role = UserRole.STAFF }
                 )
             }
@@ -134,9 +120,6 @@ fun Security(
     }
 }
 
-/**
- * Reusable Card for Sections
- */
 @Composable
 private fun SecuritySectionCard(content: @Composable ColumnScope.() -> Unit) {
     Column(
@@ -149,13 +132,9 @@ private fun SecuritySectionCard(content: @Composable ColumnScope.() -> Unit) {
     )
 }
 
-/**
- * Reusable Row for items
- */
 @Composable
 private fun SecurityRowItem(
     label: String,
-    fontFamily: FontFamily,
     action: @Composable () -> Unit
 ) {
     Row(
@@ -166,7 +145,7 @@ private fun SecurityRowItem(
         Text(
             text = label,
             style = TextStyle(
-                fontFamily = fontFamily,
+                fontFamily = GoogleSans,
                 fontWeight = FontWeight.Medium,
                 fontSize = 18.sp,
                 color = Palette.DarkBeigeText
@@ -176,20 +155,16 @@ private fun SecurityRowItem(
     }
 }
 
-/**
- * Pill-shaped action button for Security Settings
- */
 @Composable
 private fun SecurityActionButton(
     label: String,
     enabled: Boolean,
-    fontFamily: FontFamily,
     onClick: () -> Unit
 ) {
     Button(
         onClick = onClick,
         enabled = enabled,
-        shape = RoundedCornerShape(28.dp), // Pill-shaped
+        shape = RoundedCornerShape(28.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Palette.ButtonBeigeBase,
             contentColor = Palette.ButtonDarkBrown,
@@ -201,7 +176,7 @@ private fun SecurityActionButton(
         Text(
             text = label,
             style = TextStyle(
-                fontFamily = fontFamily,
+                fontFamily = GoogleSans,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 15.sp
             )

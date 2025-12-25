@@ -1,7 +1,5 @@
 package com.android.inventorytracker.presentation.popup.batch_group_insertion
 
-import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -30,7 +27,7 @@ import com.android.inventorytracker.presentation.shared.component.primitive.Conf
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
 import com.android.inventorytracker.ui.theme.Palette
-import com.android.inventorytracker.ui.theme.GoogleSans // ✅ Imported
+import com.android.inventorytracker.ui.theme.GoogleSans
 
 @Composable
 fun BatchGroupInsertionPopup(
@@ -50,8 +47,8 @@ fun BatchGroupInsertionPopup(
         valid = validItems.isNotEmpty() && validItems.all { validityMap[it.itemId] == true }
     }
 
-    fun onConfirm(){
-        if(valid){
+    fun onConfirm() {
+        if (valid) {
             val validItems = inputMap.filter { (id, _) -> id in persistentItems && validityMap[id] == true }.values.toList()
             validItems.forEach { op ->
                 batchViewModel.onStoreBatch(ItemBatchEntity(itemId = op.itemId, subUnit = op.subunit, expiryDate = op.expiryDate))
@@ -66,44 +63,39 @@ fun BatchGroupInsertionPopup(
         onDismiss()
     }) {
         Card(
-            modifier = Modifier.width(480.dp).height(620.dp),
+            modifier = Modifier
+                .width(480.dp)
+                .height(540.dp), // FIXED & SMALLER: Fixed size na hindi na masyadong matangkad
             shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = Palette.PopupSurface)
+            colors = CardDefaults.cardColors(containerColor = Palette.PopupSurface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
                 Text(
-                    text = "Quick Add",
+                    text = "Quick Add Stock",
                     style = TextStyle(
                         fontFamily = GoogleSans,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Palette.ButtonDarkBrown // ✅ Fixed: 'TextDark' is replaced with an existing palette color
+                        color = Palette.ButtonDarkBrown
                     )
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Row(modifier = Modifier.focusable(false),horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(modifier = Modifier.focusable(false), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     SearchField(Modifier.weight(1f))
                     SortDropdownMenu()
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Text(
-                    text = "Select Items and Set Values",
-                    style = TextStyle(fontFamily = GoogleSans, fontSize = 12.sp, color = Color.Gray)
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
+                // Mananatiling scrollable ang loob nito
                 LazyColumn(
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxWidth()
-                        .background(Color.White.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
-                        .padding(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(model, key = { it.item.id }) { itemModel ->
                         val persistence = itemModel.item.id in persistentItems
@@ -116,7 +108,7 @@ fun BatchGroupInsertionPopup(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
                 HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.5f))
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -132,7 +124,7 @@ fun BatchGroupInsertionPopup(
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    CancelButton(text = "Close", onClick = {
+                    CancelButton(onClick = {
                         itemViewModel.reset()
                         onDismiss()
                     })
@@ -152,12 +144,16 @@ fun BatchGroupInsertionPopup(
         AlertDialog(
             onDismissRequest = { showConfirmation = false },
             title = { Text("Confirm Action", style = TextStyle(fontFamily = GoogleSans, fontWeight = FontWeight.Bold)) },
-            text = { Text("Do you want to add these batches?", style = TextStyle(fontFamily = GoogleSans)) },
+            text = { Text("Do you want to add these batches to the inventory?", style = TextStyle(fontFamily = GoogleSans)) },
             confirmButton = {
-                TextButton(onClick = { onConfirm() }) { Text("Confirm", style = TextStyle(fontFamily = GoogleSans, color = Palette.ButtonDarkBrown)) }
+                TextButton(onClick = { onConfirm() }) {
+                    Text("Confirm", style = TextStyle(fontFamily = GoogleSans, color = Palette.ButtonDarkBrown, fontWeight = FontWeight.Bold))
+                }
             },
             dismissButton = {
-                TextButton(onClick = { showConfirmation = false }) { Text("Cancel", style = TextStyle(fontFamily = GoogleSans)) }
+                TextButton(onClick = { showConfirmation = false }) {
+                    Text("Cancel", style = TextStyle(fontFamily = GoogleSans, color = Color.Gray))
+                }
             }
         )
     }

@@ -8,11 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -22,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,6 +29,8 @@ import com.android.inventorytracker.presentation.popup.batch_insertion.BatchInse
 import com.android.inventorytracker.presentation.popup.batch_targeted_removal.BatchTargetedRemoval
 import com.android.inventorytracker.presentation.popup.item_detail.ItemDetailPopup
 import com.android.inventorytracker.presentation.shared.viewmodel.ItemViewModel
+import com.android.inventorytracker.ui.theme.GoogleSans
+import com.android.inventorytracker.ui.theme.Palette
 
 val SurfaceWhite = Color.White
 val LightBeigeField = Color(0xFFF2ECE6)
@@ -65,8 +64,7 @@ fun ItemDataRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(15.dp)
         ) {
-
-            // 1. Image
+            // 1. Image (size 48.dp)
             val painter = if (model.item.imageUri != null) {
                 rememberAsyncImagePainter(model = model.item.imageUri)
             } else {
@@ -83,7 +81,7 @@ fun ItemDataRow(
                     .background(Color.LightGray.copy(alpha = 0.2f))
             )
 
-            // 2. Item Name
+            // 2. Item Name (weight 3.0f)
             DataFieldBox(
                 text = model.item.name,
                 backgroundColor = LightBeigeField,
@@ -91,16 +89,15 @@ fun ItemDataRow(
                 modifier = Modifier.weight(3.0f)
             )
 
-            // 3. Expiry
+            // 3. Expiry (weight 1.2f)
             DataFieldBox(
-                text = if (model.nearestExpiryFormatted == "N/A") "No Date"
-                else model.nearestExpiryFormatted,
+                text = if (model.nearestExpiryFormatted == "N/A") "No Date" else model.nearestExpiryFormatted,
                 backgroundColor = LightBeigeField,
                 textColor = Color.DarkGray,
                 modifier = Modifier.weight(1.2f)
             )
 
-            // 4. Current stock
+            // 4. Current stock (weight 0.8f)
             DataFieldBox(
                 text = model.totalUnitFormatted(),
                 backgroundColor = AccentBrown,
@@ -110,13 +107,12 @@ fun ItemDataRow(
                 isBold = true
             )
 
-            // 5. Actions
+            // 5. Actions (weight 1.5f)
             Row(
                 modifier = Modifier.weight(1.5f),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
                 ActionButtons(
                     modifier = Modifier.weight(0.25f),
                     icon = Icons.Default.Remove,
@@ -139,29 +135,15 @@ fun ItemDataRow(
         }
     }
 
-    /* ---------------- Popups ---------------- */
-
+    /* Popups management stays here... */
     if (showItemDetail) {
-        ItemDetailPopup(
-            model = model,
-            onDismiss = { showItemDetail = false },
-            onUpdateItem = itemViewModel::updateItem
-        )
+        ItemDetailPopup(model = model, onDismiss = { showItemDetail = false }, onUpdateItem = itemViewModel::updateItem)
     }
-
     if (showInsertBatch) {
-        BatchInsertionPopup(
-            itemModel = model,
-            onDismiss = { showInsertBatch = false }
-        )
+        BatchInsertionPopup(itemModel = model, onDismiss = { showInsertBatch = false })
     }
-
     if (showDeleteBatch) {
-        BatchTargetedRemoval(
-            threshold = model.item.subUnitThreshold,
-            batch = model.batch,
-            onDismiss = { showDeleteBatch = false }
-        )
+        BatchTargetedRemoval(threshold = model.item.subUnitThreshold, batch = model.batch, onDismiss = { showDeleteBatch = false })
     }
 }
 
@@ -184,9 +166,12 @@ fun DataFieldBox(
     ) {
         Text(
             text = text,
-            color = textColor,
-            fontSize = 13.sp,
-            fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal,
+            style = TextStyle(
+                fontFamily = GoogleSans,
+                color = textColor,
+                fontSize = 13.sp,
+                fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal
+            ),
             maxLines = 1
         )
     }
@@ -200,11 +185,11 @@ fun ActionButtons(
     modifier: Modifier
 ) {
     IconButton(
-        modifier = modifier.background(Color.White),
+        modifier = modifier.size(32.dp).background(Color.Transparent),
         onClick = onClick,
         enabled = enabled
     ) {
-        Icon(imageVector = icon, contentDescription = null)
+        Icon(imageVector = icon, contentDescription = null, tint = if (enabled) Color.Black else Color.Gray)
     }
 }
 
@@ -223,10 +208,13 @@ fun ViewMoreButtons(
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "View",
-            color = Color.White,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold
+            text = "Update",
+            style = TextStyle(
+                fontFamily = GoogleSans,
+                color = Color.White,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+            )
         )
     }
 }

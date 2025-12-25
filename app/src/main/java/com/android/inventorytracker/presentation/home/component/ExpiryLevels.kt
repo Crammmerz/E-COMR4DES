@@ -22,6 +22,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.android.inventorytracker.R
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.ui.theme.Palette
+import com.android.inventorytracker.ui.theme.GoogleSans
 
 
 @Composable
@@ -39,8 +40,9 @@ fun ExpiryLevels(
         Text(
             text = "Expiry",
             style = TextStyle(
-                fontWeight = FontWeight.SemiBold, // Use SemiBold for the main header
-                fontSize = 24.sp, // Approximate size for titleLarge
+                fontFamily = GoogleSans,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 24.sp,
                 color = Palette.DarkBeigeText
             )
         )
@@ -92,10 +94,10 @@ fun ExpiryLevels(
                             Text(
                                 text = model.item.name,
                                 modifier = Modifier.fillMaxWidth(),
-                                // Apply Google Sans Medium for item name
                                 style = TextStyle(
-                                    fontWeight = FontWeight.Medium, // Use Medium for item name
-                                    fontSize = 16.sp, // Approximate size for bodyMedium
+                                    fontFamily = GoogleSans,
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 16.sp,
                                     color = Palette.DarkBeigeText
                                 )
                             )
@@ -107,10 +109,10 @@ fun ExpiryLevels(
                             ) {
                                 Text(
                                     text = "Expires in",
-                                    // Apply Google Sans Regular for detail text
                                     style = TextStyle(
-                                        fontWeight = FontWeight.Normal, // Use Regular for label text
-                                        fontSize = 12.sp, // Approximate size for bodySmall
+                                        fontFamily = GoogleSans,
+                                        fontWeight = FontWeight.Normal,
+                                        fontSize = 12.sp,
                                         color = Palette.DarkBeigeText
                                     )
                                 )
@@ -121,6 +123,7 @@ fun ExpiryLevels(
                                         .background(model.expiryColor.copy(alpha = 0.12f))
                                         .padding(horizontal = 8.dp, vertical = 4.dp),
                                     style = TextStyle(
+                                        fontFamily = GoogleSans,
                                         fontWeight = FontWeight.Normal,
                                         fontSize = 12.sp,
                                         color = model.expiryColor
@@ -133,7 +136,15 @@ fun ExpiryLevels(
             }
         } else {
             Box(modifier = Modifier.weight(1f).fillMaxWidth()){
-                Text("Nothing to worry about — no alerts")
+                Text(
+                    text = "Nothing to worry about — no alerts",
+                    style = TextStyle(
+                        fontFamily = GoogleSans,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 14.sp,
+                        color = Palette.LightBeigeText
+                    )
+                )
             }
         }
     }

@@ -4,19 +4,22 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.android.inventorytracker.data.model.RemoveBatch
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.presentation.shared.component.input_fields.FloatField
@@ -56,9 +59,7 @@ fun ItemRemovalRow(
     }
 
     Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         color = if (isPersistent) Color.White else Color.Transparent,
         border = if (isPersistent) androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f)) else null
@@ -74,25 +75,39 @@ fun ItemRemovalRow(
                     colors = CheckboxDefaults.colors(checkedColor = Palette.ButtonDarkBrown)
                 )
 
-                Column(modifier = Modifier.padding(start = 8.dp)) {
+                // Square Rounded Image
+                AsyncImage(
+                    model = model.item.imageUri,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.LightGray.copy(alpha = 0.3f)),
+                    contentScale = ContentScale.Crop
+                )
+
+                Column(modifier = Modifier.padding(start = 12.dp).weight(1f)) {
                     Text(
                         text = model.item.name,
-                        style = TextStyle(fontFamily = GoogleSans, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Palette.ButtonDarkBrown)
-                    )
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Text(
-                            text = "Max Units: ${model.totalUnitFormatted()}",
-                            style = TextStyle(fontFamily = GoogleSans, fontSize = 12.sp, color = Color.Gray)
+                        style = TextStyle(
+                            fontFamily = GoogleSans,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            color = Palette.ButtonDarkBrown
                         )
-                    }
+                    )
+                    Text(
+                        text = "Stock: ${model.totalUnitFormatted()}",
+                        style = TextStyle(fontFamily = GoogleSans, fontSize = 12.sp, color = Color.Gray)
+                    )
                 }
-                Spacer(modifier = Modifier.weight(1f))
+
                 if(isPersistent) {
                     Icon(
-                        modifier = Modifier.padding(10.dp),
-                        imageVector = if(valid) Icons.Default.Check else Icons.Default.Close,
-                        contentDescription = "Validity",
-                        tint = if(valid) Color.Green else Color.Red
+                        imageVector = if(valid) Icons.Default.CheckCircle else Icons.Default.Error,
+                        contentDescription = null,
+                        tint = if(valid) Color(0xFF4CAF50) else Color(0xFFE57373),
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }

@@ -1,7 +1,5 @@
 package com.android.inventorytracker.presentation.popup.batch_group_removal
 
-import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -65,13 +62,16 @@ fun BatchGroupRemovalPopup(
         onDismiss()
     }) {
         Card(
-            modifier = Modifier.width(480.dp).height(620.dp),
+            modifier = Modifier
+                .width(480.dp)
+                .height(540.dp), // FIXED & UNIFORM HEIGHT
             shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = Palette.PopupSurface)
+            colors = CardDefaults.cardColors(containerColor = Palette.PopupSurface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
                 Text(
-                    text = "Quick Remove",
+                    text = "Quick Remove Stock",
                     style = TextStyle(
                         fontFamily = GoogleSans,
                         fontSize = 20.sp,
@@ -82,27 +82,19 @@ fun BatchGroupRemovalPopup(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Row(modifier = Modifier.focusable(false),horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(modifier = Modifier.focusable(false), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     SearchField(Modifier.weight(1f))
                     SortDropdownMenu()
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Text(
-                    text = "Select Items and Set Values (FEFO)",
-                    style = TextStyle(fontFamily = GoogleSans, fontSize = 12.sp, color = Color.Gray)
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
+                // Scrollable Content
                 LazyColumn(
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxWidth()
-                        .background(Color.White.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
-                        .padding(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(model.filter { it.totalSubUnit() != 0 }, key = { it.item.id }) { itemModel ->
                         val persistence = itemModel.item.id in persistentItems
@@ -115,7 +107,7 @@ fun BatchGroupRemovalPopup(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
                 HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.5f))
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -125,19 +117,19 @@ fun BatchGroupRemovalPopup(
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = "${persistentItems.size} selected",
+                        text = "${persistentItems.size} items ready",
                         style = TextStyle(fontFamily = GoogleSans, fontSize = 12.sp, color = Color.Gray)
                     )
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    CancelButton(text = "Close", onClick = {
+                    CancelButton(onClick = {
                         itemViewModel.reset()
                         onDismiss()
                     })
 
                     ConfirmButton(
-                        text = "Remove Batch",
+                        text = "Remove Stock",
                         containerColor = Palette.ButtonDarkBrown,
                         enabled = valid,
                         onClick = { showConfirmation = true }
@@ -151,12 +143,16 @@ fun BatchGroupRemovalPopup(
         AlertDialog(
             onDismissRequest = { showConfirmation = false },
             title = { Text("Confirm Removal", style = TextStyle(fontFamily = GoogleSans, fontWeight = FontWeight.Bold)) },
-            text = { Text("Remove these batches from stock?", style = TextStyle(fontFamily = GoogleSans)) },
+            text = { Text("Are you sure you want to deduct these items from stock? (FEFO basis)", style = TextStyle(fontFamily = GoogleSans)) },
             confirmButton = {
-                TextButton(onClick = { onConfirm() }) { Text("Confirm", style = TextStyle(fontFamily = GoogleSans, color = Color.Red)) }
+                TextButton(onClick = { onConfirm() }) {
+                    Text("Deduct", style = TextStyle(fontFamily = GoogleSans, color = Color.Red, fontWeight = FontWeight.Bold))
+                }
             },
             dismissButton = {
-                TextButton(onClick = { showConfirmation = false }) { Text("Cancel", style = TextStyle(fontFamily = GoogleSans)) }
+                TextButton(onClick = { showConfirmation = false }) {
+                    Text("Cancel", style = TextStyle(fontFamily = GoogleSans, color = Color.Gray))
+                }
             }
         )
     }

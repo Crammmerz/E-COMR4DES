@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -24,11 +25,10 @@ import com.android.inventorytracker.ui.theme.GoogleSans
 @Composable
 fun DeleteItemPopup(
     model: List<ItemModel>,
-    onDelete: (List<Int>) -> Unit, // In-update para tumanggap ng list ng IDs
+    onDelete: (List<Int>) -> Unit,
     onDismiss: () -> Unit
 ) {
     val selectedIds = remember { mutableStateListOf<Int>() }
-    // Note: showConfirm is used for your confirmation logic
     var showConfirm by remember { mutableStateOf(false) }
 
     fun doDelete(){
@@ -41,25 +41,25 @@ fun DeleteItemPopup(
         Card(
             modifier = Modifier
                 .width(480.dp)
-                .heightIn(max = 620.dp), // Identical max height sa Insert
+                .height(540.dp), // FIXED & UNIFORM HEIGHT
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = Palette.PopupSurface),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .padding(24.dp)
             ) {
-                // Header section na may close button
                 HeaderSection(onClose = onDismiss)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Listahan ng items na pwedeng i-delete
+                // Fixed internal scrolling
                 LazyColumn(
                     modifier = Modifier
-                        .weight(1f, fill = false),
+                        .weight(1f)
+                        .fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(model, key = { it.item.id }) { itemModel ->
@@ -74,7 +74,6 @@ fun DeleteItemPopup(
                     }
                 }
 
-                // Footer section na kapareho ng styling sa Insert
                 Spacer(modifier = Modifier.height(24.dp))
                 HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.5f))
                 Spacer(modifier = Modifier.height(16.dp))
@@ -107,24 +106,23 @@ fun DeleteItemPopup(
             }
         }
     }
+
     if(showConfirm){
         AlertDialog(
             onDismissRequest = { showConfirm = false },
-            title = { Text("Remove Item?") },
+            title = { Text("Remove Item?", style = TextStyle(fontFamily = GoogleSans, fontWeight = FontWeight.Bold)) },
             text = {
-                Column {
-                    Text("Are you sure you want to remove the selected items?")
-                    Text("This action cannot be undone.")
-                }
+                Text("Are you sure you want to remove the selected items? This will also remove all associated batches.",
+                    style = TextStyle(fontFamily = GoogleSans))
             },
             confirmButton = {
                 TextButton(onClick = { doDelete() }) {
-                    Text("Remove")
+                    Text("Remove", style = TextStyle(fontFamily = GoogleSans, color = Color.Red, fontWeight = FontWeight.Bold))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showConfirm = false }) {
-                    Text("Cancel")
+                    Text("Cancel", style = TextStyle(fontFamily = GoogleSans, color = Color.Gray))
                 }
             }
         )

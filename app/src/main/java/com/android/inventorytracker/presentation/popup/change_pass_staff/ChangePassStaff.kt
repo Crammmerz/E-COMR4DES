@@ -21,9 +21,8 @@ import com.android.inventorytracker.presentation.shared.component.input_fields.P
 import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
 import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.ui.theme.Palette
+import com.android.inventorytracker.ui.theme.GoogleSans
 import kotlinx.coroutines.launch
-
-// --- Define Google Sans Family ---
 
 @Composable
 fun ChangePassStaff(
@@ -42,7 +41,6 @@ fun ChangePassStaff(
     var successChange by rememberSaveable { mutableStateOf<Boolean?>(null) }
 
     val scope = rememberCoroutineScope()
-
     val focusNewPass = remember { FocusRequester() }
     val focusConfirmPass = remember { FocusRequester() }
 
@@ -54,11 +52,7 @@ fun ChangePassStaff(
         if (valid && isMatch) {
             scope.launch {
                 val success = onSubmit(
-                    UserEntity(
-                        username = "staff",
-                        passwordHash = newPassword,
-                        role = "STAFF"
-                    )
+                    UserEntity(username = "staff", passwordHash = newPassword, role = "STAFF")
                 )
                 successChange = success
                 if (success) onDismiss()
@@ -71,25 +65,21 @@ fun ChangePassStaff(
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Surface(
-            modifier = Modifier
-                .width(460.dp)
-                .wrapContentHeight(),
-            shape = RoundedCornerShape(32.dp),
-            color = Palette.iOSCardWhite,
+            modifier = Modifier.width(460.dp).wrapContentHeight(),
+            shape = RoundedCornerShape(20.dp),
+            color = Palette.PopupSurface,
             shadowElevation = 8.dp
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(32.dp),
+                modifier = Modifier.fillMaxWidth().padding(32.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                // Header
                 Text(
                     text = "Staff Password Change",
                     style = TextStyle(
+                        fontFamily = GoogleSans,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp,
+                        fontSize = 22.sp,
                         letterSpacing = (-0.5).sp
                     ),
                     color = Palette.DarkBeigeText
@@ -102,7 +92,7 @@ fun ChangePassStaff(
                         onValueChange = { newPassword = it },
                         header = "New Password",
                         onValidityChange = { validNewPass = it },
-                        onDone = { if (isMatch) focusConfirmPass.requestFocus() }
+                        onDone = { focusConfirmPass.requestFocus() }
                     )
 
                     PasswordField(
@@ -115,27 +105,22 @@ fun ChangePassStaff(
                     )
                 }
 
-                // Error Messages
-                Column {
-                    if (!isMatch) {
-                        Text(
-                            text = "Password do not match",
-                            style = TextStyle(
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp
-                            ),
-                            color = Color.Red
-                        )
-                    }
-                    if (successChange == false) {
-                        Text(
-                            text = "Unable to change password",
-                            style = TextStyle(
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp
-                            ),
-                            color = Color.Red
-                        )
+                if (!isMatch || successChange == false) {
+                    Column {
+                        if (!isMatch) {
+                            Text(
+                                text = "Passwords do not match",
+                                style = TextStyle(fontFamily = GoogleSans, fontWeight = FontWeight.Medium, fontSize = 14.sp),
+                                color = Color.Red
+                            )
+                        }
+                        if (successChange == false) {
+                            Text(
+                                text = "Unable to change password",
+                                style = TextStyle(fontFamily = GoogleSans, fontWeight = FontWeight.Medium, fontSize = 14.sp),
+                                color = Color.Red
+                            )
+                        }
                     }
                 }
 
@@ -144,21 +129,14 @@ fun ChangePassStaff(
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Force Google Sans on Buttons
-                    CompositionLocalProvider(
-                        LocalTextStyle provides TextStyle(
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 16.sp
-                        )
-                    ) {
-                        CancelButton(onClick = onDismiss)
-                        Spacer(modifier = Modifier.width(12.dp))
-                        ConfirmButton(
-                            text = "Change Password",
-                            enabled = valid && isMatch,
-                            onClick = { doSubmit() }
-                        )
-                    }
+                    CancelButton(onClick = onDismiss)
+                    Spacer(modifier = Modifier.width(12.dp))
+                    ConfirmButton(
+                        text = "Update Password",
+                        containerColor = Palette.ButtonDarkBrown,
+                        enabled = valid && isMatch,
+                        onClick = { doSubmit() }
+                    )
                 }
             }
         }

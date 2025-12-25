@@ -1,25 +1,22 @@
 package com.android.inventorytracker.presentation.inventory.component
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.PaddingValues
+import com.android.inventorytracker.ui.theme.GoogleSans
 
 private val AccentColor = Color(0xFF5D4037)
-
 
 @Composable
 fun AddNewItemButton(onClick: () -> Unit) {
@@ -32,15 +29,19 @@ fun AddNewItemButton(onClick: () -> Unit) {
             contentColor = Color.White
         )
     ) {
-        Text("Add New Item")
+        Text(
+            text = "Add New Item",
+            style = TextStyle(fontFamily = GoogleSans, fontWeight = FontWeight.Bold)
+        )
     }
 }
+
 @Composable
 fun DeleteItemButton(
     onClick: () -> Unit,
     enabled: Boolean
 ) {
-    val dangerRed = Color(0xFF5D4037) // clean red (Material danger-like)
+    val dangerRed = Color(0xFF5D4037)
 
     OutlinedButton(
         onClick = onClick,
@@ -49,9 +50,7 @@ fun DeleteItemButton(
         border = BorderStroke(1.dp, dangerRed),
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = dangerRed,
-            disabledContentColor = dangerRed,
-            containerColor = Color.White,
-            disabledContainerColor = Color.White
+            containerColor = Color.White
         )
     ) {
         Icon(
@@ -65,9 +64,12 @@ fun DeleteItemButton(
 
         Text(
             text = "Remove Items",
-            color = dangerRed,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.SemiBold
+            style = TextStyle(
+                fontFamily = GoogleSans,
+                color = dangerRed,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold
+            )
         )
     }
 }

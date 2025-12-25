@@ -51,7 +51,6 @@ fun InsertItemPopup(
     var subUnitThresholdValid by rememberSaveable { mutableStateOf(true) }
     var expiryThresholdValid by rememberSaveable { mutableStateOf(true) }
 
-    // ✅ Added subUnitThresholdValid to validation
     val allValid = nameValid && unitThresholdValid && subUnitThresholdValid && expiryThresholdValid
 
     val focusName = remember { FocusRequester() }
@@ -87,8 +86,8 @@ fun InsertItemPopup(
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
-                .width(520.dp) // Nilakihan ko konti para magkasya yung 3 columns
-                .heightIn(max = 620.dp),
+                .width(480.dp) // Uniformed with other popups
+                .height(540.dp), // FIXED HEIGHT
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = Palette.PopupSurface),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
@@ -98,6 +97,7 @@ fun InsertItemPopup(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Internal Scrollable Section
                 Column(
                     modifier = Modifier
                         .weight(1f)
@@ -124,10 +124,10 @@ fun InsertItemPopup(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        IntField( // Low Stock Alerts 20% of the unit threshold value
+                        IntField(
                             modifier = Modifier.weight(1f),
                             fieldModifier = Modifier.focusRequester(focusUnit),
-                            label = "Low Stock Threshold",
+                            label = "Low Stock",
                             placeholder = "1",
                             doClear = true,
                             value = unitThreshold,
@@ -136,10 +136,10 @@ fun InsertItemPopup(
                             onDone = { focusExpiry.requestFocus() }
                         )
 
-                        IntField( // Expiry Alerts
+                        IntField(
                             modifier = Modifier.weight(1f),
                             fieldModifier = Modifier.focusRequester(focusExpiry),
-                            label = "Expiry Threshold",
+                            label = "Expiry Warning",
                             placeholder = "0",
                             doClear = true,
                             value = expiryThreshold,
@@ -148,25 +148,25 @@ fun InsertItemPopup(
                             onValidityChange = { expiryThresholdValid = it },
                             onDone = { focusSubUnit.requestFocus() }
                         )
-
-                        IntField( // sub‑unit is basically a smaller measurable piece that belongs to a bigger unit.
-                            modifier = Modifier.weight(1f),
-                            fieldModifier = Modifier.focusRequester(focusSubUnit),
-                            label = "Sub Unit",
-                            placeholder = "1",
-                            doClear = true,
-                            value = subUnitThreshold,
-                            onValueChange = { subUnitThreshold = it },
-                            onValidityChange = { subUnitThresholdValid = it }
-                        )
                     }
+
+                    IntField(
+                        modifier = Modifier.fillMaxWidth(),
+                        fieldModifier = Modifier.focusRequester(focusSubUnit),
+                        label = "Sub Unit Multiplier",
+                        placeholder = "1",
+                        doClear = true,
+                        value = subUnitThreshold,
+                        onValueChange = { subUnitThreshold = it },
+                        onValidityChange = { subUnitThresholdValid = it }
+                    )
 
                     DescriptionField(
                         value = description,
                         onValueChange = { description = it },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(120.dp)
+                            .height(100.dp)
                     )
                 }
 
@@ -180,7 +180,7 @@ fun InsertItemPopup(
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = if (allValid) "Ready to add" else "Fill required fields",
+                        text = if (allValid) "Ready to add" else "Required fields missing",
                         style = TextStyle(fontFamily = GoogleSans, fontSize = 12.sp, color = Color.Gray)
                     )
 

@@ -2,29 +2,21 @@ package com.android.inventorytracker.presentation.popup.csv_removal
 
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.presentation.popup.csv_removal.component.DataRow
 import com.android.inventorytracker.presentation.popup.csv_removal.viewmodel.CsvViewModel
@@ -32,13 +24,15 @@ import com.android.inventorytracker.presentation.shared.component.primitive.Canc
 import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.presentation.shared.component.primitive.DialogHost
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
+import com.android.inventorytracker.ui.theme.Palette
+import com.android.inventorytracker.ui.theme.GoogleSans
 
 @Composable
 fun CsvRemovalPopup(
     csvViewModel: CsvViewModel = hiltViewModel(),
     batchViewModel: BatchViewModel = hiltViewModel(),
     onDismiss: () -> Unit
-){
+) {
     val model = csvViewModel.model.collectAsState(initial = emptyList())
     val data = csvViewModel.data.observeAsState(emptyList())
     val dropped = csvViewModel.droppedCount.observeAsState()
@@ -47,10 +41,8 @@ fun CsvRemovalPopup(
 
     val context = LocalContext.current
 
-    fun onConfirm(){
-        valid = data.value.all { row ->
-            validityMap[row.id] == true
-        }
+    fun onConfirm() {
+        valid = data.value.all { row -> validityMap[row.id] == true }
 
         if (valid) {
             data.value.forEach { row ->
@@ -71,66 +63,133 @@ fun CsvRemovalPopup(
     }
 
     DialogHost(
-        modifier = Modifier
-            .size(600.dp),
         onDismissRequest = {
             csvViewModel.clearData()
             onDismiss()
         },
         useImePadding = true
     ) {
-        Column (Modifier
-            .fillMaxSize()
-            .padding(10.dp)) {
-            Text("Set Values")
-            if(dropped.value != null && dropped.value != 0) {
-                Text( "Dropped ${dropped.value} items")
-            }
-            if(data.value.isNotEmpty()){
-                LazyColumn (
+        Card(
+            modifier = Modifier
+                .width(600.dp)
+                .heightIn(max = 700.dp),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = Palette.PopupSurface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp)
+            ) {
+                // Header section
+                Text(
+                    text = "CSV Deduction Preview",
+                    style = TextStyle(
+                        fontFamily = GoogleSans,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp,
+                        color = Palette.DarkBeigeText
+                    )
+                )
+
+                if (dropped.value != null && dropped.value != 0) {
+                    Text(
+                        text = "Dropped ${dropped.value} unrecognized items",
+                        style = TextStyle(
+                            fontFamily = GoogleSans,
+                            fontSize = 12.sp,
+                            color = Color.Red.copy(alpha = 0.8f)
+                        )
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Content Area with LazyColumn
+                Box(
                     modifier = Modifier
                         .weight(1f)
-                        .background(Color.White)
-                        .padding(5.dp),
-                    verticalArrangement = Arrangement.spacedBy(5.dp)
-                ){
-                    items(
-                        items = data.value,
-                        key = { row -> row.id }
-                    ) { row ->
-                        val matchedModel = model.value.firstOrNull { it.item.id == row.id }
-                        if (matchedModel != null) {
-                            DataRow(
-                                model = matchedModel,
-                                subUnit = row.subunit,
-                                onUpdate = csvViewModel::updateData,
-                                onValidityChange = { valid ->
-                                    validityMap = validityMap + (matchedModel.item.id to valid)
+                        .fillMaxWidth()
+                ) {
+                    if (data.value.isNotEmpty()) {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(
+                                items = data.value,
+                                key = { row -> row.id }
+                            ) { row ->
+                                val matchedModel = model.value.firstOrNull { it.item.id == row.id }
+                                if (matchedModel != null) {
+                                    DataRow(
+                                        model = matchedModel,
+                                        subUnit = row.subunit,
+                                        onUpdate = csvViewModel::updateData,
+                                        onValidityChange = { isValid ->
+                                            validityMap = validityMap + (matchedModel.item.id to isValid)
+                                        }
+                                    )
                                 }
+                            }
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                "No valid data detected in CSV",
+                                style = TextStyle(
+                                    fontFamily = GoogleSans,
+                                    color = Color.Gray,
+                                    fontSize = 14.sp
+                                )
                             )
                         }
                     }
                 }
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .background(Color.White),
-                    contentAlignment = Alignment.Center
+
+                // Footer section
+                Spacer(modifier = Modifier.height(24.dp))
+                HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.5f))
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text("No data has been read")
+                    Text(
+                        text = "${data.value.size} items ready for deduction",
+                        style = TextStyle(
+                            fontFamily = GoogleSans,
+                            fontSize = 12.sp,
+                            color = Color.Gray
+                        )
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    // Applying Google Sans to Cancel and Confirm Buttons
+                    CompositionLocalProvider(
+                        LocalTextStyle provides TextStyle(fontFamily = GoogleSans, fontWeight = FontWeight.Medium)
+                    ) {
+                        CancelButton {
+                            csvViewModel.clearData()
+                            onDismiss()
+                        }
+
+                        ConfirmButton(
+                            text = "Deduct Stock",
+                            containerColor = Palette.ButtonDarkBrown,
+                            enabled = data.value.isNotEmpty(),
+                            onClick = { onConfirm() }
+                        )
+                    }
                 }
             }
-
-            CancelButton {
-                csvViewModel.clearData()
-                onDismiss()
-            }
-
-            ConfirmButton("Deduct", {
-                onConfirm()
-            })
         }
     }
 }

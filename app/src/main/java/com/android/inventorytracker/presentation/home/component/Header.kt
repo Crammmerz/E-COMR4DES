@@ -9,7 +9,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -17,21 +16,20 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.TimeViewModel
 import com.android.inventorytracker.ui.theme.Palette
+import com.android.inventorytracker.ui.theme.GoogleSans
 
 @Composable
 fun Header(){
     val timeViewModel: TimeViewModel = viewModel()
 
-    // Use a Column to stack the elements vertically
     Column(modifier = Modifier.fillMaxWidth()) {
-
-        // 1. Date/Time (Subtle, Light Beige Color, Regular Font Weight)
         Text(
             text = "Inventory Dashboard",
             style = TextStyle(
-                fontWeight = FontWeight.SemiBold, // SemiBold for prominence
+                fontFamily = GoogleSans,
+                fontWeight = FontWeight.SemiBold,
                 fontSize = 34.sp,
-                color = Palette.DarkBeigeText // Dark beige for prominence
+                color = Palette.DarkBeigeText
             )
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -39,6 +37,7 @@ fun Header(){
             Text(
                 text = "Quick Actions",
                 style = TextStyle(
+                    fontFamily = GoogleSans,
                     fontWeight = FontWeight.Medium,
                     fontSize = 20.sp,
                     color = Palette.DarkBeigeText
@@ -48,9 +47,10 @@ fun Header(){
             Text(
                 text = timeViewModel.getDayAndDate(),
                 style = TextStyle(
-                    fontWeight = FontWeight.Normal, // Regular
+                    fontFamily = GoogleSans,
+                    fontWeight = FontWeight.Normal,
                     fontSize = 16.sp,
-                    color = Palette.LightBeigeText // Use light beige for subtlety
+                    color = Palette.LightBeigeText
                 )
             )
         }

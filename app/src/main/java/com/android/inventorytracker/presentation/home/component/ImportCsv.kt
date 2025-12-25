@@ -6,29 +6,30 @@ import android.provider.OpenableColumns
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.presentation.home.viewmodel.HomeViewModel
 import com.android.inventorytracker.presentation.popup.csv_removal.CsvRemovalPopup
 import com.android.inventorytracker.presentation.popup.csv_removal.viewmodel.CsvViewModel
+import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
+import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
+import com.android.inventorytracker.ui.theme.Palette
+import com.android.inventorytracker.ui.theme.GoogleSans
 
 @Composable
 fun ImportCsv(
@@ -36,79 +37,153 @@ fun ImportCsv(
     onDismiss: () -> Unit = {},
     csvViewModel: CsvViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel = hiltViewModel(),
-){
-    val showDialog by homeViewModel.showImportConfirmation.collectAsState(initial = true)
+) {
+    val showDialogPref by homeViewModel.showImportConfirmation.collectAsState(initial = true)
     var skipConfirmation by remember { mutableStateOf(false) }
     var showCsvRemovalPopup by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
+    // Controls the visibility of the internal Confirmation Step
+    var showInternalConfirmation by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
     var csvUri: Uri? by remember { mutableStateOf(null) }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            val isCsv = isCsvFile(context, uri) ||
-                    context.contentResolver.getType(uri) == "text/csv"
+            val isCsv = isCsvFile(context, uri) || context.contentResolver.getType(uri) == "text/csv"
             csvUri = if (isCsv) uri else null
-            Log.d("CsvViewModel", "csvUri: $csvUri")
         }
     }
 
+    // Logic to handle the sequence of events
+    fun initiateFilePicker() {
+        if (showDialogPref) {
+            showInternalConfirmation = true
+        } else {
+            launcher.launch("text/*")
+            onDismiss()
+        }
+    }
 
     LaunchedEffect(csvUri) {
-        if(csvUri != null) {
+        if (csvUri != null) {
             csvViewModel.loadCsv(csvUri!!)
             showCsvRemovalPopup = true
         }
     }
 
     if (doImport) {
-        when (showDialog) {
-            true -> {
-                AlertDialog(
-                    onDismissRequest = { onDismiss() },
-                    title = { Text("Import CSV File (Deduct Stock)") },
-                    text = {
-                        Column {
-                            Text("Would you like to open the file manager to select a CSV file for import?")
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(
-                                    checked = skipConfirmation,
-                                    onCheckedChange = { skipConfirmation = it }
+        // STEP 1: The main Action Popup (Inspired by PhotoSelection/Insertion style)
+        if (!showInternalConfirmation) {
+            Dialog(onDismissRequest = { onDismiss() }) {
+                Card(
+                    modifier = Modifier.width(450.dp).wrapContentHeight(),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = Palette.PopupSurface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                ) {
+                    Column(modifier = Modifier.padding(24.dp)) {
+                        Text(
+                            text = "Stock Deduction",
+                            style = TextStyle(fontFamily = GoogleSans, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Palette.ButtonDarkBrown)
+                        )
+                        Text(
+                            text = "Choose an import method to deduct inventory",
+                            style = TextStyle(fontFamily = GoogleSans, fontSize = 14.sp, color = Color.Gray)
+                        )
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        // Large Styled Button for CSV Import
+                        OutlinedButton(
+                            onClick = { initiateFilePicker() },
+                            modifier = Modifier.fillMaxWidth().height(80.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f)),
+                            colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White.copy(alpha = 0.5f))
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Description,
+                                    contentDescription = null,
+                                    tint = Palette.ButtonDarkBrown,
+                                    modifier = Modifier.size(28.dp)
                                 )
-                                Text("Don't ask me again")
+                                Text(
+                                    text = "Import CSV File",
+                                    style = TextStyle(fontFamily = GoogleSans, fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
+                                )
                             }
                         }
-                    },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            homeViewModel.toggleImportConfirmation(!skipConfirmation)
-                            launcher.launch("text/*")
-                            onDismiss()
-                        }) {
-                            Text("Yes, Import")
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = {
-                            homeViewModel.toggleImportConfirmation(!skipConfirmation)
-                            onDismiss()
-                        }) {
-                            Text("Cancel")
+
+                        Spacer(modifier = Modifier.height(24.dp))
+                        HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.5f))
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                            CancelButton(onClick = onDismiss)
                         }
                     }
-                )
+                }
             }
-            false -> {
-                launcher.launch("text/*")
-                onDismiss()
+        } else {
+            // STEP 2: The Confirmation Dialog (Only shows if showDialogPref is true)
+            Dialog(onDismissRequest = { showInternalConfirmation = false }) {
+                Card(
+                    modifier = Modifier.width(420.dp).wrapContentHeight(),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = Palette.PopupSurface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                ) {
+                    Column(modifier = Modifier.padding(24.dp)) {
+                        Text(
+                            text = "Confirm Import",
+                            style = TextStyle(fontFamily = GoogleSans, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = "You are about to open the file manager to select your inventory data. Continue?",
+                            style = TextStyle(fontFamily = GoogleSans, fontSize = 14.sp, color = Color.DarkGray)
+                        )
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(
+                                checked = skipConfirmation,
+                                onCheckedChange = { skipConfirmation = it },
+                                colors = CheckboxDefaults.colors(checkedColor = Palette.ButtonDarkBrown)
+                            )
+                            Text("Don't ask me again", style = TextStyle(fontFamily = GoogleSans, fontSize = 12.sp, color = Color.Gray))
+                        }
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Spacer(modifier = Modifier.weight(1f))
+                            CancelButton(onClick = { showInternalConfirmation = false })
+                            ConfirmButton(
+                                text = "Continue",
+                                containerColor = Palette.ButtonDarkBrown,
+                                onClick = {
+                                    homeViewModel.toggleImportConfirmation(!skipConfirmation)
+                                    launcher.launch("text/*")
+                                    onDismiss()
+                                }
+                            )
+                        }
+                    }
+                }
             }
         }
     }
 
-    if(showCsvRemovalPopup){
+    if (showCsvRemovalPopup) {
         CsvRemovalPopup(onDismiss = {
             showCsvRemovalPopup = false
             csvUri = null

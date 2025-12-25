@@ -2,7 +2,7 @@ package com.android.inventorytracker.presentation.popup.change_pass_admin
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.* // Import para sa Surface at LocalTextStyle
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -21,8 +21,8 @@ import com.android.inventorytracker.presentation.shared.component.input_fields.P
 import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
 import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
 import com.android.inventorytracker.ui.theme.Palette
+import com.android.inventorytracker.ui.theme.GoogleSans
 import kotlinx.coroutines.launch
-
 
 @Composable
 fun ChangePassAdmin(
@@ -33,7 +33,6 @@ fun ChangePassAdmin(
     var newPassword by rememberSaveable { mutableStateOf("") }
     var confirmPass by rememberSaveable { mutableStateOf("") }
 
-    // State para sa validation para mawala ang "No value passed" errors
     var validOld by remember { mutableStateOf(false) }
     var validNew by remember { mutableStateOf(false) }
     var validConfirm by remember { mutableStateOf(false) }
@@ -43,7 +42,6 @@ fun ChangePassAdmin(
     var successChange by rememberSaveable { mutableStateOf<Boolean?>(null) }
 
     val scope = rememberCoroutineScope()
-
     val focusOldPass = remember { FocusRequester() }
     val focusNewPass = remember { FocusRequester() }
     val focusConfirmPass = remember { FocusRequester() }
@@ -63,8 +61,8 @@ fun ChangePassAdmin(
     ) {
         Surface(
             modifier = Modifier.width(460.dp).wrapContentHeight(),
-            shape = RoundedCornerShape(32.dp),
-            color = Palette.iOSCardWhite,
+            shape = RoundedCornerShape(20.dp), // Consistent with Item Removal
+            color = Palette.PopupSurface, // Matches other popups
             shadowElevation = 8.dp
         ) {
             Column(
@@ -74,6 +72,7 @@ fun ChangePassAdmin(
                 Text(
                     text = "Admin Password Change",
                     style = TextStyle(
+                        fontFamily = GoogleSans,
                         fontWeight = FontWeight.Bold,
                         fontSize = 22.sp,
                         letterSpacing = (-0.5).sp
@@ -87,7 +86,7 @@ fun ChangePassAdmin(
                         value = oldPassword,
                         onValueChange = { oldPassword = it },
                         header = "Old Password",
-                        onValidityChange = { validOld = it }, // Fix para sa error
+                        onValidityChange = { validOld = it },
                         onDone = { focusNewPass.requestFocus() }
                     )
                     PasswordField(
@@ -95,7 +94,7 @@ fun ChangePassAdmin(
                         value = newPassword,
                         onValueChange = { newPassword = it },
                         header = "New Password",
-                        onValidityChange = { validNew = it }, // Fix para sa error
+                        onValidityChange = { validNew = it },
                         onDone = { focusConfirmPass.requestFocus() }
                     )
                     PasswordField(
@@ -103,31 +102,27 @@ fun ChangePassAdmin(
                         value = confirmPass,
                         onValueChange = { confirmPass = it },
                         header = "Confirm Password",
-                        onValidityChange = { validConfirm = it }, // Fix para sa error
-                        onDone = { focusOldPass.requestFocus() }
+                        onValidityChange = { validConfirm = it },
+                        onDone = { doSubmit() }
                     )
                 }
 
-                Column {
-                    if (!isMatch) {
-                        Text(
-                            text = "Password do not match",
-                            style = TextStyle(
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp
-                            ),
-                            color = Color.Red
-                        )
-                    }
-                    if (successChange == false) {
-                        Text(
-                            text = "Unable to change password",
-                            style = TextStyle(
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 14.sp
-                            ),
-                            color = Color.Red
-                        )
+                if (!isMatch || successChange == false) {
+                    Column {
+                        if (!isMatch) {
+                            Text(
+                                text = "Passwords do not match",
+                                style = TextStyle(fontFamily = GoogleSans, fontWeight = FontWeight.Medium, fontSize = 14.sp),
+                                color = Color.Red
+                            )
+                        }
+                        if (successChange == false) {
+                            Text(
+                                text = "Unable to change password",
+                                style = TextStyle(fontFamily = GoogleSans, fontWeight = FontWeight.Medium, fontSize = 14.sp),
+                                color = Color.Red
+                            )
+                        }
                     }
                 }
 
@@ -136,23 +131,16 @@ fun ChangePassAdmin(
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Ito ang "teknik" para maging Google Sans ang buttons
-                    CompositionLocalProvider(
-                        LocalTextStyle provides TextStyle(
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 16.sp
-                        )
-                    ) {
-                        CancelButton(onClick = onDismiss)
+                    CancelButton(onClick = onDismiss)
 
-                        Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(12.dp))
 
-                        ConfirmButton(
-                            text = "Change Password",
-                            enabled = valid && isMatch,
-                            onClick = { doSubmit() },
-                        )
-                    }
+                    ConfirmButton(
+                        text = "Update Password",
+                        containerColor = Palette.ButtonDarkBrown,
+                        enabled = valid && isMatch,
+                        onClick = { doSubmit() }
+                    )
                 }
             }
         }

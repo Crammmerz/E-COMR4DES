@@ -82,7 +82,9 @@ fun QuickActions(
         BatchGroupRemovalPopup(model = model, onDismiss = { showRemoveStock = false })
     }
 
-    ImportCsv(doImport = showRemoveCSV, onDismiss = { showRemoveCSV = false })
+    if (showRemoveCSV) {
+        ImportCsv(onDismiss = { showRemoveCSV = false })
+    }
 }
 
 @Composable

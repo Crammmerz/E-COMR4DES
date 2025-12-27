@@ -54,11 +54,7 @@ fun CsvRemovalPopup(
             csvViewModel.clearData()
             onDismiss()
         } else {
-            Toast.makeText(
-                context,
-                "Oops! Looks like something’s missing — select an item or fill in the required fields.",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(context, "Oops! Looks like something’s missing — select an item or fill in the required fields.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -72,7 +68,7 @@ fun CsvRemovalPopup(
         Card(
             modifier = Modifier
                 .width(600.dp)
-                .heightIn(max = 700.dp),
+                .heightIn(min = 300.dp, max = 540.dp),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = Palette.PopupSurface),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)

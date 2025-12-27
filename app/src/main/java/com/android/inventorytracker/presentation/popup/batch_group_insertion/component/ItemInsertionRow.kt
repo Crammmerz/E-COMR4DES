@@ -54,7 +54,7 @@ fun ItemInsertionRow(
 
     val focusDate = remember { FocusRequester() }
 
-    LaunchedEffect(valid, isPersistent) {
+    LaunchedEffect(unit, subUnit, dateValue) {
         if (isPersistent) onValidityChange(valid)
         if (valid && isPersistent) {
             val parsedDate = runCatching {
@@ -139,7 +139,8 @@ fun ItemInsertionRow(
                         placeholder = "0",
                         value = unit,
                         onValueChange = { value ->
-                            onUnitChange(value, model.item.subUnitThreshold, { unit = it }, { subUnit = it })
+                            unit = value
+                            onUnitChange(value, model.item.subUnitThreshold,  { subUnit = it })
                         },
                         onValidityChange = { validUnit = it },
                         onDone = { focusDate.requestFocus() }
@@ -151,7 +152,8 @@ fun ItemInsertionRow(
                         doClear = true,
                         value = subUnit,
                         onValueChange = { value ->
-                            onSubUnitChange(value, model.item.subUnitThreshold, { unit = it }, { subUnit = it })
+                            subUnit = value
+                            onSubUnitChange(value, model.item.subUnitThreshold, { unit = it })
                         },
                         valueRange = 1..1000000,
                         onValidityChange = { validUnit = it },

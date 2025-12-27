@@ -1,5 +1,6 @@
 package com.android.inventorytracker.presentation.popup.batch_group_removal.component
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,7 +44,7 @@ fun ItemRemovalRow(
     var subUnit by rememberSaveable { mutableIntStateOf(0) }
     var valid by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(valid, isPersistent) {
+    LaunchedEffect(unit, subUnit) {
         if (isPersistent) onValidityChange(valid)
         if (valid && isPersistent) {
             onValueChange(
@@ -57,6 +58,15 @@ fun ItemRemovalRow(
             )
         }
     }
+
+    LaunchedEffect(unit) {
+        onUnitChange(unit, model.item.subUnitThreshold, { subUnit = it })
+    }
+
+    LaunchedEffect(subUnit) {
+        onSubUnitChange(subUnit, model.item.subUnitThreshold, { unit = it })
+    }
+
 
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -120,26 +130,22 @@ fun ItemRemovalRow(
                 ) {
                     FloatField(
                         modifier = Modifier.weight(1f),
-                        label = "Deduct Unit",
+                        label = "Deduct Unit (Max: ${model.totalUnit()})",
                         placeholder = "0",
                         value = unit,
                         valueRange = 0f..model.totalUnit().toFloat(),
-                        onValueChange = { value ->
-                            onUnitChange(value, model.item.subUnitThreshold, { unit = it }, { subUnit = it })
-                        },
+                        onValueChange = { unit = it },
                         onValidityChange = { valid = it && (unit > 0 || subUnit > 0) && (subUnit <= model.totalSubUnit()) },
                         onDone = null
                     )
                     IntField(
                         modifier = Modifier.weight(1f),
-                        label = "Deduct Sub Unit",
+                        label = "Deduct Sub Unit (Max: ${model.totalSubUnit()})",
                         placeholder = "0",
                         doClear = true,
                         value = subUnit,
                         valueRange = 1..model.totalSubUnit(),
-                        onValueChange = { value ->
-                            onSubUnitChange(value, model.item.subUnitThreshold, { unit = it }, { subUnit = it })
-                        },
+                        onValueChange = { subUnit = it },
                         onValidityChange = { valid = it && (unit > 0 || subUnit > 0) && (subUnit <= model.totalSubUnit()) },
                         onDone = null
                     )

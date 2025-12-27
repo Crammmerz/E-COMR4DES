@@ -130,7 +130,7 @@ fun ItemRemovalRow(
                 ) {
                     FloatField(
                         modifier = Modifier.weight(1f),
-                        label = "Deduct Unit",
+                        label = "Deduct Unit (Max: ${model.totalUnit()})",
                         placeholder = "0",
                         value = unit,
                         valueRange = 0f..model.totalUnit().toFloat(),
@@ -140,7 +140,7 @@ fun ItemRemovalRow(
                     )
                     IntField(
                         modifier = Modifier.weight(1f),
-                        label = "Deduct Sub Unit",
+                        label = "Deduct Sub Unit (Max: ${model.totalSubUnit()})",
                         placeholder = "0",
                         doClear = true,
                         value = subUnit,

@@ -42,11 +42,10 @@ fun DataRow(
             subUnit = subUnitState,
             threshold = model.item.subUnitThreshold,
             onUnit = { unitState = it },
-            onSubUnit = { subUnitState = it }
         )
     }
 
-    LaunchedEffect(valid) {
+    LaunchedEffect(unitState, subUnitState) {
         if (valid) {
             onUpdate(CSV(model.item.id, subUnitState))
             onValidityChange(true)
@@ -130,10 +129,10 @@ fun DataRow(
                     value = unitState,
                     valueRange = 0f..model.totalUnit().toFloat(),
                     onValueChange = { value ->
+                        unitState = value
                         onUnitChange(
                             unit = value,
                             threshold = model.item.subUnitThreshold,
-                            onUnit = { unitState = it },
                             onSubUnit = { subUnitState = it }
                         )
                     },
@@ -148,11 +147,11 @@ fun DataRow(
                     value = subUnitState,
                     valueRange = 1..model.totalSubUnit(),
                     onValueChange = { value ->
+                        subUnitState = value
                         onSubUnitChange(
                             subUnit = value,
                             threshold = model.item.subUnitThreshold,
                             onUnit = { unitState = it },
-                            onSubUnit = { subUnitState = it }
                         )
                     },
                     onValidityChange = { valid = it },

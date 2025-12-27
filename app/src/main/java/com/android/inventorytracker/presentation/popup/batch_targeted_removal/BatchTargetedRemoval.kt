@@ -48,6 +48,9 @@ fun BatchTargetedRemoval(
     var validDate by rememberSaveable { mutableStateOf(false) }
     var dateValue by rememberSaveable { mutableStateOf("") }
 
+    var maxUnit by rememberSaveable { mutableStateOf("") }
+    var maxSubUnit by rememberSaveable { mutableStateOf("") }
+
     val focusSubUnit = remember { FocusRequester() }
     val focusDate = remember { FocusRequester() }
 
@@ -70,6 +73,13 @@ fun BatchTargetedRemoval(
             batch.firstOrNull {
                 Instant.ofEpochMilli(it.expiryDate).atZone(ZoneId.systemDefault()).toLocalDate() == date
             }
+        }
+        if (exist != null) {
+            maxUnit = "${exist!!.subUnit.toFloat() / threshold}"
+            maxSubUnit = "${exist!!.subUnit}"
+        } else {
+            maxUnit = "N/A"
+            maxSubUnit = "N/A"
         }
     }
 
@@ -133,11 +143,12 @@ fun BatchTargetedRemoval(
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         FloatField(
                             modifier = Modifier.weight(1f),
-                            label = "Unit",
+                            label = "Unit (Max: $maxUnit)",
                             placeholder = "0",
                             value = unit,
                             onValueChange = { value ->
-                                onUnitChange(value, threshold, { unit = it }, { subUnit = it })
+                                unit = value
+                                onUnitChange(value, threshold, { subUnit = it })
                             },
                             valueRange = 0f..3000f,
                             onValidityChange = { validUnit = it },
@@ -146,14 +157,15 @@ fun BatchTargetedRemoval(
 
                         IntField(
                             modifier = Modifier.weight(1f),
-                            label = "Sub Unit",
+                            label = "Sub Unit (Max: $maxSubUnit)",
                             placeholder = "0",
                             doClear = true,
                             value = subUnit,
                             onValueChange = { value ->
-                                onSubUnitChange(value, threshold, { unit = it }, { subUnit = it })
+                                subUnit = value
+                                onSubUnitChange(value, threshold, { unit = it })
                             },
-                            valueRange = if(exist == null) 0..0 else 1..exist!!.subUnit,
+                            valueRange = if(exist == null) -32512473..-32512473 else 1..exist!!.subUnit,
                             onValidityChange = { validUnit = it },
                             onDone = { doSubmit() }
                         )

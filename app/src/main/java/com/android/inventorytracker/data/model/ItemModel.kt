@@ -15,6 +15,7 @@ import java.time.temporal.ChronoUnit
 enum class SortBy {
     NAME_ASC, NAME_DESC, EXPIRY_ASCENDING, STOCK_LOW, STOCK_LOW_HIGH, STOCK_HIGH_LOW,
 }
+
 data class ItemModel(
     val item: ItemEntity,
     val batch: List<ItemBatchEntity>
@@ -27,6 +28,7 @@ data class ItemModel(
     fun totalUnit(): Double = batch.sumOf {
         it.subUnit / (item.subUnitThreshold.takeIf { it != 0 } ?: 1).toDouble()
     }
+
     fun totalUnitFormatted(): String = df.format(totalUnit())
 
     fun totalSubUnit(): Int = batch.sumOf { it.subUnit }
@@ -43,8 +45,12 @@ data class ItemModel(
     val isExpiringSoon: Boolean = nearestExpiryDate?.isBefore(
         LocalDate.now().plusDays(item.expiryThreshold.toLong())
     ) == true
+
     val hasExpired: Boolean = nearestExpiryDate?.isBefore(LocalDate.now()) == true
-    val isLowStock: Boolean = totalUnit() <= item.unitThreshold * 0.20
+
+    // REVISED: Ito ang magpapalitaw sa Milk sa Dashboard (1.0 <= 2.0 is true)
+    val isLowStock: Boolean = totalUnit() <= item.unitThreshold
+
     val hasNoStock: Boolean = totalUnit() <= 0.0
 
     val expiryMessage: String = when {
@@ -55,18 +61,17 @@ data class ItemModel(
     }
 
     val expiryColor: Color = when {
-        daysLeft == null -> Color.Gray          // unknown
-        daysLeft < 0 -> DarkRed                 // already expired
-        daysLeft == 0L -> Color.Red             // expires today
-        isExpiringSoon -> Orange              // near expiry (within a week)
-        else -> Color.Gray                     // safe / normal stock
+        daysLeft == null -> Color.Gray
+        daysLeft < 0 -> DarkRed
+        daysLeft == 0L -> Color.Red
+        isExpiringSoon -> Orange
+        else -> Color.Gray
     }
 
     val stockColor: Color = when {
-        totalUnit() <= 0.0 -> DarkRed           // no stock
-        totalUnit() < item.unitThreshold * 0.20 -> Color.Red   // critically low
-        totalUnit() < item.unitThreshold * 0.50 -> Orange      // warning zone
-        else -> Color.Gray                     // healthy stock
+        totalUnit() <= 0.0 -> DarkRed
+        totalUnit() <= item.unitThreshold * 0.50 -> Color.Red
+        totalUnit() <= item.unitThreshold -> Orange
+        else -> Color.Gray
     }
 }
-

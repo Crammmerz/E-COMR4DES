@@ -2,7 +2,9 @@ package com.android.inventorytracker.presentation.popup.item_detail
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
@@ -13,9 +15,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.data.local.entities.ItemEntity
 import com.android.inventorytracker.data.model.ItemModel
@@ -37,10 +42,10 @@ fun ItemDetailPopup(
     onUpdateItem: (ItemEntity) -> Unit,
 ) {
     val role = loginViewModel.userRole
+    val scrollState = rememberScrollState()
 
-    var imageUri by rememberSaveable(model.item.id) {
-        mutableStateOf(model.item.imageUri)
-    }
+    // Form States
+    var imageUri by rememberSaveable(model.item.id) { mutableStateOf(model.item.imageUri) }
     var name by rememberSaveable(model.item.id) { mutableStateOf(model.item.name) }
     var unitThreshold by rememberSaveable(model.item.id) { mutableIntStateOf(model.item.unitThreshold) }
     var expiryThreshold by rememberSaveable(model.item.id) { mutableIntStateOf(model.item.expiryThreshold) }
@@ -55,245 +60,136 @@ fun ItemDetailPopup(
 
     val valid = validName && validUnit && validExpiry && validSubUnit
 
-    fun shouldTriggerWarning(): Boolean{
-        return unitThreshold != model.item.unitThreshold ||
-                expiryThreshold != model.item.expiryThreshold ||
-                subUnitThreshold != model.item.subUnitThreshold
-    }
-
-    fun hasChanged(): Boolean{
-        return name != model.item.name ||
-                imageUri != model.item.imageUri ||
-                description != model.item.description ||
-                unitThreshold != model.item.unitThreshold ||
-                expiryThreshold != model.item.expiryThreshold ||
-                subUnitThreshold != model.item.subUnitThreshold
-    }
-
-    fun onConfirm(){
-        if(valid) {
-            if(model.item.subUnitThreshold != subUnitThreshold){
-                batchViewModel.onConvertBatch(
-                    batches = model.batch,
-                    subUnitThreshold = model.item.subUnitThreshold,
-                    newSubUnitThreshold = subUnitThreshold
-                )
+    fun onConfirm() {
+        if (valid) {
+            if (model.item.subUnitThreshold != subUnitThreshold) {
+                batchViewModel.onConvertBatch(model.batch, model.item.subUnitThreshold, subUnitThreshold)
             }
-            onUpdateItem(
-                model.item.copy(
-                    name = name,
-                    imageUri = imageUri,
-                    description = description,
-                    unitThreshold = unitThreshold,
-                    expiryThreshold = expiryThreshold,
-                    subUnitThreshold = subUnitThreshold
-                )
-            )
+            onUpdateItem(model.item.copy(name = name, imageUri = imageUri, description = description, unitThreshold = unitThreshold, expiryThreshold = expiryThreshold, subUnitThreshold = subUnitThreshold))
         }
     }
 
-    DialogHost(
-        modifier = Modifier
-            .width(900.dp)
-            .height(650.dp),
-        onDismissRequest = onDismiss
+    // 🔹 Ginaya ang Dialog properties para mawala ang "frame" sa labas ng card
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false // Pinaka-importante para sa custom size at rounded corners
+        )
     ) {
-        Column(
+        Card(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp)
+                .width(900.dp)
+                .height(620.dp)
+                .padding(16.dp), // Space sa labas ng card para makita ang shadow at corners
+            shape = RoundedCornerShape(28.dp),
+            colors = CardDefaults.cardColors(containerColor = Palette.PopupSurface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
         ) {
-            /* ---------------- Header ---------------- */
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "Item Details",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = GoogleSans
-                )
-
-                Spacer(Modifier.weight(1f))
-
-                Surface(
-                    color = Color(0xFFE8F5E9),
-                    shape = RoundedCornerShape(16.dp),
-                    border = BorderStroke(1.dp, Color(0xFF4CAF50))
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.CheckCircle,
-                            contentDescription = null,
-                            tint = Color(0xFF4CAF50),
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(Modifier.width(4.dp))
-                        Text(
-                            text = "In Stock",
-                            color = Color(0xFF2E7D32),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-
-                IconButton(onClick = onDismiss) {
-                    Icon(Icons.Default.Close, contentDescription = null)
-                }
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            /* ---------------- Body ---------------- */
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(24.dp),
-                modifier = Modifier.weight(1f)
-            ) {
-
-                /* -------- Left Column -------- */
-                Column(Modifier.weight(0.4f)) {
-                    PhotoSelection(
-                        modifier = Modifier
-                            .aspectRatio(1f)
-                            .clip(RoundedCornerShape(16.dp)),
-                        image = imageUri,
-                        enabled = role == UserRole.ADMIN,
-                        onPickImage = { imageUri = it }
+            Column(modifier = Modifier.fillMaxSize().padding(20.dp)) {
+                /* Header Section */
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Item Details",
+                        style = TextStyle(fontFamily = GoogleSans, fontWeight = FontWeight.Bold, fontSize = 24.sp, color = Palette.DarkBeigeText)
                     )
 
-                    Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.weight(1f))
 
-                    DescriptionField(
-                        value = description,
-                        onValueChange = { description = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(180.dp)
-                    )
-                }
-
-                /* -------- Right Column -------- */
-                Column(Modifier.weight(0.6f)) {
-
+                    // Upper Right Label
                     Surface(
-                        color = Color(0xFFEEEEEE),
-                        shape = RoundedCornerShape(8.dp)
+                        color = if (model.hasNoStock) Color(0xFFFFEBEE) else Color(0xFFE8F5E9),
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, if (model.hasNoStock) Color.Red else Color(0xFF4CAF50))
                     ) {
-                        Text(
-                            text = "ID: #${model.item.id}",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            fontSize = 12.sp
-                        )
-                    }
-
-                    Spacer(Modifier.height(12.dp))
-
-                    StringField(
-                        value = name,
-                        header = "Item Name",
-                        placeholder = "Enter item name",
-                        onValueChange = { name = it },
-                        onValidationChange = { validName = it }
-                    )
-
-                    Spacer(Modifier.height(12.dp))
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        IntField(
-                            value = unitThreshold,
-                            label = "Low Stock",
-                            placeholder = "0",
-                            modifier = Modifier.weight(1f),
-                            onValueChange = { unitThreshold = it },
-                            onValidityChange = { validUnit = it }
-                        )
-
-                        IntField(
-                            value = expiryThreshold,
-                            label = "Expiry",
-                            placeholder = "Days",
-                            modifier = Modifier.weight(1f),
-                            onValueChange = { expiryThreshold = it },
-                            onValidityChange = { validExpiry = it }
-                        )
-                    }
-
-                    Spacer(Modifier.height(12.dp))
-
-                    IntField(
-                        value = subUnitThreshold,
-                        label = "Sub Unit",
-                        placeholder = "0",
-                        onValueChange = { subUnitThreshold = it },
-                        onValidityChange = { validSubUnit = it }
-                    )
-                    if(model.item.subUnitThreshold > subUnitThreshold){
-                        Text(
-                            text = "⚠ Lowering this value reduces precision. Existing stock will be converted to larger units",
-                            color = Color.Red,
-                            fontSize = 10.sp
-                        )
-                    }
-                    Spacer(Modifier.height(16.dp))
-
-                    BatchExpirySection(
-                        model = model,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-
-            /* ---------------- Footer ---------------- */
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                CancelButton(onClick = onDismiss)
-
-                ConfirmButton(
-                    text = "Update Item",
-                    containerColor = Palette.ButtonDarkBrown,
-                    enabled = hasChanged() && valid && loginViewModel.userRole == UserRole.ADMIN,
-                    onClick = {
-                        if(shouldTriggerWarning()){
-                            showWarning = true
-                        } else {
-                            onConfirm()
+                        Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.CheckCircle, null, tint = if (model.hasNoStock) Color.Red else Color(0xFF4CAF50), modifier = Modifier.size(14.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text(text = if (model.hasNoStock) "Out of Stock" else "In Stock", style = TextStyle(fontFamily = GoogleSans, fontWeight = FontWeight.Bold, fontSize = 11.sp, color = if (model.hasNoStock) Color.Red else Color(0xFF2E7D32)))
                         }
                     }
-                )
+
+                    Spacer(Modifier.width(12.dp))
+
+                    IconButton(onClick = onDismiss, modifier = Modifier.size(32.dp)) {
+                        Icon(Icons.Default.Close, null, tint = Palette.DarkBeigeText)
+                    }
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                /* Scrollable Body */
+                Row(
+                    modifier = Modifier.weight(1f).verticalScroll(scrollState),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    // Left Side
+                    Column(Modifier.weight(0.4f)) {
+                        PhotoSelection(
+                            modifier = Modifier.fillMaxWidth().aspectRatio(1.2f).clip(RoundedCornerShape(20.dp)),
+                            image = imageUri,
+                            enabled = role == UserRole.ADMIN,
+                            onPickImage = { imageUri = it }
+                        )
+                        Spacer(Modifier.height(16.dp))
+                        DescriptionField(
+                            value = description,
+                            onValueChange = { description = it },
+                            modifier = Modifier.fillMaxWidth().height(160.dp)
+                        )
+                    }
+
+                    // Right Side
+                    Column(Modifier.weight(0.6f)) {
+                        Surface(color = Color.White.copy(alpha = 0.5f), shape = RoundedCornerShape(6.dp)) {
+                            Text(text = "ID: #${model.item.id}", modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp), style = TextStyle(fontFamily = GoogleSans, color = Color.Gray, fontSize = 12.sp))
+                        }
+                        Spacer(Modifier.height(12.dp))
+                        StringField(value = name, header = "Item Name", placeholder = "Enter name", onValueChange = { name = it }, onValidationChange = { validName = it })
+                        Spacer(Modifier.height(12.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            IntField(value = unitThreshold, label = "Stock Alert", placeholder = "0", modifier = Modifier.weight(1f), onValueChange = { unitThreshold = it }, onValidityChange = { validUnit = it })
+                            IntField(value = expiryThreshold, label = "Expiry Alert", placeholder = "0", modifier = Modifier.weight(1f), onValueChange = { expiryThreshold = it }, onValidityChange = { validExpiry = it })
+                        }
+                        Spacer(Modifier.height(12.dp))
+                        IntField(value = subUnitThreshold, label = "Sub Unit Partition", placeholder = "1", onValueChange = { subUnitThreshold = it }, onValidityChange = { validSubUnit = it })
+                        Spacer(Modifier.height(20.dp))
+                        BatchExpirySection(model = model, modifier = Modifier.heightIn(max = 300.dp))
+                    }
+                }
+
+                /* Footer */
+                Row(modifier = Modifier.fillMaxWidth().padding(top = 16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                    CancelButton(onClick = onDismiss)
+                    ConfirmButton(
+                        text = "Update Item",
+                        containerColor = Palette.ButtonDarkBrown,
+                        enabled = (name != model.item.name || unitThreshold != model.item.unitThreshold || expiryThreshold != model.item.expiryThreshold || subUnitThreshold != model.item.subUnitThreshold || imageUri != model.item.imageUri || description != model.item.description) && valid && role == UserRole.ADMIN,
+                        onClick = {
+                            if (unitThreshold != model.item.unitThreshold || subUnitThreshold != model.item.subUnitThreshold) showWarning = true
+                            else onConfirm()
+                        }
+                    )
+                }
             }
         }
     }
 
-    if(showWarning){
+    // Warning AlertDialog (Remains standard)
+    if (showWarning) {
         AlertDialog(
             onDismissRequest = { showWarning = false },
-            title = { Text("Warning") },
-            text = {
-                Column {
-                    Text("Heads up: modifying these values means the app will apply different logic going forward.")
-                    Text("Proceed?")
-                }
-            },
+            containerColor = Color.White,
+            shape = RoundedCornerShape(24.dp),
             confirmButton = {
-                TextButton(onClick = {
-                        onConfirm()
-                        showWarning = false
-                    }
-                ) {
-                    Text("Update")
+                Button(onClick = { onConfirm(); showWarning = false }, colors = ButtonDefaults.buttonColors(containerColor = Palette.ButtonDarkBrown)) {
+                    Text("Confirm", color = Color.White)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showWarning = false }) {
-                    Text("Cancel")
-                }
-            }
+                TextButton(onClick = { showWarning = false }) { Text("Cancel", color = Color.Gray) }
+            },
+            title = { Text("Update Thresholds?", style = TextStyle(fontFamily = GoogleSans, fontWeight = FontWeight.Bold)) },
+            text = { Text("Proceed with changes to system calculations?", style = TextStyle(fontFamily = GoogleSans)) }
         )
     }
 }

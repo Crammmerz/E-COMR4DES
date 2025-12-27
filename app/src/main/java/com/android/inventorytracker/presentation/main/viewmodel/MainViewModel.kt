@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 enum class Content {
     Home, Inventory, Setting
 }
+
 @HiltViewModel
 class MainViewModel @Inject constructor(): ViewModel() {
     private val _currentContent = MutableStateFlow(Content.Home)
@@ -21,6 +22,11 @@ class MainViewModel @Inject constructor(): ViewModel() {
 
     private val _showNotif = MutableStateFlow(false)
     val showNotif: StateFlow<Boolean> = _showNotif
-
     fun setNotif(b: Boolean) { _showNotif.value = b }
+
+    // --- IDAGDAG ITONG FUNCTION ---
+    fun resetToHome() {
+        _currentContent.value = Content.Home
+        _showNavBar.value = false
+    }
 }

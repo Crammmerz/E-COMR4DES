@@ -4,7 +4,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.android.inventorytracker.data.local.entities.UserEntity
 import com.android.inventorytracker.data.model.LoginState
 import com.android.inventorytracker.data.model.UserRole
@@ -12,7 +11,6 @@ import com.android.inventorytracker.data.repository.PreferencesRepository
 import com.android.inventorytracker.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.launch
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
@@ -33,7 +31,13 @@ class LoginViewModel @Inject constructor(
         loginState = if (success) LoginState.LOGGED_IN else LoginState.LOGGED_OUT
         return success
     }
+
     fun updateUserRole(role: UserRole){
         this.userRole = role
+    }
+
+    // --- IDAGDAG ITONG FUNCTION ---
+    fun logout() {
+        loginState = LoginState.LOGGED_OUT
     }
 }

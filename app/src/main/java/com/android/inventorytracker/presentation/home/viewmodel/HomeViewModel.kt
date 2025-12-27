@@ -11,14 +11,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
-import kotlin.collections.filter
 
 @HiltViewModel
 @OptIn(FlowPreview::class)
 class HomeViewModel @Inject constructor(
     private val itemRepository: ItemRepository,
     private val preferenceRepo: PreferencesRepository,
-    ) : ViewModel() {
+) : ViewModel() {
+
     val itemModelList = itemRepository.observeItemModels()
 
     val expiryItems: Flow<List<ItemModel>> = itemModelList.map { list ->
@@ -26,9 +26,13 @@ class HomeViewModel @Inject constructor(
             .sortedBy { it.nearestExpiryDate }
     }
 
+    // REVISED: Inayos ang 'it.item' reference para mawala ang error sa line 32 ng screenshot mo
     val stockItems: Flow<List<ItemModel>> = itemModelList.map { list ->
         list.filter { it.isLowStock }
-            .sortedBy { it.totalUnit() / it.item.unitThreshold * 0.20f }
+            .sortedBy {
+                // Gamit ang coerceAtLeast(1) para iwas "divide by zero"
+                it.totalUnit() / (it.item.unitThreshold.coerceAtLeast(1)).toDouble()
+            }
     }
 
     private val _showImportConfirmation = MutableStateFlow(preferenceRepo.shouldShowConfirmation())

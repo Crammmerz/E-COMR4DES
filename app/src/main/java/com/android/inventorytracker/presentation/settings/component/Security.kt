@@ -8,8 +8,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,91 +28,92 @@ fun Security(
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
+    val backgroundColor = Color(0xFFFEF7ED)
+
     val isAuthEnabled by viewModel.authEnabled.collectAsState()
     val isRoleAuthEnabled by viewModel.roleAuthEnabled.collectAsState()
     var role by remember { mutableStateOf<UserRole?>(null) }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Palette.MainBackground)
-            .padding(horizontal = 40.dp, vertical = 32.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = backgroundColor
     ) {
-        // --- HEADING ---
-        Text(
-            text = "User Account & Security",
-            style = TextStyle(
-                fontFamily = GoogleSans,
-                fontWeight = FontWeight.Bold,
-                fontSize = 28.sp,
-                color = Palette.DarkBeigeText,
-                letterSpacing = (-0.5).sp
-            )
-        )
-
-        // --- Section 1: Authentication Settings ---
-        SecuritySectionCard {
-            SecurityRowItem(
-                label = "Enable Authentication"
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(horizontal = 40.dp, vertical = 32.dp)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(32.dp)
             ) {
-                Checkbox(
-                    checked = isAuthEnabled,
-                    onCheckedChange = { viewModel.toggleAuth(it) },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = Palette.ButtonBeigeBase,
-                        uncheckedColor = LightSand,
-                        checkmarkColor = Palette.DarkBrown
+                // --- HEADER ---
+                Text(
+                    text = "User Account & Security",
+                    style = TextStyle(
+                        fontFamily = GoogleSans,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 34.sp,
+                        color = Palette.DarkBeigeText
                     )
                 )
-            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                // Content Wrapper para sa Cards
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                ) {
+                    // --- Section 1: Authentication Settings ---
+                    SecuritySectionCard {
+                        SecurityRowItem(label = "Enable Authentication") {
+                            Checkbox(
+                                checked = isAuthEnabled,
+                                onCheckedChange = { viewModel.toggleAuth(it) },
+                                colors = CheckboxDefaults.colors(
+                                    checkedColor = Palette.ButtonBeigeBase,
+                                    uncheckedColor = LightSand,
+                                    checkmarkColor = Palette.DarkBrown
+                                )
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        SecurityRowItem(label = "Role Authentication") {
+                            Checkbox(
+                                checked = isRoleAuthEnabled,
+                                onCheckedChange = { viewModel.toggleRoleAuth(it) },
+                                colors = CheckboxDefaults.colors(
+                                    checkedColor = Palette.ButtonBeigeBase,
+                                    uncheckedColor = LightSand,
+                                    checkmarkColor = Palette.DarkBrown
+                                )
+                            )
+                        }
+                    }
 
-            SecurityRowItem(
-                label = "Role Authentication"
-            ) {
-                Checkbox(
-                    checked = isRoleAuthEnabled,
-                    onCheckedChange = { viewModel.toggleRoleAuth(it) },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = Palette.ButtonBeigeBase,
-                        uncheckedColor = LightSand,
-                        checkmarkColor = Palette.DarkBrown
-                    )
-                )
+                    // --- Section 2: Password Change ---
+                    SecuritySectionCard {
+                        SecurityRowItem(label = "Admin Password Change") {
+                            SecurityActionButton(
+                                label = "Change Password",
+                                enabled = isAuthEnabled,
+                                onClick = { role = UserRole.ADMIN }
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        SecurityRowItem(label = "Staff Password Change") {
+                            SecurityActionButton(
+                                label = "Change Password",
+                                enabled = isAuthEnabled && isRoleAuthEnabled,
+                                onClick = { role = UserRole.STAFF }
+                            )
+                        }
+                    }
+                }
             }
         }
-
-        // --- Section 2: Password Change ---
-        SecuritySectionCard {
-            SecurityRowItem(
-                label = "Admin Password Change"
-            ) {
-                SecurityActionButton(
-                    label = "Change Password",
-                    enabled = isAuthEnabled,
-                    onClick = { role = UserRole.ADMIN }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            SecurityRowItem(
-                label = "Staff Password Change"
-            ) {
-                SecurityActionButton(
-                    label = "Change Password",
-                    enabled = isAuthEnabled && isRoleAuthEnabled,
-                    onClick = { role = UserRole.STAFF }
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
     }
 
-    // Popups
+    // Popups logic
     when (role) {
         UserRole.ADMIN -> ChangePassAdmin(onDismiss = { role = null }, onSubmit = viewModel::updateUser)
         UserRole.STAFF -> ChangePassStaff(onDismiss = { role = null }, onSubmit = viewModel::updateUserStaff)

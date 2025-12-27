@@ -1,5 +1,8 @@
 package com.android.inventorytracker.presentation.shared.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.inventorytracker.data.local.entities.ItemEntity
@@ -23,6 +26,22 @@ import javax.inject.Inject
 class ItemViewModel @Inject constructor(
     private val itemRepository: ItemRepository
 ) : ViewModel() {
+
+    var pendingActionItem by mutableStateOf<ItemModel?>(null)
+        private set
+    var pendingActionType by mutableStateOf<String?>(null)
+        private set
+
+    fun triggerNotificationAction(model: ItemModel, type: String) {
+        pendingActionItem = model
+        pendingActionType = type
+    }
+
+    fun clearPendingAction() {
+        pendingActionItem = null
+        pendingActionType = null
+    }
+
     private val _sortBy = MutableStateFlow(SortBy.NAME_ASC)
     val sortBy: StateFlow<SortBy> = _sortBy
 

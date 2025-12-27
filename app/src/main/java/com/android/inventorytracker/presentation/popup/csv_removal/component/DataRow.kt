@@ -57,75 +57,61 @@ fun DataRow(
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         color = Color.White,
-        tonalElevation = 1.dp,
-        border = if (!valid) null else null // Optional: Add a subtle green border if valid
+        shadowElevation = 2.dp
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Top Section: Info and Delete
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = model.item.name,
                         style = TextStyle(
                             fontFamily = GoogleSans,
-                            fontSize = 16.sp,
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.Black
+                            color = Palette.DarkBeigeText
                         )
                     )
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Text(
-                            text = "Stock: ${model.totalUnitFormatted()}",
-                            style = TextStyle(
-                                fontFamily = GoogleSans,
-                                fontSize = 12.sp,
-                                color = Palette.ButtonDarkBrown.copy(alpha = 0.8f)
-                            )
+                    Text(
+                        text = "Stock: ${model.totalUnitFormatted()} | Expiry: ${model.nearestExpiryFormatted}",
+                        style = TextStyle(
+                            fontFamily = GoogleSans,
+                            fontSize = 12.sp,
+                            color = Color.Gray
                         )
-                        Text(
-                            text = "Expiry: ${model.nearestExpiryFormatted}",
-                            style = TextStyle(
-                                fontFamily = GoogleSans,
-                                fontSize = 12.sp,
-                                color = Color.Gray
-                            )
-                        )
-                    }
+                    )
                 }
 
                 IconButton(
                     onClick = { csvViewModel.removeData(model.item.id) },
-                    modifier = Modifier.size(24.dp)
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = Color.Red.copy(alpha = 0.05f)
+                    )
                 ) {
                     Icon(
                         imageVector = Icons.Default.DeleteOutline,
                         contentDescription = "Remove",
-                        tint = Color.Red.copy(alpha = 0.6f)
+                        tint = Color.Red.copy(alpha = 0.7f)
                     )
                 }
             }
 
-            HorizontalDivider(
-                thickness = 0.5.dp,
-                color = Color.LightGray.copy(alpha = 0.3f)
-            )
+            HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.3f))
 
-            // Bottom Section: Input Fields
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 FloatField(
                     modifier = Modifier.weight(1f),
-                    label = "Unit (Max: ${model.totalUnit()})",
+                    label = "Deduct Unit (Max: ${model.totalUnit()})",
                     placeholder = "0",
                     value = unitState,
                     valueRange = 0f..model.totalUnit().toFloat(),

@@ -1,16 +1,17 @@
 package com.android.inventorytracker.presentation.settings.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.android.inventorytracker.data.local.entities.UserEntity
 import com.android.inventorytracker.data.repository.PreferencesRepository
 import com.android.inventorytracker.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import javax.inject.Inject
 
 @HiltViewModel
-class SettingsViewModel @Inject constructor(
+class AuthViewModel @Inject constructor(
     private val preferenceRepo: PreferencesRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
@@ -22,22 +23,29 @@ class SettingsViewModel @Inject constructor(
         preferenceRepo.setAuthEnabled(enabled)
         _authEnabled.value = enabled
     }
+
     fun toggleRoleAuth(enabled: Boolean) {
         preferenceRepo.setRoleAuthEnabled(enabled)
         _roleAuthEnabled.value = enabled
     }
-    suspend fun updateUser(user: UserEntity, newPass: String): Boolean {
+
+    suspend fun register(username: String, rawPassword: String, role: String) {
+        try {
+            userRepository.register(username, rawPassword, role)
+        } catch (e: Exception) {
+            // Handle registration error
+        }
+    }
+    suspend fun updateUser(newPass: String, role: String): Boolean {
         return try {
-            userRepository.updateUser(user, newPass)
+            userRepository.updateUser(newPass, role)
         } catch (e: Exception) {
             false
         }
     }
-    suspend fun updateUserStaff(user: UserEntity): Boolean {
-        return try {
-            userRepository.updateUserStaff(user)
-        } catch (e: Exception) {
-            false
-        }
+
+    fun getCount(role: String): Flow<Int> {
+        return userRepository.getCount(role)
+            .catch { emit(0) }
     }
 }

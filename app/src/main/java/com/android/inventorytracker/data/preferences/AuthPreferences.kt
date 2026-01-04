@@ -1,6 +1,8 @@
 package com.android.inventorytracker.data.preferences
 
 import android.content.Context
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import androidx.core.content.edit
 
 object AuthPreferences {
@@ -9,8 +11,13 @@ object AuthPreferences {
     private const val KEY_ROLE_AUTH_ENABLED = "role_auth_enabled"
 
     private fun getPrefs(context: Context) =
-        context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-
+        EncryptedSharedPreferences.create(
+            PREF_NAME,
+            MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
+            context,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
 
     fun setAuthEnabled(context: Context, enabled: Boolean) {
         getPrefs(context).edit { putBoolean(KEY_AUTH_ENABLED, enabled) }

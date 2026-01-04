@@ -1,10 +1,23 @@
-package com.android.inventorytracker.presentation.popup.change_pass_admin
+package com.android.inventorytracker.presentation.popup.create_acc
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -18,58 +31,65 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.android.inventorytracker.data.local.entities.UserEntity
 import com.android.inventorytracker.presentation.shared.component.input_fields.PasswordField
+import com.android.inventorytracker.presentation.shared.component.input_fields.StringField
 import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
 import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
-import com.android.inventorytracker.ui.theme.Palette
 import com.android.inventorytracker.ui.theme.GoogleSans
+import com.android.inventorytracker.ui.theme.Palette
 import kotlinx.coroutines.launch
 
+
 @Composable
-fun ChangePassAdmin(
-    onDismiss: () -> Unit,
-    onSubmit: suspend (newPassword: String, role: String) -> Boolean
+fun CreateAccPopup(
+    role: String,
+    onDismiss: (Boolean) -> Unit,
+    onSubmit: suspend (username: String, rawPassword: String, role: String) -> Unit
 ) {
-    var oldPassword by rememberSaveable { mutableStateOf("") }
-    var newPassword by rememberSaveable { mutableStateOf("") }
+    var username by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
     var confirmPass by rememberSaveable { mutableStateOf("") }
 
-    var validOld by remember { mutableStateOf(false) }
-    var validNew by remember { mutableStateOf(false) }
+    var validUsername by remember { mutableStateOf(false) }
+    var validPassword by remember { mutableStateOf(false) }
     var validConfirm by remember { mutableStateOf(false) }
 
-    val valid = validOld && validNew && validConfirm
-    val isMatch = newPassword == confirmPass
-    var successChange by rememberSaveable { mutableStateOf<Boolean?>(null) }
+    val valid = validUsername && validPassword && validConfirm
+    val isMatch = password == confirmPass
 
     val scope = rememberCoroutineScope()
-    val focusOldPass = remember { FocusRequester() }
-    val focusNewPass = remember { FocusRequester() }
+    val focusUsername = remember { FocusRequester() }
+    val focusPassword = remember { FocusRequester() }
     val focusConfirmPass = remember { FocusRequester() }
+
+    val header = if(role == "ADMIN") "Create Admin Account" else "Create Staff Account"
 
     fun doSubmit(){
         scope.launch {
-            val success = onSubmit(newPassword, "ADMIN")
-            successChange = success
-            if(success) onDismiss()
+            onSubmit(username, password, role)
+            onDismiss(true)
         }
     }
 
     Dialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { onDismiss(false) },
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Surface(
-            modifier = Modifier.width(460.dp).wrapContentHeight(),
+            modifier = Modifier
+                .width(460.dp)
+                .wrapContentHeight(),
             shape = RoundedCornerShape(20.dp), // Consistent with Item Removal
             color = Palette.PopupSurface, // Matches other popups
             shadowElevation = 8.dp
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(32.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(32.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 Text(
-                    text = "Admin Password Change",
+                    text = header,
                     style = TextStyle(
                         fontFamily = GoogleSans,
                         fontWeight = FontWeight.Bold,
@@ -80,20 +100,21 @@ fun ChangePassAdmin(
                 )
 
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    PasswordField(
-                        fieldModifier = Modifier.focusRequester(focusOldPass),
-                        value = oldPassword,
-                        onValueChange = { oldPassword = it },
-                        header = "Old Password",
-                        onValidityChange = { validOld = it },
-                        onDone = { focusNewPass.requestFocus() }
+                    StringField(
+                        fieldModifier = Modifier.focusRequester(focusUsername),
+                        value = username,
+                        onValueChange = { username = it },
+                        header = "Username",
+                        placeholder = "Enter username",
+                        onValidityChange = { validUsername = it },
+                        onDone = { focusPassword.requestFocus() }
                     )
                     PasswordField(
-                        fieldModifier = Modifier.focusRequester(focusNewPass),
-                        value = newPassword,
-                        onValueChange = { newPassword = it },
-                        header = "New Password",
-                        onValidityChange = { validNew = it },
+                        fieldModifier = Modifier.focusRequester(focusPassword),
+                        value = password,
+                        onValueChange = { password = it },
+                        header = "Password",
+                        onValidityChange = { validPassword = it },
                         onDone = { focusConfirmPass.requestFocus() }
                     )
                     PasswordField(
@@ -106,22 +127,13 @@ fun ChangePassAdmin(
                     )
                 }
 
-                if (!isMatch || successChange == false) {
+                if (!isMatch) {
                     Column {
-                        if (!isMatch) {
-                            Text(
-                                text = "Passwords do not match",
-                                style = TextStyle(fontFamily = GoogleSans, fontWeight = FontWeight.Medium, fontSize = 14.sp),
-                                color = Color.Red
-                            )
-                        }
-                        if (successChange == false) {
-                            Text(
-                                text = "Unable to change password",
-                                style = TextStyle(fontFamily = GoogleSans, fontWeight = FontWeight.Medium, fontSize = 14.sp),
-                                color = Color.Red
-                            )
-                        }
+                        Text(
+                            text = "Passwords do not match",
+                            style = TextStyle(fontFamily = GoogleSans, fontWeight = FontWeight.Medium, fontSize = 14.sp),
+                            color = Color.Red
+                        )
                     }
                 }
 
@@ -130,12 +142,12 @@ fun ChangePassAdmin(
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    CancelButton(onClick = onDismiss)
+                    CancelButton(onClick = { onDismiss(false) })
 
                     Spacer(modifier = Modifier.width(12.dp))
 
                     ConfirmButton(
-                        text = "Update Password",
+                        text = "Create Account",
                         containerColor = Palette.ButtonDarkBrown,
                         enabled = valid && isMatch,
                         onClick = { doSubmit() }

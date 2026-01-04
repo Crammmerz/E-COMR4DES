@@ -28,7 +28,8 @@ import com.android.inventorytracker.services.notification.NotificationHelper.can
 @Composable
 fun NotificationPermissionRequest(
     modifier: Modifier = Modifier,
-    onDismiss: () -> Unit = {}
+    onDismiss: () -> Unit = {},
+    showCancel: Boolean = true
 ) {
     // Runtime guard: no-op on pre-API 33 devices
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
@@ -90,8 +91,9 @@ fun NotificationPermissionRequest(
             })
 
             Spacer(modifier = Modifier.width(8.dp))
-
-            CancelButton ("No, Thanks", onClick = { onDismiss() })
+            if(showCancel){
+                CancelButton ("No, Thanks", onClick = { onDismiss() })
+            }
         }
     }
 }

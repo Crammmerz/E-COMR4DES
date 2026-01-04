@@ -110,4 +110,6 @@ dependencies {
 
     // Image
     implementation(libs.coil.compose)
+
+    implementation(libs.androidx.security.crypto)
 }

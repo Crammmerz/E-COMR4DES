@@ -144,7 +144,7 @@ fun ItemDetailPopup(
                             Text(text = "ID: #${model.item.id}", modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp), style = TextStyle(fontFamily = GoogleSans, color = Color.Gray, fontSize = 12.sp))
                         }
                         Spacer(Modifier.height(12.dp))
-                        StringField(value = name, header = "Item Name", placeholder = "Enter name", onValueChange = { name = it }, onValidationChange = { validName = it })
+                        StringField(value = name, header = "Item Name", placeholder = "Enter name", onValueChange = { name = it }, onValidityChange = { validName = it })
                         Spacer(Modifier.height(12.dp))
                         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             IntField(value = unitThreshold, label = "Stock Alert", placeholder = "0", modifier = Modifier.weight(1f), onValueChange = { unitThreshold = it }, onValidityChange = { validUnit = it })

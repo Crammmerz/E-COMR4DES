@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ChangePassStaff(
     onDismiss: () -> Unit,
-    onSubmit: suspend (UserEntity) -> Boolean
+    onSubmit: suspend (newPassword: String, role: String) -> Boolean
 ) {
     var newPassword by rememberSaveable { mutableStateOf("") }
     var confirmPass by rememberSaveable { mutableStateOf("") }
@@ -51,9 +51,7 @@ fun ChangePassStaff(
     fun doSubmit() {
         if (valid && isMatch) {
             scope.launch {
-                val success = onSubmit(
-                    UserEntity(username = "staff", passwordHash = newPassword, role = "STAFF")
-                )
+                val success = onSubmit(newPassword, "STAFF")
                 successChange = success
                 if (success) onDismiss()
             }

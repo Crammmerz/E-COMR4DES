@@ -1,5 +1,6 @@
 package com.android.inventorytracker.data.local.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -24,24 +25,12 @@ interface UserDao {
     @Update
     suspend fun update(user: UserEntity)
 
-    @Query("UPDATE users SET passwordHash = :hashed WHERE username = :username AND role = :role")
-    suspend fun updatePassStaff(username: String, hashed: String, role: String): Int
-
-    @Query("SELECT * FROM users WHERE username = :username AND role = :role")
-    suspend fun getByUsernameAndRole(username: String, role: String): UserEntity?
-
-    @Query("SELECT * FROM users WHERE role = :role")
-    suspend fun getUsersByRole(role: String): List<UserEntity>
+    @Query("SELECT * FROM users WHERE role = :role LIMIT 1")
+    suspend fun getUserByRole(role: String): UserEntity?
 
     @Query("SELECT * FROM users WHERE username = :username AND passwordHash = :passwordHash AND role= :role")
     suspend fun getUserCredential(username: String, passwordHash: String, role: String): UserEntity?
 
-    @Query("SELECT * FROM users WHERE id = :id")
-    fun getUserById(id: Int): UserEntity?
-
-    @Query("SELECT * FROM users ORDER BY username ASC")
-    fun getUsersOrderedByUsername(): Flow<List<UserEntity>>
-
-    @Query("SELECT COUNT(*) FROM users")
-    suspend fun getCount(): Int
+    @Query("SELECT COUNT(*) FROM users WHERE role = :role")
+    fun getCount(role: String): Flow<Int>
 }

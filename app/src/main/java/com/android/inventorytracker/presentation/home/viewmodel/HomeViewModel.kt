@@ -38,6 +38,8 @@ class HomeViewModel @Inject constructor(
     private val _showImportConfirmation = MutableStateFlow(preferenceRepo.shouldShowConfirmation())
     val showImportConfirmation: StateFlow<Boolean> = _showImportConfirmation
 
+    val businessName = preferenceRepo.getBusinessName()
+
     fun toggleImportConfirmation(show: Boolean) {
         preferenceRepo.setCsvConfirmation(show)
         _showImportConfirmation.value = show

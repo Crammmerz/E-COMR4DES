@@ -14,10 +14,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.android.inventorytracker.data.model.UserRole
 import com.android.inventorytracker.presentation.popup.change_pass_admin.ChangePassAdmin
 import com.android.inventorytracker.presentation.popup.change_pass_staff.ChangePassStaff
-import com.android.inventorytracker.presentation.settings.viewmodel.SettingsViewModel
+import com.android.inventorytracker.presentation.popup.create_acc.CreateAccPopup
+import com.android.inventorytracker.presentation.settings.viewmodel.AuthViewModel
 import com.android.inventorytracker.ui.theme.Palette
 import com.android.inventorytracker.ui.theme.Sand
 import com.android.inventorytracker.ui.theme.LightSand
@@ -26,13 +26,21 @@ import com.android.inventorytracker.ui.theme.GoogleSans
 @Composable
 fun Security(
     modifier: Modifier = Modifier,
-    viewModel: SettingsViewModel = hiltViewModel()
+    viewModel: AuthViewModel = hiltViewModel()
 ) {
     val backgroundColor = Color(0xFFFEF7ED)
 
     val isAuthEnabled by viewModel.authEnabled.collectAsState()
     val isRoleAuthEnabled by viewModel.roleAuthEnabled.collectAsState()
-    var role by remember { mutableStateOf<UserRole?>(null) }
+
+    var showCreateAdminAcc by remember { mutableStateOf(false) }
+    var showCreateStaffAcc by remember { mutableStateOf(false) }
+
+    var showAdminPasswordChange by remember { mutableStateOf(false) }
+    var showStaffPasswordChange by remember { mutableStateOf(false) }
+
+    val adminCount by viewModel.getCount("ADMIN").collectAsState(initial = 0)
+    val staffCount by viewModel.getCount("STAFF").collectAsState(initial = 0)
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -68,7 +76,14 @@ fun Security(
                         SecurityRowItem(label = "Enable Authentication") {
                             Checkbox(
                                 checked = isAuthEnabled,
-                                onCheckedChange = { viewModel.toggleAuth(it) },
+                                onCheckedChange = { it ->
+                                    if(adminCount == 0){
+                                        showCreateAdminAcc = true
+                                        viewModel.toggleAuth(false)
+                                    } else {
+                                        viewModel.toggleAuth(it)
+                                    }
+                                },
                                 colors = CheckboxDefaults.colors(
                                     checkedColor = Palette.ButtonBeigeBase,
                                     uncheckedColor = LightSand,
@@ -80,7 +95,15 @@ fun Security(
                         SecurityRowItem(label = "Role Authentication") {
                             Checkbox(
                                 checked = isRoleAuthEnabled,
-                                onCheckedChange = { viewModel.toggleRoleAuth(it) },
+                                enabled = isAuthEnabled,
+                                onCheckedChange = { it ->
+                                    if(staffCount == 0){
+                                        showCreateStaffAcc = true
+                                        viewModel.toggleRoleAuth(false)
+                                    } else {
+                                        viewModel.toggleRoleAuth(it)
+                                    }
+                                },
                                 colors = CheckboxDefaults.colors(
                                     checkedColor = Palette.ButtonBeigeBase,
                                     uncheckedColor = LightSand,
@@ -96,7 +119,7 @@ fun Security(
                             SecurityActionButton(
                                 label = "Change Password",
                                 enabled = isAuthEnabled,
-                                onClick = { role = UserRole.ADMIN }
+                                onClick = { showAdminPasswordChange = true }
                             )
                         }
                         Spacer(modifier = Modifier.height(16.dp))
@@ -104,7 +127,7 @@ fun Security(
                             SecurityActionButton(
                                 label = "Change Password",
                                 enabled = isAuthEnabled && isRoleAuthEnabled,
-                                onClick = { role = UserRole.STAFF }
+                                onClick = { showStaffPasswordChange = true }
                             )
                         }
                     }
@@ -113,16 +136,34 @@ fun Security(
         }
     }
 
-    // Popups logic
-    when (role) {
-        UserRole.ADMIN -> ChangePassAdmin(onDismiss = { role = null }, onSubmit = viewModel::updateUser)
-        UserRole.STAFF -> ChangePassStaff(onDismiss = { role = null }, onSubmit = viewModel::updateUserStaff)
-        else -> {}
+    if(showCreateAdminAcc) {
+        CreateAccPopup(
+            role = "ADMIN",
+            onDismiss = {
+                if (it) viewModel.toggleAuth(true)
+                showCreateAdminAcc = false
+            },
+            onSubmit = viewModel::register
+        )
     }
+
+    if(showCreateStaffAcc){
+        CreateAccPopup(
+            role = "STAFF",
+            onDismiss = {
+                if (it) viewModel.toggleRoleAuth(true)
+                showCreateStaffAcc = false
+            },
+            onSubmit = viewModel::register
+        )
+    }
+
+    if(showAdminPasswordChange) ChangePassAdmin(onDismiss = { showAdminPasswordChange = false }, onSubmit = viewModel::updateUser)
+    if(showStaffPasswordChange) ChangePassStaff(onDismiss = { showStaffPasswordChange = false }, onSubmit = viewModel::updateUser)
 }
 
 @Composable
-private fun SecuritySectionCard(content: @Composable ColumnScope.() -> Unit) {
+fun SecuritySectionCard(content: @Composable ColumnScope.() -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -134,7 +175,7 @@ private fun SecuritySectionCard(content: @Composable ColumnScope.() -> Unit) {
 }
 
 @Composable
-private fun SecurityRowItem(
+fun SecurityRowItem(
     label: String,
     action: @Composable () -> Unit
 ) {
@@ -157,7 +198,7 @@ private fun SecurityRowItem(
 }
 
 @Composable
-private fun SecurityActionButton(
+fun SecurityActionButton(
     label: String,
     enabled: Boolean,
     onClick: () -> Unit

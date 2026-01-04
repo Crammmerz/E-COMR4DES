@@ -30,10 +30,10 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun StringField(
     modifier: Modifier = Modifier,
-    inputModifier: Modifier = Modifier,
+    fieldModifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
-    onValidationChange: ((Boolean) -> Unit)? = null,
+    onValidityChange: ((Boolean) -> Unit)? = null,
     onDone: (() -> Unit)? = null,
     header: String,
     placeholder: String,
@@ -48,7 +48,7 @@ fun StringField(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(hasError) {
-        onValidationChange?.invoke(!hasError)
+        onValidityChange?.invoke(!hasError)
     }
 
     Column(modifier = modifier) {
@@ -91,7 +91,7 @@ fun StringField(
                         innerTextField()
                     }
                 },
-                modifier = inputModifier
+                modifier = fieldModifier
                     .fillMaxWidth()
                     .align(Alignment.CenterStart)
                     .padding(end = if (showCounter) 35.dp else 0.dp), // Prevent text overlapping counter

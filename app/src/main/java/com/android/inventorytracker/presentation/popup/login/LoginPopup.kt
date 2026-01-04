@@ -98,14 +98,14 @@ fun LoginPopup(
                 // --- INPUT FIELDS ---
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     StringField(
-                        inputModifier = Modifier.focusRequester(focusUsername),
+                        fieldModifier = Modifier.focusRequester(focusUsername),
                         value = username,
                         onValueChange = { username = it },
                         header = "Username",
                         placeholder = "Enter username",
                         modifier = Modifier.fillMaxWidth(),
                         maxLength = 99,
-                        onValidationChange = { validUsername = it },
+                        onValidityChange = { validUsername = it },
                         onDone = { focusPassword.requestFocus() }
                     )
 

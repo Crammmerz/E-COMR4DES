@@ -42,29 +42,11 @@ object DatabaseModule {
             .addCallback(dbCallback)
             .build()
 
-        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
-            try {
-                if (db.userDao().getCount() == 0) {
-                    db.withTransaction {
-                        db.userDao().insert(UserEntity(1, "admin", hashPassword("admin"), "ADMIN"))
-                        db.userDao().insert(UserEntity(2, "staff", hashPassword("staff"), "STAFF"))
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("DatabaseModule", "Seeding failed", e)
-            }
-        }
-
         return db
     }
 
     @Provides fun provideItemDao(db: InventoryDatabase): ItemDao = db.itemDao()
     @Provides fun provideItemBatchDao(db: InventoryDatabase): ItemBatchDao = db.itemBatchDao()
     @Provides fun provideUserDao(db: InventoryDatabase): UserDao = db.userDao()
-
-    private fun hashPassword(password: String): String {
-        val bytes = MessageDigest.getInstance("SHA-256").digest(password.toByteArray())
-        return bytes.joinToString("") { "%02x".format(it) }
-    }
 }
 

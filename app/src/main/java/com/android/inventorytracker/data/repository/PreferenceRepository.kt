@@ -8,5 +8,12 @@ interface PreferencesRepository {
 
     fun setCsvConfirmation(show: Boolean)
     fun shouldShowConfirmation(): Boolean
+
+    fun setShowOnboarding(show: Boolean)
+    fun shouldShowOnboarding(): Boolean
+
+    fun saveProfile(businessName: String, drink: String, firstItem: String, supplier: String)
+    fun getBusinessName(): String?
+    fun verifySecurityAnswers(drink: String, firstItem: String, supplier: String): Boolean
 }
 

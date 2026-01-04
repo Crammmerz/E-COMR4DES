@@ -11,20 +11,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.android.inventorytracker.presentation.home.viewmodel.HomeViewModel
 import com.android.inventorytracker.presentation.shared.viewmodel.TimeViewModel
 import com.android.inventorytracker.ui.theme.Palette
 import com.android.inventorytracker.ui.theme.GoogleSans
 
 @Composable
-fun Header(){
+fun Header(
+    homeViewModel: HomeViewModel = hiltViewModel()
+){
     val timeViewModel: TimeViewModel = viewModel()
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "Inventory Dashboard",
+            text = (homeViewModel.businessName ?: "Inventory Tracker").uppercase(),
             style = TextStyle(
                 fontFamily = GoogleSans,
                 fontWeight = FontWeight.SemiBold,

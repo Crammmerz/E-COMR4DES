@@ -24,6 +24,7 @@ foundationLayout = "1.10.0"
 uiTest = "1.10.0"
 coil = "2.7.0"
 runtimeLivedata = "1.10.0"
+securityCrypto = "1.1.0-alpha06"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -89,3 +90,5 @@ androidx-compose-ui-test = { group = "androidx.compose.ui", name = "ui-test", ve
 # Image
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 androidx-compose-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+
+androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "securityCrypto" }

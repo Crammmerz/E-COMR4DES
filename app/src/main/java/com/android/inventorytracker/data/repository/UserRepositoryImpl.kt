@@ -5,6 +5,7 @@ import com.android.inventorytracker.data.local.dao.UserDao
 import com.android.inventorytracker.data.local.entities.UserEntity
 import com.android.inventorytracker.di.IoDispatcher
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import java.security.MessageDigest
 import javax.inject.Inject
 
@@ -29,8 +30,8 @@ class UserRepositoryImpl @Inject constructor(
         userDao.insert(UserEntity(username = username, passwordHash = hashed, role = role))
     }
 
-    override suspend fun updateUser(user: UserEntity, newPass: String,): Boolean {
-        val existingUser = userDao.getUserCredential(user.username, hashPassword(user.passwordHash), user.role)
+    override suspend fun updateUser(newPass: String, role: String): Boolean {
+        val existingUser = userDao.getUserByRole(role)
         if (existingUser == null) return false
 
         val updatedUser = existingUser.copy(passwordHash = hashPassword(newPass))
@@ -43,12 +44,7 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateUserStaff(user: UserEntity): Boolean {
-        return try {
-            userDao.updatePassStaff(user.username, hashPassword(user.passwordHash), user.role)
-            true
-        } catch (e: Exception) {
-            false
-        }
+    override fun getCount(role: String): Flow<Int> {
+        return userDao.getCount(role)
     }
 }

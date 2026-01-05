@@ -34,9 +34,12 @@ import com.android.inventorytracker.presentation.shared.component.primitive.*
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.ui.theme.GoogleSans
 import com.android.inventorytracker.ui.theme.Palette
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 
+@OptIn(FlowPreview::class)
 @Composable
 fun ItemDetailPopup(
     model: ItemModel,
@@ -73,16 +76,20 @@ fun ItemDetailPopup(
             onUpdateItem(model.item.copy(name = name, imageUri = imageUri, description = description, unitThreshold = unitThreshold, expiryThreshold = expiryThreshold, subUnitThreshold = subUnitThreshold))
         }
     }
-    
+
     LaunchedEffect(Unit) {
-        snapshotFlow { subUnitThreshold }.distinctUntilChanged()
-            .collectLatest { newValue ->
-                Toast.makeText(
-                    context,
-                    "Lowering this value reduces precision. Existing stock will be converted to larger units",
-                    Toast.LENGTH_SHORT )
-                    .show()
-            }
+        if (model.item.subUnitThreshold > subUnitThreshold) {
+            snapshotFlow { subUnitThreshold }
+                .debounce(500) // wait 500ms after last change
+                .distinctUntilChanged()
+                .collectLatest { newValue ->
+                    Toast.makeText(
+                        context,
+                        "Lowering this value reduces precision. Existing stock will be converted to larger units",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+        }
     }
         // 🔹 Ginaya ang Dialog properties para mawala ang "frame" sa labas ng card
     Dialog(

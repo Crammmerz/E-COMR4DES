@@ -77,7 +77,7 @@ fun ItemDetailPopup(
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(subUnitThreshold) {
         if (model.item.subUnitThreshold > subUnitThreshold) {
             snapshotFlow { subUnitThreshold }
                 .debounce(500) // wait 500ms after last change

@@ -1,5 +1,6 @@
 package com.android.inventorytracker.presentation.popup.item_detail
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -15,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -32,6 +34,8 @@ import com.android.inventorytracker.presentation.shared.component.primitive.*
 import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.ui.theme.GoogleSans
 import com.android.inventorytracker.ui.theme.Palette
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
 fun ItemDetailPopup(
@@ -43,6 +47,7 @@ fun ItemDetailPopup(
 ) {
     val role = loginViewModel.userRole
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
 
     // Form States
     var imageUri by rememberSaveable(model.item.id) { mutableStateOf(model.item.imageUri) }
@@ -68,8 +73,18 @@ fun ItemDetailPopup(
             onUpdateItem(model.item.copy(name = name, imageUri = imageUri, description = description, unitThreshold = unitThreshold, expiryThreshold = expiryThreshold, subUnitThreshold = subUnitThreshold))
         }
     }
-
-    // 🔹 Ginaya ang Dialog properties para mawala ang "frame" sa labas ng card
+    
+    LaunchedEffect(Unit) {
+        snapshotFlow { subUnitThreshold }.distinctUntilChanged()
+            .collectLatest { newValue ->
+                Toast.makeText(
+                    context,
+                    "Lowering this value reduces precision. Existing stock will be converted to larger units",
+                    Toast.LENGTH_SHORT )
+                    .show()
+            }
+    }
+        // 🔹 Ginaya ang Dialog properties para mawala ang "frame" sa labas ng card
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(

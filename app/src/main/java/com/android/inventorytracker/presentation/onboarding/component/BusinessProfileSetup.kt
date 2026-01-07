@@ -1,73 +1,106 @@
 package com.android.inventorytracker.presentation.onboarding.component
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.presentation.onboarding.viewmodel.OnboardingViewModel
 import com.android.inventorytracker.presentation.shared.component.input_fields.StringField
+import com.android.inventorytracker.ui.theme.GoogleSans
+import com.android.inventorytracker.ui.theme.Palette
 
 @Composable
 fun BusinessProfileSetup(
     onValidityChange: (Boolean) -> Unit,
     viewModel: OnboardingViewModel = hiltViewModel()
 ) {
+    // Kinatize na ang state: Business Name at First Product na lang
     var name by rememberSaveable { mutableStateOf("") }
-    var drink by rememberSaveable { mutableStateOf("") }
     var product by rememberSaveable { mutableStateOf("") }
-    var supplier by rememberSaveable { mutableStateOf("") }
 
     val focusName = remember { FocusRequester() }
-    val focusDrink = remember { FocusRequester() }
-    val focusFirst = remember { FocusRequester() }
-    val focusSupplier = remember { FocusRequester() }
+    val focusProduct = remember { FocusRequester() }
 
-    LaunchedEffect(Unit) {
-        focusName.requestFocus()
-    }
+    LaunchedEffect(Unit) { focusName.requestFocus() }
 
-    LaunchedEffect(name, drink, product, supplier) {
-        val allValid = name.isNotEmpty() && drink.isNotEmpty() && product.isNotEmpty() && supplier.isNotEmpty()
+    // Validity logic updated para sa dalawang fields na lang
+    LaunchedEffect(name, product) {
+        val allValid = name.isNotEmpty() && product.isNotEmpty()
         onValidityChange(allValid)
-        if(allValid) viewModel.setBusinessProfile(name, drink, product, supplier)
+        if(allValid) {
+            // Note: I-adjust ang ViewModel function kung kailangan
+            // pero pinapasa natin ang empty strings sa tinanggal na fields para walang error
+            viewModel.setBusinessProfile(name, "", product, "")
+        }
     }
 
-    StringField(
-        value = name,
-        onValueChange = { name = it },
-        header = "Business Name",
-        placeholder = "Enter business name",
-        modifier = Modifier.focusRequester(focusName),
-        onDone = { focusDrink.requestFocus() }
-    )
-    StringField(
-        value = drink,
-        onValueChange = { drink = it },
-        header = "Favourite Drink",
-        placeholder = "Enter favourite drink to make",
-        modifier = Modifier.focusRequester(focusDrink),
-        onDone = { focusFirst.requestFocus() }
-    )
-    StringField(
-        value = product,
-        onValueChange = { product = it },
-        header = "First Product",
-        placeholder = "Enter the first product sold",
-        modifier = Modifier.focusRequester(focusFirst),
-        onDone = { focusSupplier.requestFocus() }
-    )
-    StringField(
-        value = supplier,
-        onValueChange = { supplier = it },
-        header = "First Supplier",
-        placeholder = "Enter the first supplier contracted",
-        modifier = Modifier.focusRequester(focusSupplier)
-    )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 120.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
+        // --- HEADER ---
+        Text(
+            text = "Inventory Tracker",
+            style = TextStyle(
+                fontFamily = GoogleSans,
+                fontSize = 64.sp,
+                fontWeight = FontWeight.Bold,
+                color = Palette.DarkBeigeText,
+                letterSpacing = (-2.5).sp
+            )
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Text(
+            text = "BUSINESS PROFILE",
+            style = TextStyle(
+                fontFamily = GoogleSans,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                color = Palette.DarkBeigeText.copy(alpha = 0.5f),
+                letterSpacing = 1.5.sp
+            )
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // --- INPUT FIELDS (Full Width / Stretched) ---
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            StringField(
+                modifier = Modifier
+                    .fillMaxWidth() // Stretched to full width
+                    .focusRequester(focusName),
+                value = name,
+                onValueChange = { name = it },
+                header = "Business Name", // Pinalaki ang internal font sa StringField component mo dapat
+                placeholder = "What is the name of your business?",
+                onDone = { focusProduct.requestFocus() }
+            )
+
+            StringField(
+                modifier = Modifier
+                    .fillMaxWidth() // Stretched to full width
+                    .focusRequester(focusProduct),
+                value = product,
+                onValueChange = { product = it },
+                header = "First Product Sold",
+                placeholder = "What was the first product you sold?",
+                onDone = { /* Action after last field */ }
+            )
+        }
+    }
 }

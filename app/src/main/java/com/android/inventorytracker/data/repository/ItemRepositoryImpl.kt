@@ -34,7 +34,7 @@ class ItemRepositoryImpl @Inject constructor(
     private fun ItemWithBatches.toItemModel(): ItemModel =
         ItemModel(
             item = this.item,
-            batch = this.batches,
+            batch = this.batches.sortedBy { it.expiryDate },
         )
 
     override suspend fun insertItem(item: ItemEntity) = withContext(ioDispatcher) {

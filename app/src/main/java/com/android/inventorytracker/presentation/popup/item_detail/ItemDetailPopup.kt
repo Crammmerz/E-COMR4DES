@@ -77,20 +77,6 @@ fun ItemDetailPopup(
         }
     }
 
-    LaunchedEffect(subUnitThreshold) {
-        if (model.item.subUnitThreshold > subUnitThreshold) {
-            snapshotFlow { subUnitThreshold }
-                .debounce(500) // wait 500ms after last change
-                .distinctUntilChanged()
-                .collectLatest { newValue ->
-                    Toast.makeText(
-                        context,
-                        "Lowering this value reduces precision. Existing stock will be converted to larger units",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-        }
-    }
         // 🔹 Ginaya ang Dialog properties para mawala ang "frame" sa labas ng card
     Dialog(
         onDismissRequest = onDismiss,
@@ -174,7 +160,14 @@ fun ItemDetailPopup(
                         }
                         Spacer(Modifier.height(12.dp))
                         IntField(value = subUnitThreshold, label = "Sub Unit Partition", placeholder = "1", onValueChange = { subUnitThreshold = it }, onValidityChange = { validSubUnit = it })
-                        Spacer(Modifier.height(20.dp))
+                        Text( "Lowering this value might reduces precision. Existing stock will be converted to larger units",
+                            style = TextStyle(
+                                fontFamily = GoogleSans,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp
+                            ),
+                            color = if (model.item.subUnitThreshold > subUnitThreshold) Color.Red else Color.Transparent
+                        )
                         BatchExpirySection(model = model, modifier = Modifier.heightIn(max = 300.dp))
                     }
                 }

@@ -8,16 +8,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.data.model.UserRole
 import com.android.inventorytracker.presentation.login.viewmodel.LoginViewModel
+import com.android.inventorytracker.presentation.popup.change_pass.ChangePass
 import com.android.inventorytracker.presentation.popup.login.LoginPopup
-import com.android.inventorytracker.R
+import com.android.inventorytracker.presentation.popup.recover_acc.RecoverAcc
 import com.android.inventorytracker.ui.theme.GoogleSans
 import com.android.inventorytracker.ui.theme.Palette
 
@@ -29,7 +28,9 @@ fun Login(
     val userRole = loginViewModel.userRole
     val isRoleAuthEnabled = loginViewModel.roleAuthEnabled
     val header = if (isRoleAuthEnabled) "Select Login Type" else "Log In"
-    var showDialog by remember { mutableStateOf(false) }
+    var showLogin by remember { mutableStateOf(false) }
+    var showRecoverAcc by remember { mutableStateOf(false) }
+    var showChangePass by remember { mutableStateOf(false) }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -79,7 +80,7 @@ fun Login(
                     modifier = Modifier.weight(1f),
                     onClick = {
                         loginViewModel.updateUserRole(UserRole.ADMIN)
-                        showDialog = true
+                        showLogin = true
                     }
                 )
 
@@ -91,17 +92,32 @@ fun Login(
                         modifier = Modifier.weight(1f),
                         onClick = {
                             loginViewModel.updateUserRole(UserRole.STAFF)
-                            showDialog = true
+                            showLogin = true
                         }
                     )
                 }
             }
 
-            if (showDialog) {
-                LoginPopup(
+            when {
+                showLogin -> LoginPopup(
                     userRole = userRole,
-                    onDismiss = { showDialog = false },
-                    onLogin = loginViewModel::onLogin
+                    onDismiss = { showLogin = false },
+                    onLogin = loginViewModel::onLogin,
+                    onShowRecovery = {
+                        showRecoverAcc = it
+                        showLogin = false
+                    }
+                )
+                showRecoverAcc -> RecoverAcc(
+                    onDismiss = { showRecoverAcc = false },
+                    onShowChangePass = {
+                        showChangePass = it
+                        showRecoverAcc = false
+                    }
+                )
+                showChangePass -> ChangePass(
+                    role = userRole,
+                    onDismiss = { showChangePass = false }
                 )
             }
         }

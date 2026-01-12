@@ -19,7 +19,7 @@ import com.android.inventorytracker.ui.theme.Palette
 @Composable
 fun FeatureHighlights() {
     val features = listOf(
-        Pair("Secure account authentication", "Protect your data with modern authentication."),
+        Pair("Secure account authentication", "Protect your data with authentication."),
         Pair("Track inventory effortlessly", "Stay on top of stock in real time, anywhere."),
         Pair("Real-time stock alerts", "Never miss critical updates on your items."),
         Pair("CSV Data Import Ready", "Import your existing data directly from CSV."),

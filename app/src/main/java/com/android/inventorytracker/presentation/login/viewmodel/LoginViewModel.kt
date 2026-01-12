@@ -31,13 +31,15 @@ class LoginViewModel @Inject constructor(
         loginState = if (success) LoginState.LOGGED_IN else LoginState.LOGGED_OUT
         return success
     }
-
     fun updateUserRole(role: UserRole){
         this.userRole = role
     }
-
-    // --- IDAGDAG ITONG FUNCTION ---
     fun logout() {
         loginState = LoginState.LOGGED_OUT
+    }
+
+    suspend fun verifyRecoveryInfo(pin: String, phrase: String): Boolean {
+        val success = preferencesRepository.verifyRecoveryInfo(pin, phrase)
+        return success
     }
 }

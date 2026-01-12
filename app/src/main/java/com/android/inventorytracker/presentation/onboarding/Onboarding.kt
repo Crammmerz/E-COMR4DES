@@ -59,7 +59,7 @@ fun Onboarding(
                 OnboardingPage.Page3 -> NotificationPermissionRequest(modifier = Modifier.fillMaxSize(), showCancel = false)
                 OnboardingPage.Page4 -> BusinessProfileSetup(onValidityChange = { canProceed = it })
                 OnboardingPage.Page5 -> AuthenticationSetup()
-                OnboardingPage.Page6 -> FinalConfirmation()
+                OnboardingPage.Page6 -> AccRecoverySetup(onValidityChange = { canProceed = it })
             }
         }
 
@@ -73,35 +73,8 @@ fun Onboarding(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // --- BACK BUTTON (iOS Inspired White) ---
-                OutlinedButton(
-                    onClick = {
-                        when (currentPage) {
-                            OnboardingPage.Page2 -> currentPage = OnboardingPage.Page1
-                            OnboardingPage.Page3 -> currentPage = OnboardingPage.Page2
-                            OnboardingPage.Page4 -> currentPage = if (isNotificationPermissionNeeded) OnboardingPage.Page3 else OnboardingPage.Page2
-                            OnboardingPage.Page5 -> currentPage = OnboardingPage.Page4
-                            OnboardingPage.Page6 -> currentPage = OnboardingPage.Page5
-                            else -> {}
-                        }
-                    },
-                    modifier = Modifier
-                        .height(45.dp)
-                        .width(140.dp),
-                    shape = RoundedCornerShape(28.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = Color.White,
-                        contentColor = Palette.DarkBeigeText
-                    ),
-                    border = BorderStroke(1.dp, iosBorderColor)
-                ) {
-                    Text(
-                        text = "Back",
-                        style = TextStyle(fontFamily = GoogleSans, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                    )
-                }
-
                 // --- NEXT BUTTON (iOS Inspired White) ---
+                Spacer(modifier = Modifier.weight(1f))
                 OutlinedButton(
                     onClick = {
                         when (currentPage) {
@@ -131,24 +104,6 @@ fun Onboarding(
                     )
                 }
             }
-        }
-
-        // SKIP BUTTON (Top Right)
-        TextButton(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(24.dp),
-            onClick = { onDismiss() }
-        ) {
-            Text(
-                text = "Skip",
-                style = TextStyle(
-                    fontFamily = GoogleSans,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 16.sp,
-                    color = Palette.DarkBeigeText.copy(alpha = 0.5f)
-                )
-            )
         }
     }
 }

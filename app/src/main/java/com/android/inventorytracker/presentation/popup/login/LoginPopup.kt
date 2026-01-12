@@ -1,5 +1,6 @@
 package com.android.inventorytracker.presentation.popup.login
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -31,6 +32,7 @@ fun LoginPopup(
     userRole: UserRole,
     onDismiss: () -> Unit,
     onLogin: suspend (user: UserEntity) -> Boolean,
+    onShowRecovery: (Boolean) -> Unit
 ) {
     // --- States ---
     var username by rememberSaveable { mutableStateOf("") }
@@ -104,6 +106,7 @@ fun LoginPopup(
                         header = "Username",
                         placeholder = "Enter username",
                         modifier = Modifier.fillMaxWidth(),
+                        showCounter = false,
                         maxLength = 99,
                         onValidityChange = { validUsername = it },
                         onDone = { focusPassword.requestFocus() }
@@ -121,16 +124,35 @@ fun LoginPopup(
                 }
 
                 // --- ERROR MESSAGE ---
-                if (loginSuccess == false) {
-                    Text(
-                        text = "Invalid user credentials",
-                        style = TextStyle(
-                            fontFamily = GoogleSans,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 14.sp
-                        ),
-                        color = Color.Red
-                    )
+
+                Row (modifier = Modifier.fillMaxWidth().height(20.dp)) {
+                    if (loginSuccess == false) {
+                        Text(
+                            text = "Invalid user credentials",
+                            style = TextStyle(
+                                fontFamily = GoogleSans,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp
+                            ),
+                            color = Color.Red
+                        )
+                    }
+                    if (userRole == UserRole.ADMIN) {
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            text = "Forgot Password",
+                            style = TextStyle(
+                                fontFamily = GoogleSans,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp
+                            ),
+                            color = Color.Red,
+                            modifier = Modifier.clickable {
+                                onShowRecovery(true)
+                                onDismiss()
+                            }
+                        )
+                    }
                 }
 
                 // --- ACTION BUTTONS ---

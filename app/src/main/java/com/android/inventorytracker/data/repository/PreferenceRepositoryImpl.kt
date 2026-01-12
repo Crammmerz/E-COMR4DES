@@ -31,10 +31,12 @@ class PreferencesRepositoryImpl @Inject constructor(
     override fun shouldShowOnboarding(): Boolean =
         OnboardingPreference.shouldShowOnboarding(context)
 
-    override fun saveProfile(businessName: String, drink: String, firstItem: String, supplier: String) =
-        BusinessProfile.saveProfile(context, businessName, drink, firstItem, supplier)
+    override fun saveBusinessName(businessName: String) =
+        BusinessProfile.saveBusinessName(context, businessName)
     override fun getBusinessName(): String? =
         BusinessProfile.getBusinessName(context)
-    override fun verifySecurityAnswers(drink: String, firstItem: String, supplier: String): Boolean =
-        BusinessProfile.verifySecurityAnswers(context, drink, firstItem, supplier)
+    override fun saveSecurityRecovery(inputPin: String, inputPhrase: String) =
+        BusinessProfile.saveSecurityRecovery(context, inputPin, inputPhrase)
+    override fun verifyRecoveryInfo(inputPin: String, inputPhrase: String): Boolean =
+        BusinessProfile.verifySecurityAnswers(context, inputPin = inputPin, inputPhrase = inputPhrase)
 }

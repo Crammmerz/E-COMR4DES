@@ -12,8 +12,9 @@ interface PreferencesRepository {
     fun setShowOnboarding(show: Boolean)
     fun shouldShowOnboarding(): Boolean
 
-    fun saveProfile(businessName: String, drink: String, firstItem: String, supplier: String)
+    fun saveBusinessName(businessName: String)
     fun getBusinessName(): String?
-    fun verifySecurityAnswers(drink: String, firstItem: String, supplier: String): Boolean
+    fun saveSecurityRecovery(inputPin: String, inputPhrase: String)
+    fun verifyRecoveryInfo(inputPin: String, inputPhrase: String): Boolean
 }
 

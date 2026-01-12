@@ -1,4 +1,4 @@
-package com.android.inventorytracker.presentation.popup.change_pass_staff
+package com.android.inventorytracker.presentation.popup.change_pass
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,7 +16,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.android.inventorytracker.data.local.entities.UserEntity
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.android.inventorytracker.data.model.UserRole
+import com.android.inventorytracker.presentation.settings.viewmodel.AuthViewModel
 import com.android.inventorytracker.presentation.shared.component.input_fields.PasswordField
 import com.android.inventorytracker.presentation.shared.component.primitive.CancelButton
 import com.android.inventorytracker.presentation.shared.component.primitive.ConfirmButton
@@ -25,9 +27,10 @@ import com.android.inventorytracker.ui.theme.GoogleSans
 import kotlinx.coroutines.launch
 
 @Composable
-fun ChangePassStaff(
+fun ChangePass(
+    role: UserRole,
     onDismiss: () -> Unit,
-    onSubmit: suspend (newPassword: String, role: String) -> Boolean
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     var newPassword by rememberSaveable { mutableStateOf("") }
     var confirmPass by rememberSaveable { mutableStateOf("") }
@@ -51,7 +54,7 @@ fun ChangePassStaff(
     fun doSubmit() {
         if (valid && isMatch) {
             scope.launch {
-                val success = onSubmit(newPassword, "STAFF")
+                val success = authViewModel.updateUser(newPassword, if (role == UserRole.ADMIN) "ADMIN" else "STAFF")
                 successChange = success
                 if (success) onDismiss()
             }
@@ -73,7 +76,7 @@ fun ChangePassStaff(
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 Text(
-                    text = "Staff Password Change",
+                    text = if (role == UserRole.ADMIN) "Admin Password Change" else "Staff Password Change",
                     style = TextStyle(
                         fontFamily = GoogleSans,
                         fontWeight = FontWeight.Bold,

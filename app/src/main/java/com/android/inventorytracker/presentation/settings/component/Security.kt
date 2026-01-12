@@ -14,8 +14,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.android.inventorytracker.data.model.UserRole
 import com.android.inventorytracker.presentation.popup.change_pass_admin.ChangePassAdmin
-import com.android.inventorytracker.presentation.popup.change_pass_staff.ChangePassStaff
+import com.android.inventorytracker.presentation.popup.change_pass.ChangePass
 import com.android.inventorytracker.presentation.popup.create_acc.CreateAccPopup
 import com.android.inventorytracker.presentation.settings.viewmodel.AuthViewModel
 import com.android.inventorytracker.ui.theme.Palette
@@ -95,13 +96,14 @@ fun Security(
                         SecurityRowItem(label = "Role Authentication") {
                             Checkbox(
                                 checked = isRoleAuthEnabled,
-                                enabled = isAuthEnabled,
                                 onCheckedChange = { it ->
-                                    if(staffCount == 0){
-                                        showCreateStaffAcc = true
-                                        viewModel.toggleRoleAuth(false)
-                                    } else {
-                                        viewModel.toggleRoleAuth(it)
+                                    if(isAuthEnabled) {
+                                        if(staffCount == 0){
+                                            showCreateStaffAcc = true
+                                            viewModel.toggleRoleAuth(false)
+                                        } else {
+                                            viewModel.toggleRoleAuth(it)
+                                        }
                                     }
                                 },
                                 colors = CheckboxDefaults.colors(
@@ -159,7 +161,7 @@ fun Security(
     }
 
     if(showAdminPasswordChange) ChangePassAdmin(onDismiss = { showAdminPasswordChange = false }, onSubmit = viewModel::updateUser)
-    if(showStaffPasswordChange) ChangePassStaff(onDismiss = { showStaffPasswordChange = false }, onSubmit = viewModel::updateUser)
+    if(showStaffPasswordChange) ChangePass(role = UserRole.STAFF, onDismiss = { showStaffPasswordChange = false })
 }
 
 @Composable

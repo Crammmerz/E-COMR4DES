@@ -32,17 +32,27 @@ object DatabaseModule {
         val dbCallback = object : RoomDatabase.Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
+                // Initialize the auto-increment sequence to start at 1000
+                db.execSQL("INSERT OR IGNORE INTO sqlite_sequence (name, seq) VALUES ('items', 999)")
+                db.execSQL("UPDATE sqlite_sequence SET seq = 999 WHERE name = 'items'")
+            }
+
+            override fun onDestructiveMigration(db: SupportSQLiteDatabase) {
+                super.onDestructiveMigration(db)
+                // Re-apply the sequence logic if the DB is wiped/recreated
                 db.execSQL("INSERT OR IGNORE INTO sqlite_sequence (name, seq) VALUES ('items', 999)")
                 db.execSQL("UPDATE sqlite_sequence SET seq = 999 WHERE name = 'items'")
             }
         }
 
-        val db = Room.databaseBuilder(context, InventoryDatabase::class.java, "inventory.db")
-            .fallbackToDestructiveMigration()
+        return Room.databaseBuilder(
+            context,
+            InventoryDatabase::class.java,
+            "inventory.db"
+        )
+            .fallbackToDestructiveMigration() // Useful during development, dangerous in production!
             .addCallback(dbCallback)
             .build()
-
-        return db
     }
 
     @Provides fun provideItemDao(db: InventoryDatabase): ItemDao = db.itemDao()

@@ -14,8 +14,11 @@ class OnboardingViewModel @Inject constructor(
     private val _onboardingEnabled = MutableStateFlow( preferencesRepository.shouldShowOnboarding())
     val onboardingEnabled: StateFlow<Boolean> = _onboardingEnabled
 
-    fun setBusinessProfile(name: String, drink: String, product: String, supplier: String) {
-        preferencesRepository.saveProfile(name, drink, product, supplier)
+    fun setBusinessProfile(name: String) {
+        preferencesRepository.saveBusinessName(name)
+    }
+    fun setSecurityRecovery(pin: String, phrase: String) {
+        preferencesRepository.saveSecurityRecovery(pin, phrase)
     }
     fun toggleOnboarding(enabled: Boolean) {
         preferencesRepository.setShowOnboarding(enabled)

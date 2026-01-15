@@ -21,12 +21,10 @@ class HomeViewModel @Inject constructor(
 
     val itemModelList = itemRepository.observeItemModels()
 
-    val expiryItems: Flow<List<ItemModel>> = itemModelList.map { list ->
-        list.filter { it.isExpiringSoon }
-            .sortedBy { it.nearestExpiryDate }
+    val expiringItems: Flow<List<ItemModel>> = itemModelList.map { list ->
+        list.filter { it.expiringBatches().isNotEmpty() }
+            .sortedBy { it.expiringBatches().first().localExpiryDate }
     }
-
-    // REVISED: Inayos ang 'it.item' reference para mawala ang error sa line 32 ng screenshot mo
     val stockItems: Flow<List<ItemModel>> = itemModelList.map { list ->
         list.filter { it.isLowStock }
             .sortedBy {

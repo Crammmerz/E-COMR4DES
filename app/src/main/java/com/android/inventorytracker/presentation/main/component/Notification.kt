@@ -5,13 +5,20 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.filled.EventBusy
+import androidx.compose.material.icons.filled.HighlightOff
+import androidx.compose.material.icons.filled.HistoryToggleOff
+import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.ProductionQuantityLimits
+import androidx.compose.material.icons.filled.RunningWithErrors
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -19,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.ui.theme.Palette
 import com.android.inventorytracker.ui.theme.GoogleSans
+import com.android.inventorytracker.ui.theme.Orange
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,13 +34,8 @@ import java.util.*
 fun Notification(
     modifier: Modifier = Modifier,
     expiryItems: List<ItemModel>,
-    stockItems: List<ItemModel>,
+    stockModel: List<ItemModel>
 ) {
-    // 🔹 Original filter logic preserved
-    val expiredItems = expiryItems.filter { it.hasExpired }
-    val expiringItems = expiryItems.filter { it.isExpiringSoon && !it.hasExpired }
-    val noStockItems = stockItems.filter { it.hasNoStock }
-    val lowStockItems = stockItems.filter { it.isLowStock && !it.hasNoStock }
 
     Column(
         modifier = modifier
@@ -59,33 +62,70 @@ fun Notification(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(expiredItems) { model ->
-                NotificationItem(
-                    iconColor = model.expiryColor,
-                    title = "Expired Alert: ${model.item.name}",
-                    message = "${model.item.name} has expired on ${model.nearestExpiryFormatted}"
-                )
+            items(expiryItems) { model ->
+                val relevantBatches = model.batchModels.filter {
+                    it.isExpired || it.isExpiringSoon || it.expiresToday
+                }
+
+                if (relevantBatches.isNotEmpty()) {
+
+                    val expiryTitle = when {
+                        model.hasExpired -> "Expired: ${model.item.name}"
+                        model.isExpiringToday -> "Expires Today: ${model.item.name}"
+                        else -> "Expiring Soon: ${model.item.name}"
+                    }
+
+                    val (expiryIcon, expiryColor) = when {
+                        model.hasExpired -> Icons.Default.EventBusy to Palette.AlertRed
+                        model.isExpiringToday -> Icons.Default.RunningWithErrors to Color.Red
+                        else -> Icons.Default.HistoryToggleOff to Orange
+                    }
+
+                    val expiryMessages = model.batchModels
+                        .filter { it.isExpired || it.isExpiringSoon || it.expiresToday }
+                        .map { batch ->
+                            when {
+                                batch.isExpired -> "Batch expired on ${batch.dateFormatted}"
+                                batch.expiresToday -> "Batch expires today"
+                                else -> "${batch.expiryMessage} before Batch expires (${batch.dateFormatted})"
+                            }
+                        }
+
+
+                    NotificationItem(
+                        title = expiryTitle,
+                        expiryIcon = expiryIcon,
+                        iconColor = expiryColor,
+                        expiryMessage = expiryMessages,
+                        stockIcon = expiryIcon,
+                        stockMessage = ""
+                    )
+                }
             }
-            items(noStockItems) { model ->
-                NotificationItem(
-                    iconColor = model.stockColor,
-                    title = "No Stock Alert: ${model.item.name}",
-                    message = "${model.item.name} has no stock (${model.totalUnitFormatted()} units left)"
-                )
-            }
-            items(expiringItems) { model ->
-                NotificationItem(
-                    iconColor = model.expiryColor,
-                    title = "Near Expiry Alert: ${model.item.name}",
-                    message = "${model.item.name} expires on ${model.nearestExpiryFormatted}"
-                )
-            }
-            items(lowStockItems) { model ->
-                NotificationItem(
-                    iconColor = model.stockColor,
-                    title = "Low Stock Alert: ${model.item.name}",
-                    message = "${model.item.name} is running low (${model.totalUnitFormatted()} units left)"
-                )
+
+            items(stockModel) { model ->
+                if (model.hasNoStock || model.isLowStock || model.isNearLowStock) {
+                    val (stockIcon, stockColor) = when {
+                        model.hasNoStock -> Icons.Default.Inventory2 to Palette.AlertRed
+                        model.isLowStock -> Icons.Default.ProductionQuantityLimits to Orange
+                        else -> Icons.Default.Notifications to Color.Yellow
+                    }
+
+                    val (title, stockMessage) = when {
+                        model.hasNoStock -> "Out of Stock" to "${model.item.name} has 0 units left."
+                        model.isLowStock -> "Low Stock" to "${model.item.name} is running low (${model.totalUnitFormatted()} left)."
+                        else -> "Stock Warning" to "${model.item.name} is approaching low stock limit."
+                    }
+
+                    NotificationItem(
+                        title = title,
+                        expiryIcon = stockIcon,
+                        iconColor = stockColor,
+                        expiryMessage = emptyList(),
+                        stockIcon = stockIcon,
+                        stockMessage = stockMessage
+                    )
+                }
             }
         }
     }
@@ -93,9 +133,12 @@ fun Notification(
 
 @Composable
 private fun NotificationItem(
-    iconColor: Color,
     title: String,
-    message: String
+    expiryMessage: List<String>,
+    stockMessage: String = "",
+    expiryIcon: ImageVector,
+    stockIcon: ImageVector,
+    iconColor: Color,
 ) {
     // 🔹 Logic para sa Dynamic Timestamp (MM/dd o HH:mm)
     val timestamp = remember {
@@ -122,13 +165,15 @@ private fun NotificationItem(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier.align(Alignment.CenterStart).padding(end = 50.dp) // Space para sa date
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(end = 50.dp) // Space para sa date
             ) {
                 Icon(
-                    imageVector = Icons.Default.Circle,
+                    imageVector = if (expiryMessage.isNotEmpty()) expiryIcon else stockIcon,
                     tint = iconColor,
                     contentDescription = null,
-                    modifier = Modifier.size(8.dp)
+                    modifier = Modifier.size(20.dp)
                 )
                 Text(
                     text = title,
@@ -156,15 +201,31 @@ private fun NotificationItem(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        Text(
-            text = message,
-            style = TextStyle(
-                fontFamily = GoogleSans,
-                fontSize = 13.sp,
-                color = Color.Gray,
-                lineHeight = 18.sp
-            ),
-            modifier = Modifier.padding(start = 18.dp)
-        )
+        if(expiryMessage.isNotEmpty())
+            expiryMessage.forEach { it ->
+                Text(
+                    text = it,
+                    style = TextStyle(
+                        fontFamily = GoogleSans,
+                        fontSize = 13.sp,
+                        color = Color.Gray,
+                        lineHeight = 18.sp
+                    ),
+                    maxLines = 1 // Keeps the notification compact
+                )
+            }
+
+        if (stockMessage.isNotEmpty()) {
+            Text(
+                text = stockMessage,
+                style = TextStyle(
+                    fontFamily = GoogleSans,
+                    fontSize = 13.sp,
+                    color = Color.Gray,
+                    lineHeight = 18.sp
+                ),
+                maxLines = 1 // Keeps the notification compact
+            )
+        }
     }
 }

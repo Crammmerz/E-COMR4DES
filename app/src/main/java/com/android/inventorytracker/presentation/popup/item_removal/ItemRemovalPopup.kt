@@ -64,7 +64,7 @@ fun DeleteItemPopup(
                 ) {
                     items(model, key = { it.item.id }) { itemModel ->
                         InventoryItem(
-                            itemModel = itemModel,
+                            model = itemModel,
                             isChecked = selectedIds.contains(itemModel.item.id),
                             onCheckedChange = { checked ->
                                 if (checked) selectedIds.add(itemModel.item.id)

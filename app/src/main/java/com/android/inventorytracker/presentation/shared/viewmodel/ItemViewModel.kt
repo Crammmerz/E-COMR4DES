@@ -1,8 +1,5 @@
 package com.android.inventorytracker.presentation.shared.viewmodel
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.inventorytracker.data.local.entities.ItemEntity
@@ -26,21 +23,6 @@ import javax.inject.Inject
 class ItemViewModel @Inject constructor(
     private val itemRepository: ItemRepository
 ) : ViewModel() {
-
-    var pendingActionItem by mutableStateOf<ItemModel?>(null)
-        private set
-    var pendingActionType by mutableStateOf<String?>(null)
-        private set
-
-    fun triggerNotificationAction(model: ItemModel, type: String) {
-        pendingActionItem = model
-        pendingActionType = type
-    }
-
-    fun clearPendingAction() {
-        pendingActionItem = null
-        pendingActionType = null
-    }
 
     private val _sortBy = MutableStateFlow(SortBy.NAME_ASC)
     val sortBy: StateFlow<SortBy> = _sortBy
@@ -74,7 +56,7 @@ class ItemViewModel @Inject constructor(
         when (sort) {
             SortBy.NAME_ASC -> models.sortedBy { it.item.name }
             SortBy.NAME_DESC -> models.sortedByDescending { it.item.name }
-            SortBy.EXPIRY_ASCENDING -> models.sortedWith(compareBy(nullsLast()) { it.nearestExpiryDate })
+            SortBy.EXPIRY_ASCENDING -> models.sortedWith(compareBy(nullsLast()) { it.nearestExpiry()?.utcExpiryMillis })
             SortBy.STOCK_LOW -> models.sortedBy { (it.totalUnit() / it.item.unitThreshold).toFloat() }.filter { it.isLowStock || it.item.id in persist }
             SortBy.STOCK_LOW_HIGH -> models.sortedBy { it.totalUnit() }
             SortBy.STOCK_HIGH_LOW -> models.sortedByDescending { it.totalUnit() }

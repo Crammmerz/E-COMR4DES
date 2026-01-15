@@ -28,7 +28,7 @@ fun Main(
     val showNavBar by mainViewModel.showNavBar.collectAsState()
     val showNotif by mainViewModel.showNotif.collectAsState()
 
-    val expiryItems by homeViewModel.expiryItems.collectAsState(initial = emptyList())
+    val expiryItems by homeViewModel.expiringItems.collectAsState(initial = emptyList())
     val stockItems by homeViewModel.stockItems.collectAsState(initial = emptyList())
 
     Scaffold(topBar = { TopBar(mainViewModel) }) { inner ->
@@ -55,7 +55,7 @@ fun Main(
                 ) {
                     Notification(
                         expiryItems = expiryItems,
-                        stockItems = stockItems,
+                        stockModel = stockItems,
                         modifier = Modifier.align(Alignment.CenterEnd) // stick to right edge
                     )
                 }

@@ -6,10 +6,10 @@ import com.android.inventorytracker.data.model.ItemModel
 import java.time.LocalDate
 
 fun inventoryNotifier(itemModels: List<ItemModel>, context: Context, today: LocalDate) {
-    val zeroItems = itemModels.filter { it.totalSubUnit() == 0 }
+    val zeroItems = itemModels.filter { it.hasNoStock }
     val expiredItems = itemModels.filter { it.hasExpired }
-    val lowItems = itemModels.filter { it.totalSubUnit() > 0 && it.isLowStock }
-    val expiringItems = itemModels.filter { it.isExpiringSoon && !it.hasExpired }
+    val lowItems = itemModels.filter { it.isLowStock }
+    val expiringItems = itemModels.filter { it.isExpiringSoon || it.isExpiringToday }
 
     notifyIfNotEmpty(
         context,
@@ -17,7 +17,7 @@ fun inventoryNotifier(itemModels: List<ItemModel>, context: Context, today: Loca
         channel = AppChannel.CRITICAL,
         title = "Urgent Inventory Alert",
         text = "[EXPIRED ITEMS] ${expiredItems.count()}",
-        subtext = expiredItems.map { "${it.item.name}: expired on ${it.nearestExpiryFormatted}" },
+        subtext = expiredItems.map { "${it.item.name}: expired on ${it.nearestExpiry()?.dateFormatted}" },
         id = "expired".hashCode()
     )
 
@@ -37,7 +37,7 @@ fun inventoryNotifier(itemModels: List<ItemModel>, context: Context, today: Loca
         channel = AppChannel.WARNING,
         title = "Inventory Status Notice",
         text = "[EXPIRING SOON] ${expiringItems.count()}",
-        subtext = expiringItems.map { "${it.item.name}: use before ${it.nearestExpiryFormatted}" },
+        subtext = expiringItems.map { "${it.item.name}: use before ${it.nearestExpiry()?.dateFormatted}" },
         id = "expiring".hashCode()
     )
 
@@ -47,7 +47,7 @@ fun inventoryNotifier(itemModels: List<ItemModel>, context: Context, today: Loca
         channel = AppChannel.WARNING,
         title = "Inventory Status Notice",
         text = "[LOW STOCK] ${lowItems.count()}",
-        subtext = lowItems.map { "${it.item.name}: ${it.totalUnit()} remaining" },
+        subtext = lowItems.map { "${it.item.name}: ${it.totalUnitFormatted()} remaining" },
         id = "low_stock".hashCode()
     )
 }

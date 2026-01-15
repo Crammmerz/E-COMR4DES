@@ -24,7 +24,7 @@ private val CardBorder = Color(0xFFE0D6CC)
 
 @Composable
 fun InventoryItem(
-    itemModel: ItemModel,
+    model: ItemModel,
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
@@ -44,7 +44,7 @@ fun InventoryItem(
         )
 
         Image(
-            painter = rememberAsyncImagePainter(itemModel.item.imageUri),
+            painter = rememberAsyncImagePainter(model.item.imageUri),
             contentDescription = null,
             modifier = Modifier
                 .size(48.dp)
@@ -53,13 +53,13 @@ fun InventoryItem(
 
         Column {
             Text(
-                text = itemModel.item.name,
+                text = model.item.name,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = CoffeeBrown
             )
             Text(
-                text = "Quantity: ${itemModel.totalUnitFormatted()} • Expiry: ${itemModel.nearestExpiryFormatted}",
+                text = "Quantity: ${model.totalUnitFormatted()} • Expiry: ${model.nearestExpiry()?.dateFormatted ?: "N/A" }",
                 fontSize = 12.sp,
                 color = MutedText
             )

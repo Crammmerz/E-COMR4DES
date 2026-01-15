@@ -91,7 +91,7 @@ fun ItemDataRow(
 
             // 3. Expiry (weight 1.2f)
             DataFieldBox(
-                text = if (model.nearestExpiryFormatted == "N/A") "No Date" else model.nearestExpiryFormatted,
+                text = if (model.nearestExpiry() == null) "No Date" else model.nearestExpiry()!!.dateFormatted,
                 backgroundColor = LightBeigeField,
                 textColor = Color.DarkGray,
                 modifier = Modifier.weight(1.2f)

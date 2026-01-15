@@ -51,7 +51,8 @@ fun BatchGroupInsertionPopup(
         if (valid) {
             val validItems = inputMap.filter { (id, _) -> id in persistentItems && validityMap[id] == true }.values.toList()
             validItems.forEach { op ->
-                batchViewModel.onStoreBatch(ItemBatchEntity(itemId = op.itemId, subUnit = op.subunit, expiryDate = op.expiryDate))
+                val batch = ItemBatchEntity(itemId = op.itemId, subUnit = op.subunit, expiryDate = op.expiryDate)
+                batchViewModel.onStoreBatch(batch)
             }
             itemViewModel.reset()
             onDismiss()

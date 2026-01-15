@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -117,16 +118,18 @@ fun ExpiryLevels(
                                     )
                                 )
                                 Text(
-                                    text = model.expiryMessage,
+                                    text = model.nearestExpiry()?.dateFormatted ?: "N/A",
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(999.dp))
-                                        .background(model.expiryColor.copy(alpha = 0.12f))
+                                        .background(model.nearestExpiry()?.color?.copy(alpha = 0.12f)
+                                            ?: Color.White.copy(alpha = 0.12f)
+                                        )
                                         .padding(horizontal = 8.dp, vertical = 4.dp),
                                     style = TextStyle(
                                         fontFamily = GoogleSans,
                                         fontWeight = FontWeight.Normal,
                                         fontSize = 12.sp,
-                                        color = model.expiryColor
+                                        color = model.nearestExpiry()?.color ?: Palette.DarkBeigeText
                                     )
                                 )
                             }

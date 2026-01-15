@@ -2,8 +2,10 @@ package com.android.inventorytracker.presentation.main.component
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -16,13 +18,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.presentation.main.viewmodel.MainViewModel
+import com.android.inventorytracker.presentation.shared.viewmodel.BatchViewModel
 import com.android.inventorytracker.ui.theme.Palette
 import com.android.inventorytracker.ui.theme.GoogleSans
 
 @Composable
 fun TopBar(
     mainViewModel: MainViewModel,
+    batchViewModel: BatchViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
 ) {
     val showNotif by mainViewModel.showNotif.collectAsState()
@@ -60,10 +65,19 @@ fun TopBar(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                if(batchViewModel.pendingUndo.isNotEmpty())
+                    IconButton(onClick = { batchViewModel.doUndo() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Undo,
+                        tint = Color.Black,
+                        contentDescription = "Undo Button"
+                    )
+                }
+
                 IconButton(onClick = { mainViewModel.setNotif(!showNotif) }) {
                     Icon(
                         imageVector = Icons.Default.Notifications,
-                        tint = Palette.AccentBeigePrimary, // Mas matingkad na beige para sa active feel
+                        tint = Palette.AccentBeigePrimary,
                         contentDescription = "Notifications"
                     )
                 }

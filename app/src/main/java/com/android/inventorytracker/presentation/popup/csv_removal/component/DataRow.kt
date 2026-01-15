@@ -79,7 +79,7 @@ fun DataRow(
                         )
                     )
                     Text(
-                        text = "Stock: ${model.totalUnitFormatted()} | Expiry: ${model.nearestExpiryFormatted}",
+                        text = "Stock: ${model.totalUnitFormatted()} | Expiry: ${model.nearestExpiry()?.dateFormatted ?: "N/A"}",
                         style = TextStyle(
                             fontFamily = GoogleSans,
                             fontSize = 12.sp,

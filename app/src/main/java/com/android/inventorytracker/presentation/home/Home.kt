@@ -1,6 +1,5 @@
 package com.android.inventorytracker.presentation.home
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
@@ -21,7 +20,7 @@ import com.android.inventorytracker.ui.theme.Palette
 
 @Composable
 fun Home(modifier: Modifier = Modifier, homeViewModel: HomeViewModel = hiltViewModel()) {
-    val expiryItems by homeViewModel.expiryItems.collectAsState(initial = emptyList())
+    val expiryItems by homeViewModel.expiringItems.collectAsState(initial = emptyList())
     val stockItems by homeViewModel.stockItems.collectAsState(initial = emptyList())
 
     // ✅ Match the background color used in the Inventory screen

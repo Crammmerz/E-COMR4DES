@@ -25,18 +25,16 @@ fun BusinessProfileSetup(
     viewModel: OnboardingViewModel = hiltViewModel()
 ) {
     var name by rememberSaveable { mutableStateOf("") }
-    var firstProduct by rememberSaveable { mutableStateOf("") }
 
     var triedNext by rememberSaveable { mutableStateOf(false) }
 
     val focusName = remember { FocusRequester() }
-    val focusProduct = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
         focusName.requestFocus()
     }
 
-    val isValid = name.isNotBlank() && firstProduct.isNotBlank()
+    val isValid = name.isNotBlank()
 
     LaunchedEffect(isValid) {
         onValidityChange(isValid)
@@ -99,44 +97,11 @@ fun BusinessProfileSetup(
                     placeholder = "What is the name of your business?",
                     maxLength = 99,
                     showCounter = false,
-                    onDone = {
-                        triedNext = true
-                        if (name.isNotBlank()) {
-                            focusProduct.requestFocus()
-                        }
-                    }
                 )
 
                 if (triedNext && name.isBlank()) {
                     Text(
                         text = "Business name cannot be empty",
-                        color = Color.Red,
-                        fontSize = 14.sp,
-                        fontFamily = GoogleSans
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // FIRST PRODUCT
-                StringField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .focusRequester(focusProduct),
-                    value = firstProduct,
-                    onValueChange = { firstProduct = it },
-                    header = "First Product",
-                    placeholder = "What is the first item in your inventory?",
-                    maxLength = 99,
-                    showCounter = false,
-                    onDone = {
-                        triedNext = true
-                    }
-                )
-
-                if (triedNext && firstProduct.isBlank()) {
-                    Text(
-                        text = "First product cannot be empty",
                         color = Color.Red,
                         fontSize = 14.sp,
                         fontFamily = GoogleSans

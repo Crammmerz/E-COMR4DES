@@ -16,5 +16,10 @@ interface PreferencesRepository {
     fun getBusinessName(): String?
     fun saveSecurityRecovery(inputPin: String, inputPhrase: String)
     fun verifyRecoveryInfo(inputPin: String, inputPhrase: String): Boolean
-}
 
+    fun setLastBackupTimestamp(timestamp: Long)
+    fun getLastBackupTimestamp(): Long
+
+    fun setCurrentDbName(name: String)
+    fun getCurrentDbName(): String
+}

@@ -2,6 +2,7 @@ package com.android.inventorytracker.data.repository
 
 import android.content.Context
 import com.android.inventorytracker.data.preferences.AuthPreferences
+import com.android.inventorytracker.data.preferences.BackupPreferences
 import com.android.inventorytracker.data.preferences.BusinessProfile
 import com.android.inventorytracker.data.preferences.CsvPreference
 import com.android.inventorytracker.data.preferences.OnboardingPreference
@@ -39,4 +40,16 @@ class PreferencesRepositoryImpl @Inject constructor(
         BusinessProfile.saveSecurityRecovery(context, inputPin, inputPhrase)
     override fun verifyRecoveryInfo(inputPin: String, inputPhrase: String): Boolean =
         BusinessProfile.verifySecurityAnswers(context, inputPin = inputPin, inputPhrase = inputPhrase)
+
+    override fun setLastBackupTimestamp(timestamp: Long) =
+        BackupPreferences.setLastBackupTimestamp(context, timestamp)
+
+    override fun getLastBackupTimestamp(): Long =
+        BackupPreferences.getLastBackupTimestamp(context)
+
+    override fun setCurrentDbName(name: String) =
+        BackupPreferences.setCurrentDbName(context, name)
+
+    override fun getCurrentDbName(): String =
+        BackupPreferences.getCurrentDbName(context)
 }

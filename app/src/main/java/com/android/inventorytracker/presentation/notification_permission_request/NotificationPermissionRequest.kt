@@ -3,13 +3,11 @@ package com.android.inventorytracker.presentation.notification_permission_reques
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,10 +28,13 @@ import com.android.inventorytracker.ui.theme.Palette
 @Composable
 fun NotificationPermissionRequest(
     modifier: Modifier = Modifier,
-    onDismiss: () -> Unit = {},
-    showCancel: Boolean = true
+    onDismiss: () -> Unit
 ) {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+    // 🔒 Guard: Android 13+ lang
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+        onDismiss()
+        return
+    }
 
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -42,14 +43,18 @@ fun NotificationPermissionRequest(
         mutableStateOf(canPostNotifications(context))
     }
 
+    // 🔄 Re-check kapag bumalik galing settings
     DisposableEffect(lifecycleOwner) {
-        val obs = LifecycleEventObserver { _, event ->
+        val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
                 isGranted = canPostNotifications(context)
+                if (isGranted) onDismiss()
             }
         }
-        lifecycleOwner.lifecycle.addObserver(obs)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     val openNotificationSettings = {
@@ -60,110 +65,92 @@ fun NotificationPermissionRequest(
         context.startActivity(intent)
     }
 
-    if (!isGranted) {
-        Column(
-            modifier = modifier // Fixed: use the passed modifier
-                .fillMaxSize()
-                .padding(horizontal = 120.dp),
-            verticalArrangement = Arrangement.Center
+    // 🚫 Wag mag-render kung granted na
+    if (isGranted) return
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 120.dp, vertical = 60.dp)
+    ) {
+
+        // ---------- HEADER ----------
+        Text(
+            text = "StockWise",
+            modifier = Modifier.align(Alignment.TopStart),
+            style = TextStyle(
+                fontFamily = GoogleSans,
+                fontSize = 64.sp,
+                fontWeight = FontWeight.Bold,
+                color = Palette.DarkBeigeText,
+                letterSpacing = (-2.5).sp
+            )
+        )
+
+        // ---------- CONTENT ----------
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Center),
+            horizontalArrangement = Arrangement.spacedBy(48.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // --- HEADER (FIXED TEXTSTYLE) ---
-            Text(
-                text = "Inventory Tracker",
-                style = TextStyle(
-                    fontFamily = GoogleSans,
-                    fontSize = 64.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Palette.DarkBeigeText,
-                    letterSpacing = (-2.5).sp
-                )
+
+            // ICON
+            Icon(
+                imageVector = Icons.Default.Notifications,
+                contentDescription = null,
+                tint = Palette.DarkBeigeText.copy(alpha = 0.12f),
+                modifier = Modifier.size(180.dp)
             )
 
-            Spacer(modifier = Modifier.height(48.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(40.dp),
-                verticalAlignment = Alignment.CenterVertically
+            // TEXT + ACTIONS
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Text(
+                    text = "Turn On Notifications",
+                    style = TextStyle(
+                        fontFamily = GoogleSans,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 30.sp,
+                        color = Color.Black
+                    )
+                )
+
+                Text(
+                    text = "Stay informed with real-time alerts for low stock levels and critical inventory updates.",
+                    style = TextStyle(
+                        fontFamily = GoogleSans,
+                        fontSize = 18.sp,
+                        lineHeight = 26.sp,
+                        color = Color.Gray
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // ---------- ACTION BUTTONS ----------
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(40.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Notifications,
-                        contentDescription = null,
-                        tint = Palette.DarkBeigeText.copy(alpha = 0.1f),
-                        modifier = Modifier.size(160.dp)
-                    )
-                }
-
-                Column(
-                    modifier = Modifier.weight(1.2f),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Text(
-                        text = "Turn On Notifications",
-                        style = TextStyle(
-                            fontFamily = GoogleSans,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 28.sp,
-                            color = Color.Black
-                        )
-                    )
-
-                    Text(
-                        text = "Get real-time updates about critical inventory changes and low stock alerts.",
-                        style = TextStyle(
-                            fontFamily = GoogleSans,
-                            fontSize = 18.sp,
-                            lineHeight = 26.sp,
-                            color = Color.Gray
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // FIXED: Removed 'contentColor' if your custom ConfirmButton doesn't support it
-                        ConfirmButton(
-                            text = "Turn on Notifications",
-                            containerColor = Palette.ButtonBeigeBase,
-                            onClick = {
-                                openNotificationSettings()
-                                onDismiss()
-                            }
-                        )
-
-                        if (showCancel) {
-                            Spacer(modifier = Modifier.width(16.dp))
-
-                            // UNIFORM BUTTON: No, Thanks
-                            Button(
-                                onClick = { onDismiss() },
-                                shape = RoundedCornerShape(32.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Palette.ButtonBeigeBase,
-                                    contentColor = Palette.ButtonDarkBrown
-                                ),
-                                elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
-                                modifier = Modifier.height(56.dp)
-                            ) {
-                                Text(
-                                    text = "No, Thanks",
-                                    style = TextStyle(
-                                        fontFamily = GoogleSans,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 16.sp
-                                    )
-                                )
-                            }
+                    ConfirmButton(
+                        modifier = Modifier.weight(1f),
+                        text = "Turn on Notifications",
+                        containerColor = Palette.ButtonBeigeBase,
+                        onClick = {
+                            openNotificationSettings()
                         }
-                    }
+                    )
+
+                    ConfirmButton(
+                        modifier = Modifier.weight(1f),
+                        text = "No, Thanks",
+                        containerColor = Palette.ButtonBeigeBase,
+                        onClick = { onDismiss() }
+                    )
                 }
             }
         }

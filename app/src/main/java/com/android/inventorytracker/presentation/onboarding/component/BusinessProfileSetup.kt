@@ -4,9 +4,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -22,30 +24,36 @@ fun BusinessProfileSetup(
     onValidityChange: (Boolean) -> Unit,
     viewModel: OnboardingViewModel = hiltViewModel()
 ) {
-    // Kinatize na ang state: Business Name at First Product na lang
     var name by rememberSaveable { mutableStateOf("") }
+    var firstProduct by rememberSaveable { mutableStateOf("") }
+
+    var triedNext by rememberSaveable { mutableStateOf(false) }
 
     val focusName = remember { FocusRequester() }
+    val focusProduct = remember { FocusRequester() }
 
-    LaunchedEffect(Unit) { focusName.requestFocus() }
+    LaunchedEffect(Unit) {
+        focusName.requestFocus()
+    }
 
-    LaunchedEffect(name) {
-        val valid = name.isNotEmpty()
-        onValidityChange(valid)
-        if(valid) {
+    val isValid = name.isNotBlank() && firstProduct.isNotBlank()
+
+    LaunchedEffect(isValid) {
+        onValidityChange(isValid)
+        if (isValid) {
             viewModel.setBusinessProfile(name)
         }
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 120.dp),
-        verticalArrangement = Arrangement.Center
+            .padding(horizontal = 120.dp, vertical = 60.dp)
     ) {
-        // --- HEADER ---
+        // HEADER
         Text(
-            text = "Inventory Tracker",
+            text = "StockWise",
+            modifier = Modifier.align(Alignment.TopStart),
             style = TextStyle(
                 fontFamily = GoogleSans,
                 fontSize = 64.sp,
@@ -55,37 +63,86 @@ fun BusinessProfileSetup(
             )
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Text(
-            text = "BUSINESS PROFILE",
-            style = TextStyle(
-                fontFamily = GoogleSans,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                color = Palette.DarkBeigeText.copy(alpha = 0.5f),
-                letterSpacing = 1.5.sp
-            )
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // --- INPUT FIELDS (Full Width / Stretched) ---
+        // CONTENT
         Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Center),
+            verticalArrangement = Arrangement.Center
         ) {
-            StringField(
-                modifier = Modifier
-                    .fillMaxWidth() // Stretched to full width
-                    .focusRequester(focusName),
-                value = name,
-                onValueChange = { name = it },
-                header = "Business Name", // Pinalaki ang internal font sa StringField component mo dapat
-                placeholder = "What is the name of your business?",
-                maxLength = 99,
-                showCounter = false,
+            Text(
+                text = "BUSINESS PROFILE",
+                style = TextStyle(
+                    fontFamily = GoogleSans,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = Palette.DarkBeigeText.copy(alpha = 0.5f),
+                    letterSpacing = 1.5.sp
+                )
             )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+
+                // BUSINESS NAME
+                StringField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusName),
+                    value = name,
+                    onValueChange = { name = it },
+                    header = "Business Name",
+                    placeholder = "What is the name of your business?",
+                    maxLength = 99,
+                    showCounter = false,
+                    onDone = {
+                        triedNext = true
+                        if (name.isNotBlank()) {
+                            focusProduct.requestFocus()
+                        }
+                    }
+                )
+
+                if (triedNext && name.isBlank()) {
+                    Text(
+                        text = "Business name cannot be empty",
+                        color = Color.Red,
+                        fontSize = 14.sp,
+                        fontFamily = GoogleSans
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // FIRST PRODUCT
+                StringField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusProduct),
+                    value = firstProduct,
+                    onValueChange = { firstProduct = it },
+                    header = "First Product",
+                    placeholder = "What is the first item in your inventory?",
+                    maxLength = 99,
+                    showCounter = false,
+                    onDone = {
+                        triedNext = true
+                    }
+                )
+
+                if (triedNext && firstProduct.isBlank()) {
+                    Text(
+                        text = "First product cannot be empty",
+                        color = Color.Red,
+                        fontSize = 14.sp,
+                        fontFamily = GoogleSans
+                    )
+                }
+            }
         }
     }
 }

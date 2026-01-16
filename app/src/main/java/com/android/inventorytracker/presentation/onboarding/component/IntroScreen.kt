@@ -64,7 +64,7 @@ fun IntroScreen(onGetStartedClick: () -> Unit) {
                 )
 
                 Text(
-                    text = "Inventory Tracker",
+                    text = "StockWise",
                     maxLines = 1,
                     style = TextStyle(
                         fontFamily = GoogleSans,

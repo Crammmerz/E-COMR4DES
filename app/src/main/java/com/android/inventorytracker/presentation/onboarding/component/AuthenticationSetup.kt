@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.android.inventorytracker.presentation.settings.component.SecurityRowItem
 import com.android.inventorytracker.presentation.settings.viewmodel.AuthViewModel
@@ -42,15 +43,16 @@ fun AuthenticationSetup(
     val adminCount by viewModel.getCount("ADMIN").collectAsState(initial = 0)
     val staffCount by viewModel.getCount("STAFF").collectAsState(initial = 0)
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 120.dp), // Pantay sa Intro at Features
-        verticalArrangement = Arrangement.Center
+            .padding(horizontal = 120.dp, vertical = 60.dp)
     ) {
-        // --- UNIFORM HEADER ---
+
+        // HEADER
         Text(
-            text = "Inventory Tracker",
+            text = "StockWise",
+            modifier = Modifier.align(Alignment.TopStart),
             style = TextStyle(
                 fontFamily = GoogleSans,
                 fontSize = 64.sp,
@@ -60,16 +62,19 @@ fun AuthenticationSetup(
             )
         )
 
-        Spacer(modifier = Modifier.height(48.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(40.dp),
-            verticalAlignment = Alignment.Top
+        // MAIN LAYER
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 80.dp)
         ) {
-            // LEFT PANEL: Security Settings (Light Beige Card)
+
+            // ================= LEFT FIXED SECURITY PANEL =================
             Surface(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .width(420.dp)
+                    .align(Alignment.TopStart)
+                    .zIndex(1f),
                 color = Palette.iOSCardWhite,
                 shape = RoundedCornerShape(32.dp)
             ) {
@@ -97,11 +102,7 @@ fun AuthenticationSetup(
                                 } else {
                                     viewModel.toggleAuth(checked)
                                 }
-                            },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Palette.ButtonDarkBrown,
-                                checkedTrackColor = Palette.DarkBeigeText.copy(alpha = 0.3f)
-                            )
+                            }
                         )
                     }
 
@@ -115,18 +116,20 @@ fun AuthenticationSetup(
                                 } else {
                                     viewModel.toggleRoleAuth(checked)
                                 }
-                            },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Palette.ButtonDarkBrown,
-                                checkedTrackColor = Palette.DarkBeigeText.copy(alpha = 0.3f)
-                            )
+                            }
                         )
                     }
                 }
             }
 
-            // RIGHT PANEL: Dynamic Content (Forms or Placeholder)
-            Column(modifier = Modifier.weight(1.2f)) {
+            // ================= RIGHT CONTENT / POPUP =================
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = 460.dp)
+                    .zIndex(2f),
+                contentAlignment = Alignment.TopCenter
+            ) {
                 when {
                     showCreateAdminAcc -> {
                         CreateAccount(
@@ -138,6 +141,7 @@ fun AuthenticationSetup(
                             onSubmit = viewModel::register
                         )
                     }
+
                     showCreateStaffAcc -> {
                         CreateAccount(
                             role = "STAFF",
@@ -148,13 +152,11 @@ fun AuthenticationSetup(
                             onSubmit = viewModel::register
                         )
                     }
+
                     else -> {
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 60.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
+                            modifier = Modifier.padding(top = 120.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Lock,
@@ -169,8 +171,7 @@ fun AuthenticationSetup(
                                     fontFamily = GoogleSans,
                                     fontSize = 18.sp,
                                     color = Palette.DarkBeigeText.copy(alpha = 0.6f),
-                                    textAlign = TextAlign.Center,
-                                    lineHeight = 26.sp
+                                    textAlign = TextAlign.Center
                                 )
                             )
                         }
@@ -202,7 +203,7 @@ fun CreateAccount(
 
     val isMatch = password == confirmPass
 
-    fun doSubmit(){
+    fun submit() {
         scope.launch {
             onSubmit(username, password, role)
             onDismiss(true)
@@ -213,14 +214,14 @@ fun CreateAccount(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(32.dp),
         color = Palette.PopupSurface,
-        shadowElevation = 4.dp
+        shadowElevation = 6.dp
     ) {
         Column(
             modifier = Modifier.padding(32.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Text(
-                text = if(role == "ADMIN") "Create Admin Account" else "Create Staff Account",
+                text = if (role == "ADMIN") "Create Admin Account" else "Create Staff Account",
                 style = TextStyle(
                     fontFamily = GoogleSans,
                     fontWeight = FontWeight.Bold,
@@ -239,6 +240,7 @@ fun CreateAccount(
                     onValidityChange = { validUsername = it },
                     onDone = { focusPassword.requestFocus() }
                 )
+
                 PasswordField(
                     fieldModifier = Modifier.focusRequester(focusPassword),
                     value = password,
@@ -247,27 +249,33 @@ fun CreateAccount(
                     onValidityChange = { validPassword = it },
                     onDone = { focusConfirmPass.requestFocus() }
                 )
+
                 PasswordField(
                     fieldModifier = Modifier.focusRequester(focusConfirmPass),
                     value = confirmPass,
                     onValueChange = { confirmPass = it },
                     header = "Confirm Password",
                     onValidityChange = { validConfirm = it },
-                    onDone = { if(validUsername && validPassword && validConfirm && isMatch) doSubmit() }
+                    onDone = {
+                        if (validUsername && validPassword && validConfirm && isMatch) submit()
+                    }
                 )
             }
 
             if (!isMatch && confirmPass.isNotEmpty()) {
                 Text(
                     text = "Passwords do not match",
-                    style = TextStyle(fontFamily = GoogleSans, fontSize = 14.sp, color = Color.Red)
+                    style = TextStyle(
+                        fontFamily = GoogleSans,
+                        fontSize = 14.sp,
+                        color = Color.Red
+                    )
                 )
             }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.End
             ) {
                 CancelButton(onClick = { onDismiss(false) })
                 Spacer(modifier = Modifier.width(16.dp))
@@ -275,7 +283,7 @@ fun CreateAccount(
                     text = "Create Account",
                     containerColor = Palette.ButtonDarkBrown,
                     enabled = validUsername && validPassword && validConfirm && isMatch,
-                    onClick = { doSubmit() }
+                    onClick = { submit() }
                 )
             }
         }

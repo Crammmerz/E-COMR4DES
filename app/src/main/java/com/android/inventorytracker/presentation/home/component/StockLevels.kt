@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.unit.sp
 import com.android.inventorytracker.data.model.ItemModel
 import com.android.inventorytracker.ui.theme.Palette
@@ -32,8 +33,10 @@ fun StockLevels(modifier: Modifier, itemModel: List<ItemModel>) {
 
     Column(
         modifier = modifier
+            .fillMaxSize()
             .background(Palette.PureWhite)
-            .padding(24.dp)
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // Header Text
         Text(
@@ -104,8 +107,7 @@ fun StockLevels(modifier: Modifier, itemModel: List<ItemModel>) {
             }
         } else {
             Box(
-                modifier = Modifier.weight(1f).fillMaxWidth(),
-                contentAlignment = Alignment.CenterStart
+                modifier = Modifier.weight(1f).fillMaxWidth()
             ) {
                 Text(
                     text = "You're stocked up — no low stock alerts",

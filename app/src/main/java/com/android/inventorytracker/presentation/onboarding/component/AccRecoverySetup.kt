@@ -51,15 +51,16 @@ fun AccRecoverySetup(
             viewModel.setSecurityRecovery(pin, phrase)
         }
     }
-    Column(
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 120.dp),
-        verticalArrangement = Arrangement.Center
+            .padding(horizontal = 120.dp, vertical = 60.dp)
     ) {
         // --- HEADER ---
         Text(
-            text = "Inventory Tracker",
+            text = "StockWise",
+            modifier = Modifier.align(Alignment.TopStart),
             style = TextStyle(
                 fontFamily = GoogleSans,
                 fontSize = 64.sp,
@@ -69,26 +70,26 @@ fun AccRecoverySetup(
             )
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Text(
-            text = "ACCOUNT RECOVERY SETUP",
-            style = TextStyle(
-                fontFamily = GoogleSans,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                color = Palette.DarkBeigeText.copy(alpha = 0.5f),
-                letterSpacing = 1.5.sp
-            )
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // --- INPUT FIELDS (Full Width / Stretched) ---
+        // --- CENTER CONTENT ---
         Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Center),
+            verticalArrangement = Arrangement.Center
         ) {
+            Text(
+                text = "ACCOUNT RECOVERY",
+                style = TextStyle(
+                    fontFamily = GoogleSans,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = Palette.DarkBeigeText.copy(alpha = 0.5f),
+                    letterSpacing = 1.5.sp
+                )
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
             PinField(
                 modifier = Modifier
                     .fillMaxWidth() // Stretched to full width

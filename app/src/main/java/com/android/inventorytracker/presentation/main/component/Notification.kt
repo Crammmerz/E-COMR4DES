@@ -211,7 +211,7 @@ private fun NotificationItem(
                         color = Color.Gray,
                         lineHeight = 18.sp
                     ),
-                    maxLines = 1 // Keeps the notification compact
+                    maxLines = 1 // Keeps the notification compa
                 )
 //            expiryMessage.forEach { it ->
 //                Text(

@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -26,19 +27,18 @@ fun FeatureHighlights() {
         Pair("Precision Unit Tracking", "Manage grams, ml, or pieces with accuracy.")
     )
 
-    // iOS-style ultra light beige/cream shade
     val iOSLightBeige = Color(0xFFFBF9F5)
     val iOSBorderColor = Color(0xFFEBE6DE)
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 120.dp),
-        verticalArrangement = Arrangement.Center
+            .padding(horizontal = 120.dp, vertical = 60.dp)
     ) {
-        // --- HEADER ---
+        // --- FIXED HEADER ---
         Text(
-            text = "Inventory Tracker",
+            text = "StockWise",
+            modifier = Modifier.align(Alignment.TopStart),
             style = TextStyle(
                 fontFamily = GoogleSans,
                 fontSize = 64.sp,
@@ -48,62 +48,65 @@ fun FeatureHighlights() {
             )
         )
 
-        Spacer(modifier = Modifier.height(48.dp))
-
-        Text(
-            text = "KEY FEATURES",
-            modifier = Modifier.padding(bottom = 16.dp),
-            style = TextStyle(
-                fontFamily = GoogleSans,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                color = Palette.DarkBeigeText.copy(alpha = 0.5f),
-                letterSpacing = 1.5.sp
-            )
-        )
-
-        // --- FEATURE CARDS ---
-        LazyRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(24.dp),
-            contentPadding = PaddingValues(end = 40.dp)
+        // --- CENTER CONTENT ---
+        Column(
+            modifier = Modifier.align(Alignment.Center),
+            verticalArrangement = Arrangement.Center
         ) {
-            items(features) { (title, description) ->
-                Surface(
-                    modifier = Modifier
-                        .width(380.dp)
-                        .height(200.dp),
-                    shape = RoundedCornerShape(32.dp),
-                    color = iOSLightBeige, // Mas light na beige/cream
-                    border = BorderStroke(1.dp, iOSBorderColor) // Subtle border for iOS depth
-                ) {
-                    Column(
+            Text(
+                text = "KEY FEATURES",
+                modifier = Modifier.padding(bottom = 16.dp),
+                style = TextStyle(
+                    fontFamily = GoogleSans,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = Palette.DarkBeigeText.copy(alpha = 0.5f),
+                    letterSpacing = 1.5.sp
+                )
+            )
+
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(24.dp),
+                contentPadding = PaddingValues(end = 40.dp)
+            ) {
+                items(features) { (title, description) ->
+                    Surface(
                         modifier = Modifier
-                            .padding(32.dp)
-                            .fillMaxSize(),
-                        verticalArrangement = Arrangement.Center
+                            .width(380.dp)
+                            .height(200.dp),
+                        shape = RoundedCornerShape(32.dp),
+                        color = iOSLightBeige,
+                        border = BorderStroke(1.dp, iOSBorderColor)
                     ) {
-                        Text(
-                            text = title,
-                            maxLines = 1,
-                            style = TextStyle(
-                                fontFamily = GoogleSans,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 24.sp,
-                                color = Palette.ButtonDarkBrown // Mas dark para sa contrast
+                        Column(
+                            modifier = Modifier
+                                .padding(32.dp)
+                                .fillMaxSize(),
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = title,
+                                maxLines = 1,
+                                style = TextStyle(
+                                    fontFamily = GoogleSans,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 24.sp,
+                                    color = Palette.ButtonDarkBrown
+                                )
                             )
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            text = description,
-                            style = TextStyle(
-                                fontFamily = GoogleSans,
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 16.sp,
-                                lineHeight = 22.sp,
-                                color = Palette.ButtonDarkBrown.copy(alpha = 0.6f) // Subtle contrast
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                text = description,
+                                style = TextStyle(
+                                    fontFamily = GoogleSans,
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 16.sp,
+                                    lineHeight = 22.sp,
+                                    color = Palette.ButtonDarkBrown.copy(alpha = 0.6f)
+                                )
                             )
-                        )
+                        }
                     }
                 }
             }

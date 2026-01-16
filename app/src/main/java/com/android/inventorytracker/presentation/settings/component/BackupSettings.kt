@@ -115,23 +115,25 @@ fun BackupSettings(
                 onClick = { exportLauncher.launch("inventory_backup_${System.currentTimeMillis()}.db") }
             )
         }
-//
-//        Spacer(modifier = Modifier.height(16.dp))
-//
-//        // Row 3: Import from External
-//        SecurityRowItem(label = "Restore from File") {
-//            SecurityActionButton(
-//                label = "Import File",
-//                enabled = backupStatus !is BackupViewModel.BackupStatus.Loading,
-//                onClick = { importLauncher.launch(arrayOf("application/octet-stream", "*/*")) }
-//            )
-//        }
-//
-//        if (backupStatus is BackupViewModel.BackupStatus.Loading) {
-//            LinearProgressIndicator(
-//                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-//                color = Palette.ButtonBeigeBase
-//            )
-//        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Row 3: Import from External
+        SecurityRowItem(label = "Restore from File") {
+            SecurityActionButton(
+                label = "Import File",
+                enabled = false,
+
+//                enabled = backupStatus !is BackupViewModel.BackupStatus.Loading ,
+                onClick = { importLauncher.launch(arrayOf("application/octet-stream", "*/*")) }
+            )
+        }
+
+        if (backupStatus is BackupViewModel.BackupStatus.Loading) {
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                color = Palette.ButtonBeigeBase
+            )
+        }
     }
 }

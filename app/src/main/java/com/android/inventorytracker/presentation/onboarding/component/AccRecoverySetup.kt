@@ -107,8 +107,8 @@ fun AccRecoverySetup(
                     .focusRequester(focusPhrase),
                 value = phrase,
                 onValueChange = { phrase = it },
-                header = "Recovery Phrase",
-                placeholder = "Enter a phrase that will help you recover your account",
+                header = "Recovery Phrase ",
+                placeholder = "Enter a phrase that will help you recover your account ",
                 onValidityChange = { validPhrase = it }
             )
         }

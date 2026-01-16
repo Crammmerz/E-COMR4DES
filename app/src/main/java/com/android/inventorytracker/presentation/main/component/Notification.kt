@@ -202,9 +202,9 @@ private fun NotificationItem(
         Spacer(modifier = Modifier.height(4.dp))
 
         if(expiryMessage.isNotEmpty())
-            expiryMessage.forEach { it ->
-                Text(
-                    text = it,
+            Text(
+                    text =
+                        expiryMessage.first(),
                     style = TextStyle(
                         fontFamily = GoogleSans,
                         fontSize = 13.sp,
@@ -213,7 +213,18 @@ private fun NotificationItem(
                     ),
                     maxLines = 1 // Keeps the notification compact
                 )
-            }
+//            expiryMessage.forEach { it ->
+//                Text(
+//                    text = it,
+//                    style = TextStyle(
+//                        fontFamily = GoogleSans,
+//                        fontSize = 13.sp,
+//                        color = Color.Gray,
+//                        lineHeight = 18.sp
+//                    ),
+//                    maxLines = 1 // Keeps the notification compact
+//                )
+//            }
 
         if (stockMessage.isNotEmpty()) {
             Text(
